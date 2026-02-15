@@ -180,7 +180,7 @@ export async function runGenerationPipeline(
   // ── Step 6: Render template ──
   console.log("[Pipeline] Rendering template...");
   const clientType = input.docType === DocType.SOE ? null : input.clientType;
-  const renderedHtml = await renderTemplate(input.docType, clientType, context);
+  const renderedHtml = await renderTemplate(input.docType, clientType, context, hasAnyExistingCover);
 
   // ── Step 7: Generate PDF ──
   console.log("[Pipeline] Generating PDF...");

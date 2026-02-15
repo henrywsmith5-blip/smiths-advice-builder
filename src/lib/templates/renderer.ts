@@ -47,7 +47,8 @@ export interface RenderContext {
 export async function renderTemplate(
   docType: DocType,
   clientType: ClientType | null,
-  context: RenderContext
+  context: RenderContext,
+  hasCover?: boolean
 ): Promise<string> {
   // Try to fetch active template from DB
   let templateHtml: string | null = null;
@@ -58,6 +59,7 @@ export async function renderTemplate(
       where: {
         docType,
         clientType: clientType,
+        hasCover: hasCover ?? null,
         isActive: true,
       },
       orderBy: { version: "desc" },
@@ -73,7 +75,7 @@ export async function renderTemplate(
 
   // Fallback to built-in defaults
   if (!templateHtml) {
-    const def = getDefaultTemplate(docType, clientType);
+    const def = getDefaultTemplate(docType, clientType, hasCover);
     templateHtml = def.html;
     templateCss = def.css;
   }

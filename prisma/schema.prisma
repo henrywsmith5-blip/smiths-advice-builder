@@ -31,6 +31,7 @@ model Template {
   id         String      @id @default(uuid())
   docType    DocType     @map("doc_type")
   clientType ClientType? @map("client_type")
+  hasCover   Boolean?    @map("has_cover")
   name       String
   html       String      @db.Text
   css        String      @default("") @db.Text
@@ -38,7 +39,7 @@ model Template {
   isActive   Boolean     @default(true) @map("is_active")
   createdAt  DateTime    @default(now()) @map("created_at")
 
-  @@unique([docType, clientType, version])
+  @@unique([docType, clientType, hasCover, version])
   @@map("templates")
 }
 
