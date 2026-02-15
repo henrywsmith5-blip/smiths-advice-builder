@@ -205,7 +205,7 @@ const SOA_INDIVIDUAL = `<!DOCTYPE html>
 
   <div class="section-heading"><div class="num">4</div><h2>Out of Scope — What We Do Not Provide</h2></div>
   <p class="body-text">The following services are explicitly outside the scope of this engagement:</p>
-  <ul class="styled-list"><li>KiwiSaver, managed funds, shares, or investment advice</li><li>Fire and general insurance — referred to Aon Insurance Brokers</li><li>Mortgages, lending, or budgeting services</li><li>Tax advice, legal advice, or accounting services</li><li>Estate planning, trust structuring, or business succession planning</li></ul>
+  <ul class="styled-list"><li>Fire and general insurance (home, contents, vehicle) — referred to Aon Insurance Brokers</li><li>Mortgages, lending, or budgeting services</li><li>Tax advice, legal advice, or accounting services</li><li>Estate planning, trust structuring, or business succession planning</li></ul>
 
   <div class="section-heading"><div class="num">5</div><h2>Information We Rely On — Client Responsibilities</h2></div>
   <p class="body-text">Our advice is based on information you provide during the Fact Find process. You have a responsibility to:</p>
