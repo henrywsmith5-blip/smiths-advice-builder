@@ -10,58 +10,113 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
-const styles: Record<Variant, React.CSSProperties> = {
-  primary: {
-    background: "#C08B6F",
-    color: "white",
-    border: "none",
-    boxShadow: "0 1px 2px rgba(192,139,111,0.3)",
-  },
-  secondary: {
-    background: "transparent",
-    color: "#3D3D3D",
-    border: "1px solid #E5E1DC",
-  },
-  ghost: {
-    background: "transparent",
-    color: "#C08B6F",
-    border: "1px solid transparent",
-  },
-};
-
-const hoverStyles: Record<Variant, React.CSSProperties> = {
-  primary: { background: "#B07D63" },
-  secondary: { background: "#FAFAF9" },
-  ghost: { background: "rgba(192,139,111,0.06)" },
-};
-
 const sizes: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-xs",
-  md: "px-5 py-2.5 text-[13px]",
-  lg: "px-6 py-3 text-sm",
+  sm: "px-3 py-1.5 text-[12px]",
+  md: "px-5 py-2 text-[13px]",
+  lg: "px-6 py-2.5 text-[14px]",
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "primary", size = "md", className = "", style, children, ...props }, ref) => {
+  ({ variant = "primary", size = "md", className = "", children, disabled, ...props }, ref) => {
+
+    const baseClass = `inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed select-none ${sizes[size]} ${className}`;
+
+    if (variant === "primary") {
+      return (
+        <button
+          ref={ref}
+          className={baseClass}
+          disabled={disabled}
+          style={{
+            background: "linear-gradient(135deg, #C08B6F 0%, #B37A5E 100%)",
+            color: "white",
+            border: "none",
+            boxShadow: "0 1px 3px rgba(192,139,111,0.3), 0 1px 2px rgba(0,0,0,0.06)",
+          }}
+          onMouseEnter={(e) => {
+            if (!disabled) {
+              (e.currentTarget).style.boxShadow = "0 3px 12px rgba(192,139,111,0.35), 0 1px 3px rgba(0,0,0,0.08)";
+              (e.currentTarget).style.transform = "translateY(-0.5px)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget).style.boxShadow = "0 1px 3px rgba(192,139,111,0.3), 0 1px 2px rgba(0,0,0,0.06)";
+            (e.currentTarget).style.transform = "translateY(0)";
+          }}
+          onMouseDown={(e) => {
+            if (!disabled) (e.currentTarget).style.transform = "scale(0.98)";
+          }}
+          onMouseUp={(e) => {
+            (e.currentTarget).style.transform = "translateY(-0.5px)";
+          }}
+          {...props}
+        >
+          {children}
+        </button>
+      );
+    }
+
+    if (variant === "secondary") {
+      return (
+        <button
+          ref={ref}
+          className={baseClass}
+          disabled={disabled}
+          style={{
+            background: "white",
+            color: "#3D3D3D",
+            border: "1px solid #E5E1DC",
+            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+          }}
+          onMouseEnter={(e) => {
+            if (!disabled) {
+              (e.currentTarget).style.background = "#FAFAF9";
+              (e.currentTarget).style.borderColor = "#D5D0CB";
+            }
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget).style.background = "white";
+            (e.currentTarget).style.borderColor = "#E5E1DC";
+          }}
+          onMouseDown={(e) => {
+            if (!disabled) (e.currentTarget).style.transform = "scale(0.98)";
+          }}
+          onMouseUp={(e) => {
+            (e.currentTarget).style.transform = "scale(1)";
+          }}
+          {...props}
+        >
+          {children}
+        </button>
+      );
+    }
+
+    // ghost
     return (
       <button
         ref={ref}
-        className={`inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizes[size]} ${className}`}
-        style={{ ...styles[variant], ...style }}
+        className={baseClass}
+        disabled={disabled}
+        style={{
+          background: "transparent",
+          color: "#8A8A8A",
+          border: "1px solid transparent",
+        }}
         onMouseEnter={(e) => {
-          if (!props.disabled) {
-            Object.assign((e.target as HTMLElement).style, hoverStyles[variant]);
+          if (!disabled) {
+            (e.currentTarget).style.color = "#C08B6F";
+            (e.currentTarget).style.background = "rgba(192,139,111,0.05)";
           }
         }}
         onMouseLeave={(e) => {
-          Object.assign((e.target as HTMLElement).style, styles[variant]);
-          if (style) Object.assign((e.target as HTMLElement).style, style);
+          (e.currentTarget).style.color = "#8A8A8A";
+          (e.currentTarget).style.background = "transparent";
         }}
         onMouseDown={(e) => {
-          (e.target as HTMLElement).style.transform = "scale(0.98)";
+          if (!disabled) (e.currentTarget).style.transform = "scale(0.98)";
         }}
         onMouseUp={(e) => {
-          (e.target as HTMLElement).style.transform = "scale(1)";
+          (e.currentTarget).style.transform = "scale(1)";
         }}
         {...props}
       >

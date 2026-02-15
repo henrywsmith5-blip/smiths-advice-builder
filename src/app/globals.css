@@ -22,44 +22,51 @@
   --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Selection */
+::selection {
+  background: rgba(192,139,111,0.15);
+  color: #1A1A1A;
 }
 
 /* Focus ring utility */
 .focus-ring:focus {
   outline: none;
-  border-color: var(--color-copper);
-  box-shadow: 0 0 0 3px rgba(192,139,111,0.12);
+  border-color: var(--color-copper) !important;
+  box-shadow: 0 0 0 3px rgba(192,139,111,0.12) !important;
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: rgba(0,0,0,0.08);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted);
-}
-
-/* Print utility */
-@media print {
-  body { background: white; }
+  background: rgba(0,0,0,0.14);
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -69,10 +76,29 @@ body {
   100% { box-shadow: 0 0 0 0 rgba(192,139,111,0); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.3s ease forwards;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-pulse-ring {
   animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+/* Smooth transitions for interactive elements */
+input, textarea, select, button {
+  font-family: inherit;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #B8B3AE;
+}
+
+/* Print utility */
+@media print {
+  body { background: white !important; }
 }
