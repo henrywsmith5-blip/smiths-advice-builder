@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DocType {
+  SOA
+  ROA
+  SOE
+}
+
+enum ClientType {
+  INDIVIDUAL
+  PARTNER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Template {
+  id         String      @id @default(uuid())
+  docType    DocType     @map("doc_type")
+  clientType ClientType? @map("client_type")
+  name       String
+  html       String      @db.Text
+  css        String      @default("") @db.Text
+  version    Int         @default(1)
+  isActive   Boolean     @default(true) @map("is_active")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  @@unique([docType, clientType, version])
+  @@map("templates")
+}
+
+model Case {
+  id                 String      @id @default(uuid())
+  title              String      @default("")
+  clientType         ClientType  @default(INDIVIDUAL) @map("client_type")
+  clientAName        String?     @map("client_a_name")
+  clientBName        String?     @map("client_b_name")
+  clientEmail        String?     @map("client_email")
+  clientAHasExisting Boolean     @default(false) @map("client_a_has_existing")
+  clientBHasExisting Boolean     @default(false) @map("client_b_has_existing")
+  firefliesText      String?     @db.Text @map("fireflies_text")
+  quotesText         String?     @db.Text @map("quotes_text")
+  otherDocsText      String?     @db.Text @map("other_docs_text")
+  additionalContext  String?     @db.Text @map("additional_context")
+  roaDeviations      String?     @db.Text @map("roa_deviations")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+  retentionDeleteAt  DateTime?   @map("retention_delete_at")
+  documents          GeneratedDocument[]
+
+  @@map("cases")
+}
+
+model GeneratedDocument {
+  id            String   @id @default(uuid())
+  caseId        String   @map("case_id")
+  case          Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  docType       DocType  @map("doc_type")
+  extractedJson Json?    @map("extracted_json")
+  renderedHtml  String?  @db.Text @map("rendered_html")
+  pdfPath       String?  @map("pdf_path")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("generated_documents")
+}

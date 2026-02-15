@@ -1,0 +1,235 @@
+import { prisma } from "@/lib/db";
+import { getLLMProvider, type ExtractInput } from "@/lib/llm/provider";
+import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
+import { generatePdf } from "@/lib/pdf/generator";
+import { DocType, ClientType } from "@prisma/client";
+import { v4 as uuid } from "uuid";
+import fs from "fs/promises";
+import path from "path";
+
+const DATA_DIR = process.env.DATA_DIR || "/data";
+
+export interface GenerateInput {
+  caseId: string;
+  docType: DocType;
+  firefliesText?: string;
+  quotesText?: string;
+  otherDocsText?: string;
+  additionalContext?: string;
+  roaDeviations?: string;
+  clientOverrides?: {
+    name?: string;
+    nameB?: string;
+    email?: string;
+  };
+  clientType: ClientType;
+  clientAHasExisting: boolean;
+  clientBHasExisting: boolean;
+  saveCase: boolean;
+}
+
+export interface GenerateResult {
+  docId: string;
+  renderedHtml: string;
+  pdfPath: string | null;
+}
+
+export async function runGenerationPipeline(
+  input: GenerateInput
+): Promise<GenerateResult> {
+  const llm = getLLMProvider();
+
+  console.log(`[Pipeline] Starting ${input.docType} generation for case ${input.caseId}`);
+
+  // ── Step 1: Save inputs if requested ──
+  if (input.saveCase) {
+    await prisma.case.update({
+      where: { id: input.caseId },
+      data: {
+        firefliesText: input.firefliesText || null,
+        quotesText: input.quotesText || null,
+        otherDocsText: input.otherDocsText || null,
+        additionalContext: input.additionalContext || null,
+        roaDeviations: input.roaDeviations || null,
+        clientAName: input.clientOverrides?.name || undefined,
+        clientBName: input.clientOverrides?.nameB || undefined,
+        clientEmail: input.clientOverrides?.email || undefined,
+        clientAHasExisting: input.clientAHasExisting,
+        clientBHasExisting: input.clientBHasExisting,
+        retentionDeleteAt: new Date(
+          Date.now() +
+            (parseInt(process.env.RETENTION_DAYS || "7") * 24 * 60 * 60 * 1000)
+        ),
+      },
+    });
+  }
+
+  // ── Step 2: LLM Extractor ──
+  console.log("[Pipeline] Running extractor...");
+  const extractInput: ExtractInput = {
+    docType: input.docType,
+    clientOverrides: input.clientOverrides,
+    firefliesText: input.firefliesText,
+    quotesText: input.quotesText,
+    otherDocsText: input.otherDocsText,
+    additionalContext: input.additionalContext,
+    roaDeviations: input.roaDeviations,
+  };
+
+  const extractedJson = await llm.extractCaseJson(extractInput);
+  console.log("[Pipeline] Extraction complete");
+
+  // ── Step 3: LLM Writer ──
+  console.log("[Pipeline] Running writer...");
+  const writerOutput = await llm.writeSections(extractedJson, input.docType);
+  console.log("[Pipeline] Writer complete");
+
+  // ── Step 4: Compute cover logic ──
+  const hasAnyExistingCover =
+    input.clientType === ClientType.INDIVIDUAL
+      ? input.clientAHasExisting
+      : input.clientAHasExisting || input.clientBHasExisting;
+
+  // ── Step 5: Build render context ──
+  // Helper to safely access writer sections by string key
+  const sec = (key: string): string => {
+    const s = writerOutput.sections as Record<string, { included: boolean; html: string }> | undefined;
+    if (s && key in s) return s[key].html || "";
+    return "";
+  };
+
+  const context: RenderContext = {
+    // Client info
+    CLIENT_NAME: extractedJson.client.name || input.clientOverrides?.name || "Client",
+    CLIENT_A_NAME: extractedJson.client.name || input.clientOverrides?.name || "Client A",
+    CLIENT_B_NAME: extractedJson.client.name_b || input.clientOverrides?.nameB || "Client B",
+    CLIENT_EMAIL: extractedJson.client.email || input.clientOverrides?.email || "",
+    CLIENT_PHONE: extractedJson.client.phone || "",
+    DATE: new Date().toLocaleDateString("en-NZ", {
+      timeZone: "Pacific/Auckland",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
+    SIGNOFF_DATE: new Date().toLocaleDateString("en-NZ", {
+      timeZone: "Pacific/Auckland",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
+    ENGAGEMENT_DATE: new Date().toLocaleDateString("en-NZ", {
+      timeZone: "Pacific/Auckland",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }),
+
+    // Adviser defaults
+    ADVISER_NAME: "Craig Smith",
+    ADVISER_EMAIL: "craig@smiths.net.nz",
+    ADVISER_PHONE: "0274 293 939",
+    ADVISER_FSP: "FSP33042",
+
+    // Cover logic
+    HAS_EXISTING_COVER: hasAnyExistingCover,
+    NEW_COVER_ONLY: !hasAnyExistingCover,
+
+    // Section includes
+    LIFE_INCLUDED: extractedJson.sections.life?.included ?? false,
+    TRAUMA_INCLUDED: extractedJson.sections.trauma?.included ?? false,
+    TPD_INCLUDED: extractedJson.sections.tpd?.included ?? false,
+    INCOME_MP_INCLUDED: extractedJson.sections.income_protection?.included ?? false,
+    IP_INCLUDED: extractedJson.sections.income_protection?.included ?? false,
+    MP_INCLUDED: extractedJson.sections.mortgage?.included ?? false,
+    AIC_INCLUDED: false,
+
+    // Existing cover data
+    OLD_INSURER: extractedJson.existing_cover?.insurer || "",
+    NEW_INSURER: extractedJson.new_cover?.insurer || "",
+    OLD_PREMIUM: extractedJson.existing_cover?.premium || "",
+    NEW_PREMIUM: extractedJson.new_cover?.premium || "",
+
+    // Cover details from extraction
+    ...(extractedJson.existing_cover?.covers || {}),
+    ...(extractedJson.new_cover?.covers || {}),
+
+    // Writer section HTML snippets
+    SPECIAL_INSTRUCTIONS: sec("special_instructions"),
+    REASON_LIFE_COVER: sec("reasons_life"),
+    REASON_TRAUMA: sec("reasons_trauma"),
+    REASON_TPD: sec("reasons_tpd"),
+    REASON_INCOME_MORTGAGE: sec("reasons_income_mortgage"),
+    SECTION_SUMMARY: sec("summary"),
+    SECTION_REASONS: sec("summary"),
+    SECTION_SCOPE: sec("scope"),
+    SECTION_OUT_OF_SCOPE: sec("out_of_scope"),
+    SECTION_RESPONSIBILITIES: sec("responsibilities"),
+    ROA_DEVIATIONS: sec("deviations") || input.roaDeviations || "",
+
+    // Pros/cons
+    LIFE_PROS: sec("pros_life"),
+    LIFE_CONS: sec("cons_life"),
+    TRAUMA_PROS: sec("pros_trauma"),
+    TRAUMA_CONS: sec("cons_trauma"),
+    TPD_PROS: sec("pros_tpd"),
+    TPD_CONS: sec("cons_tpd"),
+    INCOME_MP_PROS: sec("pros_income_mp"),
+    INCOME_MP_CONS: sec("cons_income_mp"),
+  };
+
+  // ── Step 6: Render template ──
+  console.log("[Pipeline] Rendering template...");
+  const clientType = input.docType === DocType.SOE ? null : input.clientType;
+  const renderedHtml = await renderTemplate(input.docType, clientType, context);
+
+  // ── Step 7: Generate PDF ──
+  console.log("[Pipeline] Generating PDF...");
+  let pdfPath: string | null = null;
+  try {
+    const pdfBuffer = await generatePdf(renderedHtml);
+    const docId = uuid();
+
+    // Save PDF to disk
+    const dir = path.join(DATA_DIR, "pdfs", input.caseId);
+    await fs.mkdir(dir, { recursive: true });
+    pdfPath = path.join(dir, `${docId}.pdf`);
+    await fs.writeFile(pdfPath, pdfBuffer);
+    console.log(`[Pipeline] PDF saved: ${pdfPath}`);
+
+    // ── Step 8: Save generated document record ──
+    const doc = await prisma.generatedDocument.create({
+      data: {
+        id: docId,
+        caseId: input.caseId,
+        docType: input.docType,
+        extractedJson: extractedJson as object,
+        renderedHtml,
+        pdfPath,
+      },
+    });
+
+    return {
+      docId: doc.id,
+      renderedHtml,
+      pdfPath,
+    };
+  } catch (pdfError) {
+    console.error("[Pipeline] PDF generation failed:", pdfError);
+    // Still save the document without PDF
+    const doc = await prisma.generatedDocument.create({
+      data: {
+        caseId: input.caseId,
+        docType: input.docType,
+        extractedJson: extractedJson as object,
+        renderedHtml,
+        pdfPath: null,
+      },
+    });
+
+    return {
+      docId: doc.id,
+      renderedHtml,
+      pdfPath: null,
+    };
+  }
+}
