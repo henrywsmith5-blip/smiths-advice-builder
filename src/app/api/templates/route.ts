@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { DocType, ClientType } from "@prisma/client";
+import { getDefaultTemplate } from "@/lib/templates/defaults";
+
+// Built-in template configs
+const BUILT_IN_TEMPLATES = [
+  { docType: DocType.SOA, clientType: ClientType.INDIVIDUAL, name: "SOA - Individual (Built-in)" },
+  { docType: DocType.SOA, clientType: ClientType.PARTNER, name: "SOA - Partner (Built-in)" },
+  { docType: DocType.ROA, clientType: ClientType.INDIVIDUAL, name: "ROA - Individual (Built-in)" },
+  { docType: DocType.ROA, clientType: ClientType.PARTNER, name: "ROA - Partner (Built-in)" },
+  { docType: DocType.SOE, clientType: null, name: "SOE (Built-in)" },
+];
 
 // GET /api/templates?docType=SOA&clientType=INDIVIDUAL
 export async function GET(request: NextRequest) {
@@ -13,10 +23,38 @@ export async function GET(request: NextRequest) {
     if (docType) where.docType = docType;
     if (clientType) where.clientType = clientType;
 
-    const templates = await prisma.template.findMany({
+    const dbTemplates = await prisma.template.findMany({
       where,
       orderBy: [{ docType: "asc" }, { clientType: "asc" }, { version: "desc" }],
     });
+
+    // For any (docType, clientType) combo that has no DB template,
+    // return the built-in default so it shows in the editor
+    const templates = [...dbTemplates];
+
+    for (const bi of BUILT_IN_TEMPLATES) {
+      const hasDb = dbTemplates.some(
+        (t) => t.docType === bi.docType && t.clientType === bi.clientType
+      );
+      if (!hasDb) {
+        // Filter by query params if provided
+        if (docType && bi.docType !== docType) continue;
+        if (clientType && bi.clientType !== clientType) continue;
+
+        const def = getDefaultTemplate(bi.docType, bi.clientType);
+        templates.push({
+          id: `builtin-${bi.docType}-${bi.clientType || "null"}`,
+          docType: bi.docType,
+          clientType: bi.clientType,
+          name: bi.name,
+          html: def.html,
+          css: def.css,
+          version: 0,
+          isActive: true,
+          createdAt: new Date(),
+        });
+      }
+    }
 
     return NextResponse.json({ templates });
   } catch {
