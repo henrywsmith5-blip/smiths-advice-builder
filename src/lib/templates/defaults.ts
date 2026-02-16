@@ -321,7 +321,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   <div class="dual-cover-wrapper">
     <table>
       <thead>
-        <tr><th class="header-proposed" colspan="2">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_A_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_A_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
+        <tr><th class="header-proposed" colspan="2">{% for logo in CLIENT_A_NEW_INSURER_LOGOS %}<img class="insurer-logo" src="{{ logo.src }}" alt="{{ logo.alt }}"> {% endfor %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% for logo in CLIENT_A_EXISTING_INSURER_LOGOS %}<img class="insurer-logo" src="{{ logo.src }}" alt="{{ logo.alt }}"> {% endfor %}Existing Cover</th></tr>
         <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
       </thead>
       <tbody>
@@ -339,7 +339,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   {% else %}
   <p class="body-text"><em>Recommended new cover</em></p>
   <div class="single-cover-wrapper">
-    <div class="side-header">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
+    <div class="side-header">{% for logo in CLIENT_A_NEW_INSURER_LOGOS %}<img class="insurer-logo" src="{{ logo.src }}" alt="{{ logo.alt }}"> {% endfor %}Recommended Cover</div>
     <table>
       <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
       <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_A_NEW_LIFE }}</td></tr>
@@ -369,7 +369,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   <div class="dual-cover-wrapper">
     <table>
       <thead>
-        <tr><th class="header-proposed" colspan="2">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_B_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_B_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
+        <tr><th class="header-proposed" colspan="2">{% for logo in CLIENT_B_NEW_INSURER_LOGOS %}<img class="insurer-logo" src="{{ logo.src }}" alt="{{ logo.alt }}"> {% endfor %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% for logo in CLIENT_B_EXISTING_INSURER_LOGOS %}<img class="insurer-logo" src="{{ logo.src }}" alt="{{ logo.alt }}"> {% endfor %}Existing Cover</th></tr>
         <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
       </thead>
       <tbody>
@@ -387,7 +387,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   {% else %}
   <p class="body-text"><em>Recommended new cover</em></p>
   <div class="single-cover-wrapper">
-    <div class="side-header">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
+    <div class="side-header">{% for logo in CLIENT_B_NEW_INSURER_LOGOS %}<img class="insurer-logo" src="{{ logo.src }}" alt="{{ logo.alt }}"> {% endfor %}Recommended Cover</div>
     <table>
       <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
       <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_B_NEW_LIFE }}</td></tr>

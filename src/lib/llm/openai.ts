@@ -20,8 +20,9 @@ RULES:
 4. Prefer formal quotes/schedules for amounts over transcript.
 5. Partner cases: extract client_a and client_b separately.
 6. PREMIUM RULE: If client has existing cover (client_a_existing_insurer is not null), you MUST extract BOTH premium.existing_total AND premium.new_total. There must ALWAYS be two premium figures when existing cover exists. Never leave either blank or null when existing cover is present.
+7. HEALTH INSURER RULE: Health insurance is often with a DIFFERENT insurer than life/trauma cover (e.g. Life through Chubb but Health through NIB). If health insurance is with a different insurer, extract the health insurer separately into the health_insurer fields. If health is with the same insurer as life cover, leave the health_insurer fields null.
 
-Return JSON with: client, doc_type, sections_included, client_a_old_cover, client_a_new_cover, client_b_old_cover, client_b_new_cover, premium, benefits, situation_summary, special_instructions, missing_fields.
+Return JSON with: client, doc_type, sections_included, client_a_existing_insurer, client_a_new_insurer, client_a_existing_health_insurer, client_a_new_health_insurer, client_a_old_cover, client_a_new_cover, client_b_existing_insurer, client_b_new_insurer, client_b_existing_health_insurer, client_b_new_health_insurer, client_b_old_cover, client_b_new_cover, premium, benefits, situation_summary, special_instructions, missing_fields.
 Each cover object has: life, trauma, tpd, income_protection, mortgage_protection, accidental_injury, premium_cover, health.`;
 
   if (input.clientOverrides?.name) {

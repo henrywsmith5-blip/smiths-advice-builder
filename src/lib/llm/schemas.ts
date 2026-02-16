@@ -50,12 +50,16 @@ export const ExtractedJsonSchema = z.object({
   // Client A cover data
   client_a_existing_insurer: z.string().nullable().default(null),
   client_a_new_insurer: z.string().nullable().default(null),
+  client_a_existing_health_insurer: z.string().nullable().default(null),
+  client_a_new_health_insurer: z.string().nullable().default(null),
   client_a_old_cover: CoverLineSchema.default(emptyCover),
   client_a_new_cover: CoverLineSchema.default(emptyCover),
 
   // Client B cover data (partner only)
   client_b_existing_insurer: z.string().nullable().default(null),
   client_b_new_insurer: z.string().nullable().default(null),
+  client_b_existing_health_insurer: z.string().nullable().default(null),
+  client_b_new_health_insurer: z.string().nullable().default(null),
   client_b_old_cover: CoverLineSchema.default(emptyCover),
   client_b_new_cover: CoverLineSchema.default(emptyCover),
 

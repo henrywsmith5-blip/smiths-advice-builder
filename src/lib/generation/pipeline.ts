@@ -129,6 +129,20 @@ export async function runGenerationPipeline(
     return insurerLogoMap[name.toLowerCase().trim()] || "";
   };
 
+  const buildInsurerLogos = (mainInsurer: string | null | undefined, healthInsurer: string | null | undefined): Array<{src: string; alt: string}> => {
+    const seen = new Set<string>();
+    const logos: Array<{src: string; alt: string}> = [];
+    for (const name of [mainInsurer, healthInsurer]) {
+      if (!name) continue;
+      const key = name.toLowerCase().trim();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const logo = getInsurerLogo(name);
+      if (logo) logos.push({ src: logo, alt: name });
+    }
+    return logos;
+  };
+
   // Direct field mapping from schema → template variables
   const d = extractedJson;
   const v = (val: string | null | undefined, fallback = "—") => val || fallback;
@@ -197,6 +211,7 @@ export async function runGenerationPipeline(
     // Client A — existing cover
     CLIENT_A_EXISTING_INSURER: v(d.client_a_existing_insurer, ""),
     CLIENT_A_EXISTING_INSURER_LOGO: getInsurerLogo(d.client_a_existing_insurer),
+    CLIENT_A_EXISTING_INSURER_LOGOS: buildInsurerLogos(d.client_a_existing_insurer, d.client_a_existing_health_insurer),
     CLIENT_A_ADVICE_TYPE_LABEL: hasAnyExistingCover
       ? `Summary of changes from ${v(d.client_a_existing_insurer, "existing insurer")} to ${v(d.client_a_new_insurer, "new insurer")}`
       : "",
@@ -212,6 +227,7 @@ export async function runGenerationPipeline(
     // Client A — new cover
     CLIENT_A_NEW_INSURER: v(d.client_a_new_insurer, ""),
     CLIENT_A_NEW_INSURER_LOGO: getInsurerLogo(d.client_a_new_insurer),
+    CLIENT_A_NEW_INSURER_LOGOS: buildInsurerLogos(d.client_a_new_insurer, d.client_a_new_health_insurer),
     CLIENT_A_NEW_LIFE: vc(d.client_a_new_cover.life),
     CLIENT_A_NEW_TRAUMA: vc(d.client_a_new_cover.trauma),
     CLIENT_A_NEW_TPD: vc(d.client_a_new_cover.tpd),
@@ -224,6 +240,7 @@ export async function runGenerationPipeline(
     // Client B — existing cover
     CLIENT_B_EXISTING_INSURER: v(d.client_b_existing_insurer, ""),
     CLIENT_B_EXISTING_INSURER_LOGO: getInsurerLogo(d.client_b_existing_insurer),
+    CLIENT_B_EXISTING_INSURER_LOGOS: buildInsurerLogos(d.client_b_existing_insurer, d.client_b_existing_health_insurer),
     CLIENT_B_ADVICE_TYPE_LABEL: hasAnyExistingCover
       ? `Summary of changes from ${v(d.client_b_existing_insurer, "existing insurer")} to ${v(d.client_b_new_insurer, "new insurer")}`
       : "",
@@ -239,6 +256,7 @@ export async function runGenerationPipeline(
     // Client B — new cover
     CLIENT_B_NEW_INSURER: v(d.client_b_new_insurer, ""),
     CLIENT_B_NEW_INSURER_LOGO: getInsurerLogo(d.client_b_new_insurer),
+    CLIENT_B_NEW_INSURER_LOGOS: buildInsurerLogos(d.client_b_new_insurer, d.client_b_new_health_insurer),
     CLIENT_B_NEW_LIFE: vc(d.client_b_new_cover.life),
     CLIENT_B_NEW_TRAUMA: vc(d.client_b_new_cover.trauma),
     CLIENT_B_NEW_TPD: vc(d.client_b_new_cover.tpd),

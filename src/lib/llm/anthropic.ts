@@ -24,6 +24,7 @@ CRITICAL RULES:
 6. If there are two clients (partner case), extract data separately for client_a and client_b.
 7. Never ignore structured data inside Additional Context.
 8. PREMIUM RULE: If the client has existing cover (client_a_existing_insurer is not null), you MUST extract BOTH premium.existing_total AND premium.new_total. There must ALWAYS be two premium figures when existing cover exists. Never leave either blank or null when existing cover is present. If new cover has no existing cover, only new_total is required.
+9. HEALTH INSURER RULE: Health insurance is often with a DIFFERENT insurer than life/trauma cover (e.g. Life through Chubb but Health through NIB). If health insurance is with a different insurer, extract the health insurer separately into the health_insurer fields. If health is with the same insurer as life cover, you may leave the health_insurer fields null.
 
 === UI STRUCTURE FLAGS ===
 isPartner: ${!!input.clientOverrides?.nameB}
@@ -49,6 +50,8 @@ YOU MUST RETURN THIS EXACT JSON STRUCTURE:
   },
   "client_a_existing_insurer": "Chubb or null",
   "client_a_new_insurer": "Fidelity Life or null",
+  "client_a_existing_health_insurer": "NIB or null (only if different from main insurer)",
+  "client_a_new_health_insurer": "NIB or null (only if different from main insurer)",
   "client_a_old_cover": {
     "life": "$100,000 or null",
     "trauma": "null",
@@ -71,6 +74,8 @@ YOU MUST RETURN THIS EXACT JSON STRUCTURE:
   },
   "client_b_existing_insurer": "Chubb or null",
   "client_b_new_insurer": "Fidelity Life or null",
+  "client_b_existing_health_insurer": "NIB or null (only if different from main insurer)",
+  "client_b_new_health_insurer": "NIB or null (only if different from main insurer)",
   "client_b_old_cover": { "life": "$100,000", "trauma": null, "tpd": null, "income_protection": null, "mortgage_protection": null, "accidental_injury": null, "premium_cover": null, "health": null },
   "client_b_new_cover": { "life": "$200,000", "trauma": "$120,000", "tpd": "$120,000", "income_protection": "$4,000/month", "mortgage_protection": null, "accidental_injury": null, "premium_cover": "Included", "health": null },
   "premium": {
