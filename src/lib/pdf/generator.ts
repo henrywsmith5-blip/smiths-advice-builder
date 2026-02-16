@@ -1,4 +1,6 @@
 import { chromium, type Browser } from "playwright";
+import fs from "fs";
+import path from "path";
 
 let browserInstance: Browser | null = null;
 
@@ -13,6 +15,42 @@ async function getBrowser(): Promise<Browser> {
   return browserInstance;
 }
 
+const MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".svg": "image/svg+xml",
+};
+
+function embedLocalImages(html: string): string {
+  const publicDir = path.join(process.cwd(), "public");
+
+  return html.replace(
+    /(?:url\(\s*['"]?|(?:src|href)\s*=\s*['"])(\/(images\/[^'")}\s]+))/g,
+    (fullMatch, urlPath, relPath) => {
+      const filePath = path.join(publicDir, relPath);
+      if (!fs.existsSync(filePath)) return fullMatch;
+
+      const ext = path.extname(filePath).toLowerCase();
+      const mime = MIME[ext];
+      if (!mime) return fullMatch;
+
+      const b64 = fs.readFileSync(filePath).toString("base64");
+      const dataUri = `data:${mime};base64,${b64}`;
+
+      if (fullMatch.startsWith("url(")) {
+        const quote = fullMatch.includes("'") ? "'" : fullMatch.includes('"') ? '"' : "";
+        return `url(${quote}${dataUri}`;
+      }
+      const attr = fullMatch.startsWith("src") ? "src" : "href";
+      const quote = fullMatch.includes("'") ? "'" : '"';
+      return `${attr}=${quote}${dataUri}`;
+    }
+  );
+}
+
 export async function generatePdf(html: string): Promise<Buffer> {
   const browser = await getBrowser();
   const page = await browser.newPage();
@@ -20,9 +58,12 @@ export async function generatePdf(html: string): Promise<Buffer> {
   try {
     // Inject <base> tag so /fonts/ paths resolve to the running app
     const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
-    const htmlWithBase = html.replace("<head>", `<head><base href="${baseUrl}">`);
+    let prepared = html.replace("<head>", `<head><base href="${baseUrl}">`);
 
-    await page.setContent(htmlWithBase, { waitUntil: "networkidle" });
+    // Embed local images as base64 data URIs so Playwright doesn't need HTTP access
+    prepared = embedLocalImages(prepared);
+
+    await page.setContent(prepared, { waitUntil: "networkidle" });
 
     // Wait for all locally-served fonts to load
     await page.evaluate(() => document.fonts.ready);
