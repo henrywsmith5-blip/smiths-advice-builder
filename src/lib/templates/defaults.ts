@@ -398,7 +398,6 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   <div class="premium-grid">
     <div class="premium-cell"><div class="p-label">Existing Premium</div><div class="p-amount">{{ OLD_PREMIUM }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
     <div class="premium-cell"><div class="p-label">New Premium</div><div class="p-amount">{{ NEW_PREMIUM }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
-    <div class="premium-cell"><div class="p-label">{{ PREMIUM_CHANGE_LABEL }}</div><div class="p-amount">{{ PREMIUM_CHANGE }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
   </div>
   {% else %}
   <div class="premium-grid single-row">
@@ -426,10 +425,12 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   {% if HAS_EXISTING_COVER %}<h2>${reasonsHeadingExisting}</h2>{% else %}<h2>${reasonsHeadingNew}</h2>{% endif %}
 </div>
 
-{% if LIFE_INCLUDED %}<div class="sub-heading">Life Cover</div><div class="info-card">{{ REASON_LIFE_COVER }}</div>{% endif %}
-{% if TRAUMA_INCLUDED %}<div class="sub-heading">Trauma / Critical Conditions Cover</div><div class="info-card">{{ REASON_TRAUMA }}</div><div class="sub-heading">Progressive Care (Severity-Based Trauma)</div><div class="info-card">{{ REASON_PROGRESSIVE_CARE }}</div>{% endif %}
-{% if TPD_INCLUDED %}<div class="sub-heading">Total and Permanent Disability Cover</div><div class="info-card">{{ REASON_TPD }}</div>{% endif %}
-{% if INCOME_MP_INCLUDED %}<div class="sub-heading">Mortgage and Income Protection Cover</div><div class="info-card">{{ REASON_INCOME_MORTGAGE }}</div>{% endif %}
+{% if LIFE_INCLUDED %}<div class="sub-heading">Life Cover</div><div class="info-card">{{ REASON_LIFE_COVER }}</div>{% else %}<div class="sub-heading">Life Cover</div><div class="info-card"><p class="body-text">Life cover was discussed and considered as part of this review. Based on your current circumstances and objectives, life cover was not required or requested at this time. This can be revisited at any future review.</p></div>{% endif %}
+{% if TRAUMA_INCLUDED %}<div class="sub-heading">Trauma / Critical Conditions Cover</div><div class="info-card">{{ REASON_TRAUMA }}</div><div class="sub-heading">Progressive Care (Severity-Based Trauma)</div><div class="info-card">{{ REASON_PROGRESSIVE_CARE }}</div>{% else %}<div class="sub-heading">Trauma / Critical Conditions Cover</div><div class="info-card"><p class="body-text">Trauma and critical conditions cover was discussed and considered as part of this review. Based on your current circumstances and objectives, this cover was not required or requested at this time. This can be revisited at any future review.</p></div>{% endif %}
+{% if TPD_INCLUDED %}<div class="sub-heading">Total and Permanent Disability Cover</div><div class="info-card">{{ REASON_TPD }}</div>{% else %}<div class="sub-heading">Total and Permanent Disability Cover</div><div class="info-card"><p class="body-text">Total and permanent disability (TPD) cover was discussed and considered as part of this review. Based on your current circumstances and objectives, this cover was not required or requested at this time. This can be revisited at any future review.</p></div>{% endif %}
+{% if INCOME_MP_INCLUDED %}<div class="sub-heading">Mortgage and Income Protection Cover</div><div class="info-card">{{ REASON_INCOME_MORTGAGE }}</div>{% else %}<div class="sub-heading">Mortgage and Income Protection Cover</div><div class="info-card"><p class="body-text">Mortgage and income protection cover was discussed and considered as part of this review. Based on your current circumstances and objectives, this cover was not required or requested at this time. This can be revisited at any future review.</p></div>{% endif %}
+{% if AIC_INCLUDED %}<div class="sub-heading">Accidental Injury Cover</div><div class="info-card">{{ REASON_ACCIDENTAL_INJURY }}</div>{% else %}<div class="sub-heading">Accidental Injury Cover</div><div class="info-card"><p class="body-text">Accidental injury cover was discussed and considered as part of this review. Based on your current circumstances and objectives, this cover was not required or requested at this time. This can be revisited at any future review.</p></div>{% endif %}
+{% if HEALTH_INCLUDED %}<div class="sub-heading">Health Insurance</div><div class="info-card">{{ REASON_HEALTH }}</div>{% else %}<div class="sub-heading">Health Insurance</div><div class="info-card"><p class="body-text">Health insurance was discussed and considered as part of this review. Based on your current circumstances and objectives, health insurance was not required or requested at this time. This can be revisited at any future review.</p></div>{% endif %}
 
 <!-- ═══ SECTION 11 — BENEFITS SUMMARY ═══ -->
 {% if INCOME_MP_INCLUDED %}
@@ -462,8 +463,6 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 {% endif %}
 
 {% endif %}
-
-{% if AIC_INCLUDED %}<div class="sub-heading">Accidental Injury Cover</div><div class="info-card">{{ REASON_ACCIDENTAL_INJURY }}</div>{% endif %}
 
 <!-- ═══ SECTION 12 — ONGOING SERVICE ═══ -->
 <div class="section-heading"><div class="num">12</div><h2>Ongoing Service</h2></div>

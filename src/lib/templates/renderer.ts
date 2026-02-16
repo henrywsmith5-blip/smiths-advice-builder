@@ -38,6 +38,7 @@ export interface RenderContext {
   IP_INCLUDED?: boolean;
   MP_INCLUDED?: boolean;
   AIC_INCLUDED?: boolean;
+  HEALTH_INCLUDED?: boolean;
   PREMIUM_COVER_INCLUDED?: boolean;
 
   // Section HTML snippets (from LLM writer)

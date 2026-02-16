@@ -148,6 +148,7 @@ export async function runGenerationPipeline(
     IP_INCLUDED: d.sections_included.income_protection,
     MP_INCLUDED: d.sections_included.mortgage_protection,
     AIC_INCLUDED: d.sections_included.accidental_injury,
+    HEALTH_INCLUDED: d.sections_included.health,
 
     // Premium
     OLD_PREMIUM: v(d.premium.existing_total, ""),
@@ -232,6 +233,7 @@ export async function runGenerationPipeline(
     REASON_TPD: sec("reasons_tpd"),
     REASON_INCOME_MORTGAGE: sec("reasons_income_mortgage"),
     REASON_ACCIDENTAL_INJURY: sec("reasons_aic"),
+    REASON_HEALTH: sec("reasons_health"),
     SECTION_SUMMARY: sec("summary"),
     SECTION_REASONS: sec("summary"),
     SECTION_SCOPE: sec("scope"),
