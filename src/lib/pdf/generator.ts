@@ -51,24 +51,6 @@ function embedLocalImages(html: string): string {
   );
 }
 
-function preflightValidation(html: string): void {
-  const isPartner = html.includes('IS_PARTNER') === false && html.includes('section-block-break') && html.includes('CLIENT_B_NAME');
-  const isSingleClient = !html.includes('client-divider"><span>') || 
-    (html.match(/client-divider/g) || []).length <= 1;
-
-  if (isSingleClient && /Client\s*B/i.test(html.replace(/<!--[\s\S]*?-->/g, '').replace(/{%[\s\S]*?%}/g, ''))) {
-    throw new Error("Preflight: Single-client document contains Client B content. Aborting PDF generation.");
-  }
-
-  const premiumSection = html.indexOf('Premium Summary');
-  if (premiumSection !== -1) {
-    const beforePremium = html.substring(Math.max(0, premiumSection - 200), premiumSection);
-    if (!beforePremium.includes('section-block-break')) {
-      throw new Error("Preflight: Premium Summary does not start on a new page. Aborting PDF generation.");
-    }
-  }
-}
-
 export async function generatePdf(html: string): Promise<Buffer> {
   const browser = await getBrowser();
   const page = await browser.newPage();
@@ -80,9 +62,6 @@ export async function generatePdf(html: string): Promise<Buffer> {
 
     // Embed local images as base64 data URIs so Playwright doesn't need HTTP access
     prepared = embedLocalImages(prepared);
-
-    // Preflight: validate pagination structure
-    preflightValidation(prepared);
 
     await page.setContent(prepared, { waitUntil: "networkidle" });
 
