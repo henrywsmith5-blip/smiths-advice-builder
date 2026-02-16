@@ -6,6 +6,136 @@ import type { FactPack, WriterOutput } from "./schemas";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = "claude-sonnet-4-20250514";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/**
+ * Forgiving parser — accepts any reasonable JSON structure and maps
+ * it into the FactPack format. Handles old schema, new schema, and
+ * completely freeform LLM output.
+ */
+function forgivingParse(raw: Record<string, any>): FactPack {
+  const fp: any = {
+    documentMetadata: raw.documentMetadata || raw.document_metadata || {},
+    clients: [],
+    scopeOfAdvice: { isLimitedAdvice: false, perClient: [] },
+    specialInstructions: null,
+    existingCover: [],
+    recommendedCover: [],
+    premiumComparison: {},
+    insurerSelectionReasoning: [],
+    replacementConsiderations: { isReplacement: false },
+    adviceTypeFlags: {},
+    productDetailsToInclude: [],
+    benefitsSummaryA: { ip: null, mp: null },
+    benefitsSummaryB: { ip: null, mp: null },
+    missingFields: raw.missingFields || raw.missing_fields || [],
+  };
+
+  // Map clients from various formats
+  const rawClients = raw.clients || raw.client || [];
+  if (Array.isArray(rawClients)) {
+    fp.clients = rawClients.map((c: any, i: number) => ({
+      clientLabel: c.clientLabel || c.client_label || (i === 0 ? "Client A" : "Client B"),
+      fullName: c.fullName || c.full_name || c.name || c.name_a || c.name_b || null,
+      email: c.email || null,
+      phone: c.phone || null,
+      occupation: c.occupation || null,
+      smokerStatus: c.smokerStatus || c.smoker_status || null,
+      income: c.income || c.incomeGrossAnnual || null,
+      dateOfBirth: c.dateOfBirth || c.date_of_birth || c.dob || null,
+      healthDisclosures: c.healthDisclosures || c.health_disclosures || [],
+      lifestyleDisclosures: c.lifestyleDisclosures || c.lifestyle_disclosures || {},
+    }));
+  } else if (typeof rawClients === "object" && rawClients.name_a) {
+    // Old flat client format
+    fp.clients = [
+      { clientLabel: "Client A", fullName: rawClients.name_a, email: rawClients.email, phone: rawClients.phone },
+    ];
+    if (rawClients.name_b) {
+      fp.clients.push({ clientLabel: "Client B", fullName: rawClients.name_b });
+    }
+  }
+
+  // Map existing cover
+  const rawExisting = raw.existingCover || raw.existing_cover || [];
+  if (Array.isArray(rawExisting)) {
+    fp.existingCover = rawExisting.map((e: any) => ({
+      clientName: e.clientName || e.client_name || "",
+      insurer: e.insurer || null,
+      covers: Array.isArray(e.covers) ? e.covers.map((c: any) => ({
+        coverType: c.coverType || c.cover_type || "",
+        sumInsured: c.sumInsured || c.sum_insured || null,
+        benefitPeriod: c.benefitPeriod || c.benefit_period || null,
+        waitPeriod: c.waitPeriod || c.wait_period || null,
+      })) : [],
+      totalPremium: e.totalPremium || e.total_premium || null,
+      premiumAmount: typeof e.premiumAmount === "number" ? e.premiumAmount : (typeof e.premium_amount === "number" ? e.premium_amount : null),
+      premiumFrequency: e.premiumFrequency || e.premium_frequency || null,
+    }));
+  }
+
+  // Map recommended cover
+  const rawRec = raw.recommendedCover || raw.recommended_cover || [];
+  if (Array.isArray(rawRec)) {
+    fp.recommendedCover = rawRec.map((r: any) => ({
+      clientName: r.clientName || r.client_name || "",
+      insurer: r.insurer || null,
+      covers: Array.isArray(r.covers) ? r.covers.map((c: any) => ({
+        coverType: c.coverType || c.cover_type || "",
+        sumInsured: c.sumInsured || c.sum_insured || null,
+        benefitPeriod: c.benefitPeriod || c.benefit_period || null,
+        waitPeriod: c.waitPeriod || c.wait_period || null,
+      })) : [],
+      totalPremium: r.totalPremium || r.total_premium || null,
+      premiumAmount: typeof r.premiumAmount === "number" ? r.premiumAmount : (typeof r.premium_amount === "number" ? r.premium_amount : null),
+      premiumFrequency: r.premiumFrequency || r.premium_frequency || null,
+    }));
+  }
+
+  // Map special instructions
+  fp.specialInstructions = raw.specialInstructions || raw.special_instructions || raw.shared?.specialInstructions || raw.shared?.special_instructions || null;
+
+  // Map scope
+  const rawScope = raw.scopeOfAdvice || raw.scope_of_advice || raw.scope;
+  if (rawScope) {
+    fp.scopeOfAdvice.isLimitedAdvice = rawScope.isLimitedAdvice || rawScope.is_limited_advice || false;
+    if (Array.isArray(rawScope.perClient || rawScope.per_client)) {
+      fp.scopeOfAdvice.perClient = (rawScope.perClient || rawScope.per_client).map((s: any) => ({
+        clientName: s.clientName || s.client_name || "",
+        lifeInsurance: s.lifeInsurance || s.life_insurance || false,
+        traumaInsurance: s.traumaInsurance || s.trauma_insurance || false,
+        tpdInsurance: s.tpdInsurance || s.tpd_insurance || false,
+        incomeProtection: s.incomeProtection || s.income_protection || false,
+        redundancyCover: s.redundancyCover || s.redundancy_cover || false,
+        healthInsurance: s.healthInsurance || s.health_insurance || false,
+      }));
+    }
+  }
+
+  // Map benefits
+  const rawBenA = raw.benefitsSummaryA || raw.benefits_summary_a || raw.benefits?.a;
+  const rawBenB = raw.benefitsSummaryB || raw.benefits_summary_b || raw.benefits?.b;
+  if (rawBenA) fp.benefitsSummaryA = rawBenA;
+  if (rawBenB) fp.benefitsSummaryB = rawBenB;
+
+  // Map insurer reasoning
+  fp.insurerSelectionReasoning = raw.insurerSelectionReasoning || raw.insurer_selection_reasoning || [];
+
+  // Map replacement
+  const rawRepl = raw.replacementConsiderations || raw.replacement_considerations;
+  if (rawRepl) fp.replacementConsiderations = rawRepl;
+
+  // Map advice flags
+  const rawFlags = raw.adviceTypeFlags || raw.advice_type_flags;
+  if (rawFlags) fp.adviceTypeFlags = rawFlags;
+
+  console.log(`[Forgiving Parse] Mapped: ${fp.clients.length} clients, ${fp.existingCover.length} existing, ${fp.recommendedCover.length} recommended`);
+
+  // Validate through Zod with lenient defaults
+  return FactPackSchema.parse(fp);
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 // ══════════════════════════════════════════════════════════════
 // EXTRACTOR SYSTEM PROMPT — Part 3: Craig Smith corpus
 // ══════════════════════════════════════════════════════════════
@@ -195,31 +325,60 @@ export class AnthropicProvider implements LLMProvider {
     });
 
     const text = response.content[0]?.type === "text" ? response.content[0].text : "";
+    console.log(`[Anthropic Extractor] Response length: ${text.length}`);
+
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON found in extractor response");
+    if (!jsonMatch) {
+      console.error("[Anthropic Extractor] No JSON found in response. First 500 chars:", text.substring(0, 500));
+      throw new Error("No JSON found in extractor response");
+    }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch (e) {
+      console.error("[Anthropic Extractor] JSON parse failed:", e);
+      throw new Error("Invalid JSON in extractor response");
+    }
+
+    console.log("[Anthropic Extractor] Parsed keys:", Object.keys(parsed));
+
+    // Try strict schema first
     const result = FactPackSchema.safeParse(parsed);
+    if (result.success) {
+      console.log("[Anthropic Extractor] Schema validation passed");
+      return result.data;
+    }
 
-    if (result.success) return result.data;
+    console.warn("[Anthropic Extractor] Schema validation failed:", result.error.issues.slice(0, 5).map(i => `${i.path.join(".")}: ${i.message}`));
 
-    // Retry once
-    console.warn("Extractor validation failed, retrying...", result.error.issues.slice(0, 3));
+    // FORGIVING FALLBACK: Accept whatever structure the LLM returned and
+    // map it into the FactPack format as best we can
+    console.log("[Anthropic Extractor] Attempting forgiving parse...");
+    try {
+      return forgivingParse(parsed);
+    } catch (e) {
+      console.error("[Anthropic Extractor] Forgiving parse also failed:", e);
+    }
+
+    // Retry once with simplified prompt
+    console.log("[Anthropic Extractor] Retrying with simplified prompt...");
     const retryResponse = await client.messages.create({
       model: MODEL, max_tokens: 8000, temperature: 0,
-      system: EXTRACTOR_SYSTEM,
       messages: [
-        { role: "user", content: prompt },
-        { role: "assistant", content: text },
-        { role: "user", content: `Validation errors:\n${JSON.stringify(result.error.issues.slice(0, 5), null, 2)}\nFix and return corrected JSON.` },
+        { role: "user", content: `${prompt}\n\nIMPORTANT: Return a simple JSON with these top-level keys: clients (array), existingCover (array), recommendedCover (array), specialInstructions (string), missingFields (array). Each client needs: clientLabel, fullName, email, phone. Each cover block needs: clientName, insurer, covers (array of {coverType, sumInsured}), premiumAmount (number), premiumFrequency (string).` },
       ],
     });
 
     const retryText = retryResponse.content[0]?.type === "text" ? retryResponse.content[0].text : "";
     const retryMatch = retryText.match(/\{[\s\S]*\}/);
     if (retryMatch) {
-      const retryResult = FactPackSchema.safeParse(JSON.parse(retryMatch[0]));
-      if (retryResult.success) return retryResult.data;
+      try {
+        const retryParsed = JSON.parse(retryMatch[0]);
+        const retryResult = FactPackSchema.safeParse(retryParsed);
+        if (retryResult.success) return retryResult.data;
+        return forgivingParse(retryParsed);
+      } catch { /* fall through */ }
     }
 
     return FactPackSchema.parse({ clients: [], missingFields: ["Full extraction failed — review manually"] });
