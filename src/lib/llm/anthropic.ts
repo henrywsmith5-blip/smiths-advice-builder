@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { LLMProvider, ExtractInput } from "./provider";
-import { ExtractedJsonSchema, WriterOutputSchema } from "./schemas";
-import type { ExtractedJson, WriterOutput } from "./schemas";
+import { FactPackSchema, WriterOutputSchema } from "./schemas";
+import type { FactPack, WriterOutput } from "./schemas";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = "claude-sonnet-4-20250514";
@@ -9,182 +9,154 @@ const MODEL = "claude-sonnet-4-20250514";
 function buildExtractPrompt(input: ExtractInput): string {
   const isROA = input.docType === "ROA";
 
-  let prompt = `You are a data extraction specialist for Smiths Insurance & KiwiSaver, a New Zealand financial advice provider.
+  let prompt = `You are a data extraction specialist for Smiths Insurance & KiwiSaver (NZ).
 
-TASK: Extract structured data from the provided insurance documents into a precise JSON format.
-DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice — what was IMPLEMENTED" : "Statement of Advice — what is being RECOMMENDED"})
+TASK: Extract facts from insurance documents into a JSON "Fact Pack".
+DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice — what was IMPLEMENTED" : "Statement of Advice — what is RECOMMENDED"})
 
-CRITICAL RULES:
-1. NEVER invent or guess numbers. If a sum insured, premium, or amount is not explicitly stated, use null.
-2. All monetary values should include "$" and be formatted as they appear (e.g. "$500,000", "$145.20").
-3. If a value cannot be found, use null and ADD it to the "missing_fields" array.
-4. Prefer insurer formal quotes / schedules for cover amounts and premiums over transcript discussion.
-5. If there are two clients (partner case), extract data separately for client_a and client_b.
+ABSOLUTE RULES:
+1. NEVER compute totals, savings, increases, or any derived math. The app computes these.
+2. NEVER guess or invent numbers. If not explicitly stated, use null.
+3. NEVER decide if this is Partner or Individual — the app UI controls that.
+4. NEVER decide if there is existing cover — the app UI controls that.
+5. Extract per-client premiums as raw numbers (e.g., 68.49 not "$68.49").
+6. Monetary cover amounts keep "$" formatting (e.g., "$200,000").
+7. If two clients exist in the data, create TWO client objects (id "A" and "B").
+8. If data for a field is missing, use null and add the field name to missingFields[].
 
 REQUIRED JSON STRUCTURE:
 {
-  "client": {
-    "name_a": "First client full name or null",
-    "name_b": "Second client full name or null (partner cases only)",
-    "email": "Client email or null",
-    "phone": "Client phone or null"
+  "caseMeta": {
+    "frequency": "fortnight" | "month" | "year"
   },
-  "doc_type": "${input.docType}",
-  "sections_included": {
+  "clients": [
+    {
+      "id": "A",
+      "name": "Full Name or null",
+      "dob": "date or null",
+      "email": "email or null",
+      "phone": "phone or null",
+      "occupation": "occupation or null",
+      "smoker": true/false/null,
+      "income": "$132,000 or null",
+      "existingCover": {
+        "insurer": "Insurer Name or null",
+        "covers": {
+          "life": "$100,000 or null",
+          "trauma": "$50,000 or null",
+          "tpd": "null if none",
+          "ip": "$4,000/month or null",
+          "mp": "$2,500/month or null",
+          "aic": "$100,000 or null",
+          "premiumCover": "Included or null",
+          "health": "Comprehensive or null"
+        },
+        "premium": { "amount": 37.96, "frequency": "fortnight" }
+      },
+      "implementedCover": {
+        "insurer": "Insurer Name or null",
+        "covers": { same keys },
+        "premium": { "amount": 68.49, "frequency": "fortnight" }
+      },
+      "benefitsSummary": {
+        "ip": { "monthlyAmount": "$5,500", "waitPeriod": "4 weeks", "benefitPeriod": "To age 65", "premium": "$85.00" } or null,
+        "mp": { "monthlyAmount": "$3,200", "waitPeriod": "4 weeks", "benefitPeriod": "5 years", "premium": "$45.00" } or null
+      }
+    }
+  ],
+  "sectionsIncluded": {
     "life": true/false,
     "trauma": true/false,
     "tpd": true/false,
-    "income_protection": true/false,
-    "mortgage_protection": true/false,
-    "accidental_injury": true/false,
+    "incomeProtection": true/false,
+    "mortgageProtection": true/false,
+    "accidentalInjury": true/false,
     "health": true/false
   },
-  "client_a_existing_insurer": "Insurer name or null",
-  "client_a_new_insurer": "Insurer name or null",
-  "client_a_old_cover": {
-    "life": "$500,000 or null",
-    "trauma": "$100,000 or null",
-    "tpd": "$50,000 or null",
-    "income_protection": "$4,000/month or null",
-    "mortgage_protection": "$2,500/month or null",
-    "accidental_injury": "$100,000 or null",
-    "premium_cover": "Included or null",
-    "health": "Comprehensive or null"
+  "shared": {
+    "address": "address or null",
+    "mortgage": "$610,000 or null",
+    "children": "2 (Aged 4 and 2) or null",
+    "objectives": ["objective 1", "objective 2"],
+    "specialInstructions": "text or null",
+    "situationSummary": "Brief summary of why client sought advice"
   },
-  "client_a_new_cover": {
-    "life": "$600,000 or null",
-    "trauma": "$150,000 or null",
-    ... same fields
-  },
-  "client_b_existing_insurer": "or null if single client",
-  "client_b_new_insurer": "or null if single client",
-  "client_b_old_cover": { ...same fields, all null if single },
-  "client_b_new_cover": { ...same fields, all null if single },
-  "premium": {
-    "existing_total": "$180.50 or null",
-    "new_total": "$145.20 or null",
-    "frequency": "per month",
-    "savings": "$35.30 or null",
-    "annual_savings": "$423.60 or null"
-  },
-  "benefits": {
-    "mortgage_protection": {
-      "monthly_amount": "$2,500 or null",
-      "wait_period": "4 weeks or null",
-      "benefit_period": "2 years or null",
-      "premium": "$45.00 or null"
-    },
-    "income_protection": {
-      "monthly_amount": "$4,000 or null",
-      "wait_period": "4 weeks or null",
-      "benefit_period": "To age 65 or null",
-      "premium": "$85.00 or null"
-    }
-  },
-  "situation_summary": "Brief summary of why the client is seeking advice (from transcript/notes)",
-  "special_instructions": "Any special requests or objectives mentioned",
-  "missing_fields": ["List of fields that could not be found in the documents"]
+  "missingFields": ["field names that could not be found"]
 }
 
-Return ONLY valid JSON. No markdown, no explanation, just the JSON object.`;
+CRITICAL REMINDERS:
+- Premium amounts MUST be raw numbers (68.49) not strings ("$68.49")
+- Do NOT include "savings" or "total" or "increase" fields — the app computes these
+- If only one client exists, still put them in the clients array as id "A"
+- For Partner cases, Client B must exist even if some fields are null
 
-  // Append source documents
+Return ONLY valid JSON.`;
+
   if (input.clientOverrides?.name) {
-    prompt += `\n\n=== CLIENT DETAILS (provided by adviser) ===\nClient A Name: ${input.clientOverrides.name}`;
-    if (input.clientOverrides.nameB) prompt += `\nClient B Name: ${input.clientOverrides.nameB}`;
+    prompt += `\n\n=== CLIENT DETAILS (from adviser) ===\nClient A: ${input.clientOverrides.name}`;
+    if (input.clientOverrides.nameB) prompt += `\nClient B: ${input.clientOverrides.nameB}`;
     if (input.clientOverrides.email) prompt += `\nEmail: ${input.clientOverrides.email}`;
   }
-
-  if (input.firefliesText) {
-    prompt += `\n\n=== MEETING TRANSCRIPT (Fireflies) ===\n${input.firefliesText.substring(0, 60000)}`;
-  }
-
-  if (input.quotesText) {
-    prompt += `\n\n=== INSURANCE QUOTES / SCHEDULES ===\nThese are the PRIMARY source for cover amounts and premiums. Trust these numbers.\n${input.quotesText.substring(0, 60000)}`;
-  }
-
-  if (input.otherDocsText) {
-    prompt += `\n\n=== OTHER DOCUMENTS ===\n${input.otherDocsText.substring(0, 30000)}`;
-  }
-
-  if (input.additionalContext) {
-    prompt += `\n\n=== ADVISER NOTES / ADDITIONAL CONTEXT ===\nThis may contain ALL client data including cover details, premiums, pros/cons, and reasons. Treat this as a PRIMARY source.\n${input.additionalContext.substring(0, 60000)}`;
-  }
-
-  if (input.roaDeviations) {
-    prompt += `\n\n=== DEVIATIONS FROM ORIGINAL RECOMMENDATION ===\n${input.roaDeviations.substring(0, 10000)}`;
-  }
+  if (input.firefliesText) prompt += `\n\n=== MEETING TRANSCRIPT ===\n${input.firefliesText.substring(0, 60000)}`;
+  if (input.quotesText) prompt += `\n\n=== INSURANCE QUOTES/SCHEDULES (PRIMARY source for numbers) ===\n${input.quotesText.substring(0, 60000)}`;
+  if (input.otherDocsText) prompt += `\n\n=== OTHER DOCUMENTS ===\n${input.otherDocsText.substring(0, 30000)}`;
+  if (input.additionalContext) prompt += `\n\n=== ADVISER NOTES / ALL CONTEXT (PRIMARY source) ===\n${input.additionalContext.substring(0, 60000)}`;
+  if (input.roaDeviations) prompt += `\n\n=== DEVIATIONS ===\n${input.roaDeviations.substring(0, 30000)}`;
 
   return prompt;
 }
 
-function buildWriterPrompt(extractedJson: ExtractedJson, docType: string): string {
+function buildWriterPrompt(factPack: FactPack, docType: string): string {
   const isROA = docType === "ROA";
-  const tense = isROA ? "PAST tense (was implemented, was arranged, was placed)" : "FUTURE tense (we recommend, will provide, is proposed)";
+  const tense = isROA ? "PAST tense (was implemented, was arranged)" : "FUTURE tense (we recommend, will provide)";
 
-  return `You are a professional document writer for Smiths Insurance & KiwiSaver, a New Zealand financial advice provider.
+  return `You are a document writer for Smiths Insurance & KiwiSaver (NZ).
 
-TASK: Write polished HTML content sections for a ${docType} (${isROA ? "Record of Advice" : "Statement of Advice"}).
+TASK: Write polished HTML content sections for a ${docType}.
 
-TENSE: ALL narrative must be in ${tense}.
-TONE: Professional NZ financial adviser. Concise, clear, authoritative. No fluff.
-FORMAT: Return HTML fragments ONLY — use <p>, <ul>, <li>, <strong>, <em>. No <html>, <body>, <head>.
+TENSE: ${tense}
+TONE: Professional NZ financial adviser. Concise, authoritative.
+FORMAT: HTML fragments ONLY — <p>, <ul>, <li>, <strong>, <em>. No full document tags.
 
-CRITICAL RULES:
-1. NEVER invent any numbers, providers, or cover amounts. Use ONLY what is in the extracted data below.
-2. If a section is not included (sections_included = false), return { "included": false, "html": "" }
-3. Keep paragraphs short (2-3 sentences). Use bullet lists for comparisons.
-4. For pros/cons sections, write 3-5 bullet points each.
-5. For reasons sections, explain WHY this cover type was ${isROA ? "implemented" : "recommended"} based on the client's situation.
+ABSOLUTE RULES:
+1. NEVER compute or state premium totals, savings, or increase amounts. The app injects these.
+2. NEVER write "savings of $X" or "increase of $X" — use generic phrasing or skip premium discussion.
+3. If a section's cover type is not included, return { "included": false, "html": "" }.
+4. For pros/cons, write 3-5 bullet points each as <ul><li> lists.
+5. For reasons, explain WHY based on client situation (2-3 sentences).
+6. Use ONLY facts from the data below. Never invent numbers.
 
-EXTRACTED DATA:
-${JSON.stringify(extractedJson, null, 2)}
+FACT PACK DATA:
+${JSON.stringify(factPack, null, 2)}
 
-REQUIRED OUTPUT — JSON with "sections" object. Each key maps to { "included": boolean, "html": "..." }.
+Return JSON with "sections" and "meta":
+{
+  "sections": {
+    "key": { "included": true/false, "html": "<p>...</p>" }
+  },
+  "meta": { "document_title": "...", "client_name": "..." }
+}
 
-SECTION KEYS YOU MUST RETURN:
-- "special_instructions": Client's objectives / special requests narrative
-- "reasons_life": Why life cover was ${isROA ? "implemented" : "recommended"}
-- "reasons_trauma": Why trauma cover was ${isROA ? "implemented" : "recommended"}
-- "reasons_progressive_care": Why progressive care was ${isROA ? "chosen" : "recommended"}
-- "reasons_tpd": Why TPD cover was ${isROA ? "implemented" : "recommended"}
-- "reasons_income_mortgage": Why income/mortgage protection was ${isROA ? "implemented" : "recommended"}
-- "reasons_aic": Why accidental injury cover was ${isROA ? "included" : "recommended"}
-- "pros_life": Pros of ${isROA ? "the implemented" : "the recommended"} life cover (HTML bullet list)
-- "cons_life": Cons / trade-offs of life cover change (HTML bullet list)
-- "pros_trauma": Pros of trauma cover (HTML bullet list)
-- "cons_trauma": Cons of trauma cover (HTML bullet list)
-- "pros_tpd": Pros of TPD cover (HTML bullet list)
-- "cons_tpd": Cons of TPD cover (HTML bullet list)
-- "pros_income_mp": Pros of income/mortgage protection (HTML bullet list)
-- "cons_income_mp": Cons of income/mortgage protection (HTML bullet list)
-- "pros_aic": Pros of accidental injury cover (HTML bullet list)
-- "cons_aic": Cons of accidental injury cover (HTML bullet list)
-- "modification_notes": Any deviations or modifications (if applicable)
-- "summary": Overall summary of what was ${isROA ? "implemented" : "recommended"}
-- "scope": Scope of services provided
-- "out_of_scope": What is out of scope
-- "responsibilities": Client responsibilities
+SECTION KEYS TO RETURN:
+- special_instructions, reasons_life, reasons_trauma, reasons_progressive_care
+- reasons_tpd, reasons_income_mortgage, reasons_aic
+- pros_life, cons_life, pros_trauma, cons_trauma
+- pros_tpd, cons_tpd, pros_income_mp, cons_income_mp
+- pros_aic, cons_aic
+- modification_notes, summary
 
-Also return "meta" with "document_title" and "client_name".
-
-Return ONLY valid JSON. No markdown wrapper.`;
+Return ONLY valid JSON.`;
 }
 
 export class AnthropicProvider implements LLMProvider {
-  async extractCaseJson(input: ExtractInput): Promise<ExtractedJson> {
+  async extractCaseJson(input: ExtractInput): Promise<FactPack> {
     const prompt = buildExtractPrompt(input);
 
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: 6000,
       temperature: 0,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      messages: [{ role: "user", content: prompt }],
     });
 
     const text = response.content[0]?.type === "text" ? response.content[0].text : "";
@@ -192,69 +164,46 @@ export class AnthropicProvider implements LLMProvider {
     if (!jsonMatch) throw new Error("No JSON found in extractor response");
 
     const parsed = JSON.parse(jsonMatch[0]);
-    const result = ExtractedJsonSchema.safeParse(parsed);
+    const result = FactPackSchema.safeParse(parsed);
 
     if (result.success) return result.data;
 
-    // Retry once with error feedback
     console.warn("Extractor validation failed, retrying...", result.error.issues.slice(0, 3));
     const retryResponse = await client.messages.create({
-      model: MODEL,
-      max_tokens: 6000,
-      temperature: 0,
+      model: MODEL, max_tokens: 6000, temperature: 0,
       messages: [
         { role: "user", content: prompt },
         { role: "assistant", content: text },
-        {
-          role: "user",
-          content: `Your JSON had validation errors:\n${JSON.stringify(result.error.issues.slice(0, 5), null, 2)}\n\nFix these and return corrected JSON only.`,
-        },
+        { role: "user", content: `Validation errors:\n${JSON.stringify(result.error.issues.slice(0, 5), null, 2)}\nFix and return corrected JSON.` },
       ],
     });
 
     const retryText = retryResponse.content[0]?.type === "text" ? retryResponse.content[0].text : "";
     const retryMatch = retryText.match(/\{[\s\S]*\}/);
     if (retryMatch) {
-      const retryParsed = JSON.parse(retryMatch[0]);
-      const retryResult = ExtractedJsonSchema.safeParse(retryParsed);
+      const retryResult = FactPackSchema.safeParse(JSON.parse(retryMatch[0]));
       if (retryResult.success) return retryResult.data;
     }
 
-    // Best effort fallback
-    console.error("Extraction failed after retry");
-    return ExtractedJsonSchema.parse({
-      client: {},
-      doc_type: input.docType,
-      sections_included: {},
-      missing_fields: ["Extraction validation failed — review all fields manually"],
-    });
+    return FactPackSchema.parse({ clients: [], missingFields: ["Full extraction failed — review manually"] });
   }
 
-  async writeSections(extractedJson: ExtractedJson, docType: string): Promise<WriterOutput> {
-    const prompt = buildWriterPrompt(extractedJson, docType);
+  async writeSections(factPack: FactPack, docType: string): Promise<WriterOutput> {
+    const prompt = buildWriterPrompt(factPack, docType);
 
     const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 8000,
-      temperature: 0.2,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+      model: MODEL, max_tokens: 8000, temperature: 0.2,
+      messages: [{ role: "user", content: prompt }],
     });
 
     const text = response.content[0]?.type === "text" ? response.content[0].text : "";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON found in writer response");
+    if (!jsonMatch) throw new Error("No JSON in writer response");
 
     const parsed = JSON.parse(jsonMatch[0]);
     const result = WriterOutputSchema.safeParse(parsed);
-
     if (result.success) return result.data;
 
-    console.warn("Writer validation issues:", result.error.issues.slice(0, 3));
     return { sections: {}, meta: { document_title: `${docType} Document` } };
   }
 }

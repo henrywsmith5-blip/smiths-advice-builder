@@ -422,6 +422,10 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <!-- ═══ SECTION 11 — BENEFITS SUMMARY ═══ -->
 {% if INCOME_MP_INCLUDED %}
 <div class="section-heading"><div class="num">11</div><h2>Your Benefits Summary</h2></div>
+
+{% if IS_PARTNER %}
+<div class="sub-heading">{{ CLIENT_A_NAME }}</div>
+{% endif %}
 <table class="data-table">
   <thead><tr><th>Benefit Type</th><th>Monthly Amount</th><th>Wait Period</th><th>Benefit Period</th><th>Premium</th></tr></thead>
   <tbody>
@@ -429,6 +433,18 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
     <tr><td>Income Protection</td><td class="na">{{ IP_MONTHLY }}</td><td class="na">{{ IP_WAIT }}</td><td class="na">{{ IP_BENEFIT_PERIOD }}</td><td class="na">{{ IP_PREMIUM }}</td></tr>
   </tbody>
 </table>
+
+{% if IS_PARTNER %}
+<div class="sub-heading">{{ CLIENT_B_NAME }}</div>
+<table class="data-table">
+  <thead><tr><th>Benefit Type</th><th>Monthly Amount</th><th>Wait Period</th><th>Benefit Period</th><th>Premium</th></tr></thead>
+  <tbody>
+    <tr><td>Mortgage Protection</td><td class="na">{{ CLIENT_B_MP_MONTHLY }}</td><td class="na">{{ CLIENT_B_MP_WAIT }}</td><td class="na">{{ CLIENT_B_MP_BENEFIT_PERIOD }}</td><td class="na">{{ CLIENT_B_MP_PREMIUM }}</td></tr>
+    <tr><td>Income Protection</td><td class="na">{{ CLIENT_B_IP_MONTHLY }}</td><td class="na">{{ CLIENT_B_IP_WAIT }}</td><td class="na">{{ CLIENT_B_IP_BENEFIT_PERIOD }}</td><td class="na">{{ CLIENT_B_IP_PREMIUM }}</td></tr>
+  </tbody>
+</table>
+{% endif %}
+
 {% endif %}
 
 {% if AIC_INCLUDED %}<div class="sub-heading">Accidental Injury Cover</div><div class="info-card">{{ REASON_ACCIDENTAL_INJURY }}</div>{% endif %}
