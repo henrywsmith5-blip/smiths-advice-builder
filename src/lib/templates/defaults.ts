@@ -88,8 +88,11 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .dual-cover-wrapper{margin:12px 0 22px 0;border:1px solid var(--rule);overflow:hidden;page-break-inside:avoid;}
 .dual-cover-wrapper table{width:100%;border-collapse:collapse;}
 .dual-cover-wrapper th{padding:8px 12px;font-size:8pt;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--rule);text-align:left;}
-.dual-cover-wrapper .header-proposed{background:var(--bronze);color:var(--white);}
-.dual-cover-wrapper .header-existing{background:var(--navy);color:var(--white);}
+.dual-cover-wrapper .header-proposed{background:var(--bronze);color:var(--white);vertical-align:middle;}
+.dual-cover-wrapper .header-existing{background:var(--navy);color:var(--white);vertical-align:middle;}
+.insurer-logo{height:22px;width:auto;display:inline-block;vertical-align:middle;margin-right:6px;}
+.header-proposed .insurer-logo,.header-existing .insurer-logo{filter:brightness(0) invert(1);}
+.single-cover-wrapper .insurer-logo{height:20px;filter:brightness(0) invert(1);margin-right:6px;vertical-align:middle;}
 .dual-cover-wrapper td{padding:7px 12px;border-bottom:1px solid var(--rule);font-size:9.5pt;}
 .dual-cover-wrapper .spacer-col{width:20px;background:var(--white);border-bottom:1px solid var(--rule);}
 .single-cover-wrapper{max-width:420px;margin:12px auto 22px auto;border:1px solid var(--rule);overflow:hidden;page-break-inside:avoid;}
@@ -308,7 +311,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <div class="dual-cover-wrapper">
   <table>
     <thead>
-      <tr><th class="header-proposed" colspan="2">Proposed Additional Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">Existing {{ CLIENT_A_EXISTING_INSURER }} Cover</th></tr>
+      <tr><th class="header-proposed" colspan="2">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_A_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_A_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
       <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
     </thead>
     <tbody>
@@ -323,9 +326,9 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   </table>
 </div>
 {% else %}
-<p class="body-text"><em>Recommended new cover with <span class="placeholder">{{ CLIENT_A_NEW_INSURER }}</span></em></p>
+<p class="body-text"><em>Recommended new cover</em></p>
 <div class="single-cover-wrapper">
-  <div class="side-header">Recommended Cover — {{ CLIENT_A_NEW_INSURER }}</div>
+  <div class="side-header">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
   <table>
     <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
     <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_A_NEW_LIFE }}</td></tr>
@@ -349,7 +352,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <div class="dual-cover-wrapper">
   <table>
     <thead>
-      <tr><th class="header-proposed" colspan="2">Proposed Additional Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">Existing {{ CLIENT_B_EXISTING_INSURER }} Cover</th></tr>
+      <tr><th class="header-proposed" colspan="2">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_B_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_B_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
       <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
     </thead>
     <tbody>
@@ -364,9 +367,9 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   </table>
 </div>
 {% else %}
-<p class="body-text"><em>Recommended new cover with <span class="placeholder">{{ CLIENT_B_NEW_INSURER }}</span></em></p>
+<p class="body-text"><em>Recommended new cover</em></p>
 <div class="single-cover-wrapper">
-  <div class="side-header">Recommended Cover — {{ CLIENT_B_NEW_INSURER }}</div>
+  <div class="side-header">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
   <table>
     <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
     <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_B_NEW_LIFE }}</td></tr>
