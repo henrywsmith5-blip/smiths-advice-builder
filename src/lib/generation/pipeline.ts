@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/db";
 import { getLLMProvider, type ExtractInput } from "@/lib/llm/provider";
-import type { FactPack, ClientData } from "@/lib/llm/schemas";
+import type { FactPack, CoverItem } from "@/lib/llm/schemas";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
-import { computePremiumSummary, parseDollar, type UIState, type PremiumFrequency } from "./premium";
+import { computePremiumSummary, type UIState, type PremiumFrequency } from "./premium";
 import { buildBenefitsSummary } from "./benefits";
 import { preflightValidate, type ValidationResult } from "./validator";
 import { DocType, ClientType } from "@prisma/client";
@@ -37,30 +37,57 @@ export interface GenerateResult {
   };
 }
 
-// Helper: get client from fact pack by id
-function getClient(fp: FactPack, id: "A" | "B"): ClientData | null {
-  return fp.clients.find(c => c.id === id) || null;
+// ── Helpers ──
+
+/** Find a cover item by type (case-insensitive partial match) */
+function findCover(covers: CoverItem[], type: string): string {
+  const t = type.toLowerCase();
+  const item = covers.find(c => c.coverType.toLowerCase().includes(t));
+  return item?.sumInsured || "N/A";
 }
 
-// Helper: safe string value
+/** Safe string value */
 function v(val: string | null | undefined, fallback = "N/A"): string {
   return val || fallback;
+}
+
+/** Detect frequency from various string formats */
+function detectFrequency(fp: FactPack): PremiumFrequency {
+  // Check caseMeta first (if present from old schema)
+  const meta = fp as Record<string, unknown>;
+  if (meta.caseMeta && typeof meta.caseMeta === "object") {
+    const cm = meta.caseMeta as Record<string, unknown>;
+    if (cm.frequency === "fortnight" || cm.frequency === "month" || cm.frequency === "year") {
+      return cm.frequency as PremiumFrequency;
+    }
+  }
+  // Check existing/recommended cover premium frequencies
+  for (const ec of fp.existingCover) {
+    if (ec.premiumFrequency?.toLowerCase().includes("fortnight")) return "fortnight";
+    if (ec.premiumFrequency?.toLowerCase().includes("month")) return "month";
+    if (ec.premiumFrequency?.toLowerCase().includes("year")) return "year";
+  }
+  for (const rc of fp.recommendedCover) {
+    if (rc.premiumFrequency?.toLowerCase().includes("fortnight")) return "fortnight";
+    if (rc.premiumFrequency?.toLowerCase().includes("month")) return "month";
+    if (rc.premiumFrequency?.toLowerCase().includes("year")) return "year";
+  }
+  return "month";
 }
 
 export async function runGenerationPipeline(input: GenerateInput): Promise<GenerateResult> {
   const llm = getLLMProvider();
   console.log(`[Pipeline] Starting ${input.docType} for case ${input.caseId}`);
 
-  // ── Step 1: UI State (SOURCE OF TRUTH for structure) ──
+  // ── Step 1: UI State (SOURCE OF TRUTH) ──
   const uiState: UIState = {
     isPartner: input.clientType === ClientType.PARTNER,
     clientAHasExisting: input.clientAHasExisting,
     clientBHasExisting: input.clientBHasExisting,
     hasExistingCover: input.clientAHasExisting || input.clientBHasExisting,
   };
-  console.log(`[Pipeline] UI State: partner=${uiState.isPartner}, existingA=${uiState.clientAHasExisting}, existingB=${uiState.clientBHasExisting}`);
 
-  // ── Step 2: Save inputs if requested ──
+  // ── Step 2: Save inputs ──
   if (input.saveCase) {
     await prisma.case.update({
       where: { id: input.caseId },
@@ -80,9 +107,9 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     });
   }
 
-  // ── Step 3: LLM Extractor (facts only, no math) ──
+  // ── Step 3: LLM Extractor ──
   console.log("[Pipeline] Running extractor...");
-  const extractInput: ExtractInput = {
+  const factPack = await llm.extractCaseJson({
     docType: input.docType,
     clientOverrides: input.clientOverrides,
     firefliesText: input.firefliesText,
@@ -90,47 +117,66 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     otherDocsText: input.otherDocsText,
     additionalContext: input.additionalContext,
     roaDeviations: input.roaDeviations,
-  };
-  const factPack = await llm.extractCaseJson(extractInput);
-  console.log(`[Pipeline] Extracted ${factPack.clients.length} clients, ${factPack.missingFields.length} missing fields`);
+  });
+  console.log(`[Pipeline] Extracted: ${factPack.clients.length} clients, ${factPack.existingCover.length} existing, ${factPack.recommendedCover.length} recommended`);
 
-  // ── Step 4: LLM Writer (narrative only, no premium math) ──
+  // ── Step 4: LLM Writer ──
   console.log("[Pipeline] Running writer...");
   const writerOutput = await llm.writeSections(factPack, input.docType);
   console.log("[Pipeline] Writer complete");
 
-  // ── Step 5: Get client data from fact pack ──
-  const clientA = getClient(factPack, "A");
-  const clientB = getClient(factPack, "B");
-  const freq: PremiumFrequency = factPack.caseMeta.frequency || "month";
+  // ── Step 5: Map fact pack to template variables ──
+  // Get client data
+  const clientA = factPack.clients[0];
+  const clientB = factPack.clients.length > 1 ? factPack.clients[1] : null;
 
-  // ── Step 6: DETERMINISTIC premium math (never from LLM) ──
+  // Get existing/recommended cover blocks per client
+  const clientAName = clientA?.fullName || input.clientOverrides?.name || "Client A";
+  const clientBName = clientB?.fullName || input.clientOverrides?.nameB || "Client B";
+
+  const existA = factPack.existingCover.find(e => e.clientName?.includes(clientAName.split(" ")[0]) || e.clientName?.includes("Client A") || e.clientName?.includes("A"));
+  const existB = factPack.existingCover.find(e => e.clientName?.includes(clientBName.split(" ")[0]) || e.clientName?.includes("Client B") || e.clientName?.includes("B"));
+  const recA = factPack.recommendedCover.find(r => r.clientName?.includes(clientAName.split(" ")[0]) || r.clientName?.includes("Client A") || r.clientName?.includes("A"));
+  const recB = factPack.recommendedCover.find(r => r.clientName?.includes(clientBName.split(" ")[0]) || r.clientName?.includes("Client B") || r.clientName?.includes("B"));
+
+  // Fallbacks: if only one block and not partner, use it for A
+  const existCoverA = existA || (factPack.existingCover.length === 1 ? factPack.existingCover[0] : null);
+  const existCoverB = existB || null;
+  const recCoverA = recA || (factPack.recommendedCover.length === 1 ? factPack.recommendedCover[0] : null);
+  const recCoverB = recB || null;
+
+  const freq = detectFrequency(factPack);
+
+  // ── Step 6: DETERMINISTIC premium math ──
   const premiumSummary = computePremiumSummary(
     {
-      existingAmount: clientA?.existingCover.premium.amount ?? null,
-      newAmount: clientA?.implementedCover.premium.amount ?? null,
+      existingAmount: existCoverA?.premiumAmount ?? null,
+      newAmount: recCoverA?.premiumAmount ?? null,
       frequency: freq,
     },
     uiState.isPartner ? {
-      existingAmount: clientB?.existingCover.premium.amount ?? null,
-      newAmount: clientB?.implementedCover.premium.amount ?? null,
+      existingAmount: existCoverB?.premiumAmount ?? null,
+      newAmount: recCoverB?.premiumAmount ?? null,
       frequency: freq,
     } : null,
     uiState,
     freq
   );
-  console.log(`[Pipeline] Premium: existing=${premiumSummary.OLD_PREMIUM}, new=${premiumSummary.NEW_PREMIUM}, delta=${premiumSummary.PREMIUM_CHANGE_LABEL}`);
+  console.log(`[Pipeline] Premium: ${premiumSummary.OLD_PREMIUM} → ${premiumSummary.NEW_PREMIUM} (${premiumSummary.PREMIUM_CHANGE_LABEL})`);
 
-  // ── Step 7: DETERMINISTIC benefits summary ──
+  // ── Step 7: DETERMINISTIC benefits ──
   const benefitsSummary = buildBenefitsSummary(
-    clientA?.name || input.clientOverrides?.name || "Client A",
-    clientA?.benefitsSummary || null,
-    clientB?.name || input.clientOverrides?.nameB || null,
-    clientB?.benefitsSummary || null,
+    clientAName,
+    factPack.benefitsSummaryA || null,
+    uiState.isPartner ? clientBName : null,
+    factPack.benefitsSummaryB || null,
     uiState
   );
 
-  // ── Step 8: Build Nunjucks render context ──
+  // ── Step 8: Sections included ──
+  const si = factPack.scopeOfAdvice.perClient[0] || { lifeInsurance: false, traumaInsurance: false, tpdInsurance: false, incomeProtection: false, redundancyCover: false, healthInsurance: false };
+
+  // ── Step 9: Build Nunjucks context ──
   const sec = (key: string): string => {
     const s = writerOutput.sections as Record<string, { included: boolean; html: string }> | undefined;
     if (s && key in s) return s[key].html || "";
@@ -141,89 +187,92 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     timeZone: "Pacific/Auckland", day: "numeric", month: "long", year: "numeric",
   });
 
-  const si = factPack.sectionsIncluded;
+  const existCoversA = existCoverA?.covers || [];
+  const existCoversB = existCoverB?.covers || [];
+  const newCoversA = recCoverA?.covers || [];
+  const newCoversB = recCoverB?.covers || [];
 
   const context: RenderContext = {
-    // Client info
-    CLIENT_NAME: v(clientA?.name, input.clientOverrides?.name || "Client"),
-    CLIENT_A_NAME: v(clientA?.name, input.clientOverrides?.name || "Client A"),
-    CLIENT_B_NAME: v(clientB?.name, input.clientOverrides?.nameB || "Client B"),
+    CLIENT_NAME: clientAName,
+    CLIENT_A_NAME: clientAName,
+    CLIENT_B_NAME: clientBName,
     CLIENT_EMAIL: v(clientA?.email, input.clientOverrides?.email || ""),
     CLIENT_PHONE: v(clientA?.phone, ""),
     DATE: nzDate,
     SIGNOFF_DATE: nzDate,
     ENGAGEMENT_DATE: nzDate,
 
-    ADVISER_NAME: "Craig Smith",
+    ADVISER_NAME: factPack.documentMetadata.adviserName || "Craig Smith",
     ADVISER_EMAIL: "craig@smiths.net.nz",
     ADVISER_PHONE: "0274 293 939",
-    ADVISER_FSP: "FSP33042",
+    ADVISER_FSP: `FSP${factPack.documentMetadata.adviserFapLicence || "33042"}`,
 
-    // Structure flags (FROM UI, never LLM)
     IS_PARTNER: uiState.isPartner,
     HAS_EXISTING_COVER: uiState.hasExistingCover,
     NEW_COVER_ONLY: !uiState.hasExistingCover,
 
-    // Section includes (from extractor)
-    LIFE_INCLUDED: si.life,
-    TRAUMA_INCLUDED: si.trauma,
-    TPD_INCLUDED: si.tpd,
-    INCOME_MP_INCLUDED: si.incomeProtection || si.mortgageProtection,
+    // Section includes
+    LIFE_INCLUDED: si.lifeInsurance,
+    TRAUMA_INCLUDED: si.traumaInsurance,
+    TPD_INCLUDED: si.tpdInsurance,
+    INCOME_MP_INCLUDED: si.incomeProtection || si.redundancyCover,
     IP_INCLUDED: si.incomeProtection,
-    MP_INCLUDED: si.mortgageProtection,
-    AIC_INCLUDED: si.accidentalInjury,
-    HEALTH_INCLUDED: si.health,
+    MP_INCLUDED: si.redundancyCover,
+    AIC_INCLUDED: newCoversA.some(c => c.coverType.toLowerCase().includes("accident")),
+    HEALTH_INCLUDED: si.healthInsurance,
 
-    // PREMIUM (all from deterministic computation)
+    // Premium (deterministic)
     ...premiumSummary,
 
-    // Client A covers
-    CLIENT_A_EXISTING_INSURER: v(clientA?.existingCover.insurer, ""),
-    CLIENT_A_NEW_INSURER: v(clientA?.implementedCover.insurer, ""),
+    // Client A existing covers (from covers array)
+    CLIENT_A_EXISTING_INSURER: v(existCoverA?.insurer, ""),
+    CLIENT_A_NEW_INSURER: v(recCoverA?.insurer, ""),
     CLIENT_A_ADVICE_TYPE_LABEL: uiState.hasExistingCover
-      ? `Summary of changes from ${v(clientA?.existingCover.insurer, "existing")} to ${v(clientA?.implementedCover.insurer, "new")}`
+      ? `Summary of changes from ${v(existCoverA?.insurer, "existing")} to ${v(recCoverA?.insurer, "new")}`
       : "",
-    CLIENT_A_OLD_LIFE: v(clientA?.existingCover.covers.life),
-    CLIENT_A_OLD_TRAUMA: v(clientA?.existingCover.covers.trauma),
-    CLIENT_A_OLD_TPD: v(clientA?.existingCover.covers.tpd),
-    CLIENT_A_OLD_IP: v(clientA?.existingCover.covers.ip),
-    CLIENT_A_OLD_MP: v(clientA?.existingCover.covers.mp),
-    CLIENT_A_OLD_AIC: v(clientA?.existingCover.covers.aic),
-    CLIENT_A_OLD_PREMIUM_COVER: v(clientA?.existingCover.covers.premiumCover),
-    CLIENT_A_NEW_LIFE: v(clientA?.implementedCover.covers.life),
-    CLIENT_A_NEW_TRAUMA: v(clientA?.implementedCover.covers.trauma),
-    CLIENT_A_NEW_TPD: v(clientA?.implementedCover.covers.tpd),
-    CLIENT_A_NEW_IP: v(clientA?.implementedCover.covers.ip),
-    CLIENT_A_NEW_MP: v(clientA?.implementedCover.covers.mp),
-    CLIENT_A_NEW_AIC: v(clientA?.implementedCover.covers.aic),
-    CLIENT_A_NEW_PREMIUM_COVER: v(clientA?.implementedCover.covers.premiumCover),
+    CLIENT_A_OLD_LIFE: findCover(existCoversA, "life"),
+    CLIENT_A_OLD_TRAUMA: findCover(existCoversA, "trauma"),
+    CLIENT_A_OLD_TPD: findCover(existCoversA, "tpd"),
+    CLIENT_A_OLD_IP: findCover(existCoversA, "income"),
+    CLIENT_A_OLD_MP: findCover(existCoversA, "mortgage"),
+    CLIENT_A_OLD_AIC: findCover(existCoversA, "accident"),
+    CLIENT_A_OLD_PREMIUM_COVER: findCover(existCoversA, "premium"),
 
-    // Client B covers
-    CLIENT_B_EXISTING_INSURER: v(clientB?.existingCover.insurer, ""),
-    CLIENT_B_NEW_INSURER: v(clientB?.implementedCover.insurer, ""),
+    CLIENT_A_NEW_LIFE: findCover(newCoversA, "life"),
+    CLIENT_A_NEW_TRAUMA: findCover(newCoversA, "trauma"),
+    CLIENT_A_NEW_TPD: findCover(newCoversA, "tpd"),
+    CLIENT_A_NEW_IP: findCover(newCoversA, "income"),
+    CLIENT_A_NEW_MP: findCover(newCoversA, "mortgage"),
+    CLIENT_A_NEW_AIC: findCover(newCoversA, "accident"),
+    CLIENT_A_NEW_PREMIUM_COVER: findCover(newCoversA, "premium"),
+
+    // Client B
+    CLIENT_B_EXISTING_INSURER: v(existCoverB?.insurer, ""),
+    CLIENT_B_NEW_INSURER: v(recCoverB?.insurer, ""),
     CLIENT_B_ADVICE_TYPE_LABEL: uiState.hasExistingCover
-      ? `Summary of changes from ${v(clientB?.existingCover.insurer, "existing")} to ${v(clientB?.implementedCover.insurer, "new")}`
+      ? `Summary of changes from ${v(existCoverB?.insurer, "existing")} to ${v(recCoverB?.insurer, "new")}`
       : "",
-    CLIENT_B_OLD_LIFE: v(clientB?.existingCover.covers.life),
-    CLIENT_B_OLD_TRAUMA: v(clientB?.existingCover.covers.trauma),
-    CLIENT_B_OLD_TPD: v(clientB?.existingCover.covers.tpd),
-    CLIENT_B_OLD_IP: v(clientB?.existingCover.covers.ip),
-    CLIENT_B_OLD_MP: v(clientB?.existingCover.covers.mp),
-    CLIENT_B_OLD_AIC: v(clientB?.existingCover.covers.aic),
-    CLIENT_B_OLD_PREMIUM_COVER: v(clientB?.existingCover.covers.premiumCover),
-    CLIENT_B_NEW_LIFE: v(clientB?.implementedCover.covers.life),
-    CLIENT_B_NEW_TRAUMA: v(clientB?.implementedCover.covers.trauma),
-    CLIENT_B_NEW_TPD: v(clientB?.implementedCover.covers.tpd),
-    CLIENT_B_NEW_IP: v(clientB?.implementedCover.covers.ip),
-    CLIENT_B_NEW_MP: v(clientB?.implementedCover.covers.mp),
-    CLIENT_B_NEW_AIC: v(clientB?.implementedCover.covers.aic),
-    CLIENT_B_NEW_PREMIUM_COVER: v(clientB?.implementedCover.covers.premiumCover),
+    CLIENT_B_OLD_LIFE: findCover(existCoversB, "life"),
+    CLIENT_B_OLD_TRAUMA: findCover(existCoversB, "trauma"),
+    CLIENT_B_OLD_TPD: findCover(existCoversB, "tpd"),
+    CLIENT_B_OLD_IP: findCover(existCoversB, "income"),
+    CLIENT_B_OLD_MP: findCover(existCoversB, "mortgage"),
+    CLIENT_B_OLD_AIC: findCover(existCoversB, "accident"),
+    CLIENT_B_OLD_PREMIUM_COVER: findCover(existCoversB, "premium"),
+
+    CLIENT_B_NEW_LIFE: findCover(newCoversB, "life"),
+    CLIENT_B_NEW_TRAUMA: findCover(newCoversB, "trauma"),
+    CLIENT_B_NEW_TPD: findCover(newCoversB, "tpd"),
+    CLIENT_B_NEW_IP: findCover(newCoversB, "income"),
+    CLIENT_B_NEW_MP: findCover(newCoversB, "mortgage"),
+    CLIENT_B_NEW_AIC: findCover(newCoversB, "accident"),
+    CLIENT_B_NEW_PREMIUM_COVER: findCover(newCoversB, "premium"),
 
     // Benefits (deterministic)
     ...benefitsSummary,
 
     // Writer narratives
-    SPECIAL_INSTRUCTIONS: sec("special_instructions") || factPack.shared.specialInstructions || "",
+    SPECIAL_INSTRUCTIONS: sec("special_instructions") || factPack.specialInstructions || "",
     REASON_LIFE_COVER: sec("reasons_life"),
     REASON_TRAUMA: sec("reasons_trauma"),
     REASON_PROGRESSIVE_CARE: sec("reasons_progressive_care"),
@@ -238,7 +287,6 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     ROA_DEVIATIONS: sec("deviations") || input.roaDeviations || "",
     MODIFICATION_NOTES: sec("modification_notes") || "",
 
-    // Pros/cons
     LIFE_PROS: sec("pros_life"),
     LIFE_CONS: sec("cons_life"),
     TRAUMA_PROS: sec("pros_trauma"),
@@ -251,31 +299,25 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     AIC_CONS: sec("cons_aic"),
   };
 
-  // ── Step 9: Render template ──
+  // ── Step 10: Render template ──
   console.log("[Pipeline] Rendering template...");
   const clientType = input.docType === DocType.SOE ? null : input.clientType;
   const renderedHtml = await renderTemplate(input.docType, clientType, context, uiState.hasExistingCover);
 
-  // ── Step 10: PREFLIGHT VALIDATION (blocks PDF if fails) ──
+  // ── Step 11: PREFLIGHT VALIDATION ──
   const validation = preflightValidate({
     uiState,
     premiumSummary,
     benefitsSummary,
     renderedHtml,
-    clientAName: clientA?.name || input.clientOverrides?.name || null,
-    clientBName: clientB?.name || input.clientOverrides?.nameB || null,
+    clientAName: clientA?.fullName || input.clientOverrides?.name || null,
+    clientBName: clientB?.fullName || input.clientOverrides?.nameB || null,
   });
 
-  if (validation.errors.length > 0) {
-    console.warn("[Pipeline] Validation ERRORS:", validation.errors);
-  }
-  if (validation.warnings.length > 0) {
-    console.warn("[Pipeline] Validation warnings:", validation.warnings);
-  }
+  if (validation.errors.length > 0) console.warn("[Pipeline] ERRORS:", validation.errors);
+  if (validation.warnings.length > 0) console.warn("[Pipeline] Warnings:", validation.warnings);
 
-  // ── Step 11: Save document + generate PDF (only if validation passes) ──
-  let pdfPath: string | null = null;
-
+  // ── Step 12: Save doc + PDF ──
   const doc = await prisma.generatedDocument.create({
     data: {
       caseId: input.caseId,
@@ -286,17 +328,14 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     },
   });
 
+  let pdfPath: string | null = null;
   if (validation.valid) {
     try {
-      const pdfBuffer = await generatePdf(renderedHtml);
-      // PDF stored in DB via rendered HTML, generated on-the-fly for download
+      await generatePdf(renderedHtml);
       pdfPath = "on-demand";
-      console.log(`[Pipeline] PDF generation successful for doc ${doc.id}`);
     } catch (e) {
       console.error("[Pipeline] PDF generation failed:", e);
     }
-  } else {
-    console.warn(`[Pipeline] PDF blocked due to ${validation.errors.length} validation errors`);
   }
 
   return {
