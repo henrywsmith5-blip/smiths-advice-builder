@@ -180,8 +180,16 @@ export default function CaseWorkspacePage({ params }: { params: Promise<{ id: st
 
       const data = await res.json();
 
+      // #region agent log
+      console.log("[Generate Debug] API response status:", res.status);
+      console.log("[Generate Debug] API response data:", JSON.stringify(data, null, 2));
+      if (data._debug) {
+        console.log("[Generate Debug] Server debug info:", JSON.stringify(data._debug, null, 2));
+      }
+      // #endregion
+
       if (!res.ok) {
-        throw new Error(data.error || "Generation failed");
+        throw new Error(data.error || `Generation failed (status ${res.status})`);
       }
 
       setDocId(data.docId);

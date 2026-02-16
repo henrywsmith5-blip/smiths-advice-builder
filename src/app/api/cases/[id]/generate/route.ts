@@ -32,6 +32,19 @@ export async function POST(
 
     const body = await request.json().catch(() => ({}));
 
+    // #region agent log
+    const debugInfo: Record<string, unknown> = {};
+    debugInfo.inputLengths = {
+      additionalContext: (body.additionalContext || "").length,
+      firefliesText: (body.firefliesText || "").length,
+      clientAName: body.clientAName || caseRecord.clientAName || "NOT SET",
+      clientType: body.clientType || caseRecord.clientType,
+      clientAHasExisting: body.clientAHasExisting ?? caseRecord.clientAHasExisting,
+      clientBHasExisting: body.clientBHasExisting ?? caseRecord.clientBHasExisting,
+    };
+    console.log("[Generate Debug] Input:", JSON.stringify(debugInfo.inputLengths));
+    // #endregion
+
     const result = await runGenerationPipeline({
       caseId: id,
       docType: docTypeParam as DocType,
@@ -54,16 +67,33 @@ export async function POST(
     // Return validation results alongside doc info
     const status = result.validation.valid ? 200 : 422;
 
+    // #region agent log
+    debugInfo.pipelineResult = {
+      docId: result.docId,
+      validationValid: result.validation.valid,
+      validationErrors: result.validation.errors,
+      validationWarnings: result.validation.warnings,
+      premiumSummary: result.premiumSummary,
+      htmlLength: result.renderedHtml?.length || 0,
+    };
+    console.log("[Generate Debug] Result:", JSON.stringify(debugInfo.pipelineResult));
+    // #endregion
+
     return NextResponse.json({
       docId: result.docId,
       hasPdf: result.validation.valid,
       validation: result.validation,
       premiumSummary: result.premiumSummary,
+      _debug: debugInfo,
     }, { status });
   } catch (error) {
-    console.error("[Generate] Error:", error);
+    console.error("[Generate] CAUGHT ERROR:", error);
+    // #region agent log
+    const errDetail = error instanceof Error ? { message: error.message, stack: error.stack?.substring(0, 500) } : String(error);
+    console.error("[Generate Debug] Error detail:", JSON.stringify(errDetail));
+    // #endregion
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Generation failed" },
+      { error: error instanceof Error ? error.message : "Generation failed", _debug: { caughtError: error instanceof Error ? error.message : String(error) } },
       { status: 500 }
     );
   }
