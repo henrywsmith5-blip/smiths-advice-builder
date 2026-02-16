@@ -44,12 +44,15 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px 0;border-bottom:1px solid var(--rule);}
 .header img.logo{height:44px;width:auto;}
 .header .doc-label{font-family:var(--font-body);font-size:8.5pt;font-weight:600;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;}
-.cover-page{min-height:85vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 0 60px 0;}
+.cover-hero{width:100%;height:480px;background-image:url('/images/cover-hero.jpg');background-size:cover;background-position:center center;background-repeat:no-repeat;position:relative;margin:0 -44px;width:calc(100% + 88px);}
+.cover-logo-overlay{position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);border-radius:50%;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.cover-logo-overlay img{height:56px;width:auto;display:block;}
+.cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 0 40px 0;position:relative;}
 .cover-page .cover-logo{height:72px;width:auto;margin-bottom:48px;}
-.cover-rule{width:120px;height:3px;background:var(--bronze);margin:0 auto 32px auto;}
-.cover-page h1{font-family:var(--font-display);font-size:38pt;font-weight:700;color:var(--black);letter-spacing:-0.8px;line-height:1.15;margin-bottom:6px;}
+.cover-rule{width:80px;height:2px;background:var(--bronze);margin:0 auto 28px auto;}
+.cover-page h1{font-family:var(--font-display);font-size:36pt;font-weight:700;color:var(--black);letter-spacing:-0.8px;line-height:1.15;margin-bottom:6px;}
 .cover-page .cover-subtitle{font-family:var(--font-display);font-size:15pt;font-weight:400;color:var(--bronze);letter-spacing:0.3px;margin-bottom:8px;}
-.cover-page .cover-type{font-family:var(--font-body);font-size:10pt;font-weight:500;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:52px;}
+.cover-page .cover-type{font-family:var(--font-body);font-size:10pt;font-weight:500;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px;}
 .cover-meta{margin-top:20px;width:100%;max-width:400px;}
 .cover-meta-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--rule);}
 .cover-meta-row:last-child{border-bottom:none;}
@@ -138,7 +141,7 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .footer{border-top:1.5px solid var(--bronze);padding-top:10px;margin-top:36px;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--muted);}
 .footer a{color:var(--bronze);text-decoration:none;}
 .page-break{page-break-before:always;margin-top:0;}
-@media print{body{background:white;}.page{max-width:none;padding:0;}.accent-bar{position:fixed;top:0;left:0;right:0;}.cover-page{min-height:auto;page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}}
+@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:480px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}}
 `;
 
 const LOGO_URL = "https://images.squarespace-cdn.com/content/v1/6033fe3152058c67d1e84e7f/1614286673894-ZH98E19GRUKA55E6Z17W/Smiths_wide_withouttagline_RGB_COLOUR-300dpi.jpg?format=1500w";
@@ -160,12 +163,16 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 </head>
 <body>
 
-<div class="accent-bar"></div>
 <div class="page">
 
 <!-- ═══ COVER PAGE ═══ -->
+<div class="cover-hero">
+  <div class="cover-logo-overlay">
+    <img src="${LOGO_URL}" alt="Smiths Insurance &amp; KiwiSaver">
+  </div>
+</div>
+
 <div class="cover-page">
-  <img class="cover-logo" src="${LOGO_URL}" alt="Smiths Insurance &amp; KiwiSaver">
   <div class="cover-rule"></div>
   <h1>${title}</h1>
   {% if HAS_EXISTING_COVER %}
