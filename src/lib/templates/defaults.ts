@@ -536,13 +536,6 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 </div>
 {% endif %}
 
-<div class="adviser-sig">
-  <p style="margin-bottom:4px;"><strong>Financial Adviser</strong></p>
-  <p style="margin-bottom:16px;"><strong>{{ ADVISER_NAME }}</strong> | FAP License #33042</p>
-  <div class="sig-line"></div>
-  <div class="sig-label">Signature &amp; Date</div>
-</div>
-
 <!-- ═══ FOOTER ═══ -->
 <div class="footer">
   <span>${title} | Confidential</span>
