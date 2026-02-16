@@ -4,7 +4,7 @@ import { FactPackSchema, WriterOutputSchema } from "./schemas";
 import type { FactPack, WriterOutput } from "./schemas";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-sonnet-4-5-20250929";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -315,14 +315,23 @@ Return ONLY valid JSON.`;
 export class AnthropicProvider implements LLMProvider {
   async extractCaseJson(input: ExtractInput): Promise<FactPack> {
     const prompt = buildExtractPrompt(input);
+    console.log(`[Anthropic Extractor] Using model: ${MODEL}`);
+    console.log(`[Anthropic Extractor] Prompt length: ${prompt.length} chars`);
 
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 8000,
-      temperature: 0,
-      system: EXTRACTOR_SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    });
+    let response;
+    try {
+      response = await client.messages.create({
+        model: MODEL,
+        max_tokens: 8000,
+        temperature: 0,
+        system: EXTRACTOR_SYSTEM,
+        messages: [{ role: "user", content: prompt }],
+      });
+    } catch (apiError: unknown) {
+      const errMsg = apiError instanceof Error ? apiError.message : String(apiError);
+      console.error(`[Anthropic Extractor] API CALL FAILED: ${errMsg}`);
+      throw new Error(`Anthropic API call failed: ${errMsg}`);
+    }
 
     const text = response.content[0]?.type === "text" ? response.content[0].text : "";
     console.log(`[Anthropic Extractor] Response length: ${text.length}`);
