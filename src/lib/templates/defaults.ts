@@ -142,7 +142,7 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .section-block-break{page-break-before:always;}
 .section-page-2{page-break-before:always;page-break-after:always;}
 .section-heading{page-break-after:avoid;}
-@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.section-heading{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{page-break-before:always;}.section-page-2{page-break-before:always;page-break-after:always;}}
+@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.section-heading{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{page-break-before:always;}.section-page-2{page-break-before:always;page-break-after:always;}.placeholder{border:none;background:transparent;color:var(--dark);font-style:normal;font-weight:600;padding:0;}.placeholder-block{border:none;background:transparent;color:var(--body);font-style:normal;padding:14px 0;min-height:0;}}
 `;
 
 const LOGO_URL = "https://images.squarespace-cdn.com/content/v1/6033fe3152058c67d1e84e7f/1614286673894-ZH98E19GRUKA55E6Z17W/Smiths_wide_withouttagline_RGB_COLOUR-300dpi.jpg?format=1500w";
