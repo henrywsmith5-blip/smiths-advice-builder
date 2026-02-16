@@ -77,10 +77,11 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .schedule-table td:last-child{font-weight:600;color:var(--dark);font-size:9.5pt;}
 .placeholder{background:rgba(184,132,95,0.10);border:1px dashed var(--bronze-border);padding:1px 7px;font-style:italic;color:var(--bronze);font-weight:600;white-space:nowrap;}
 .placeholder-block{background:rgba(184,132,95,0.05);border:1px dashed var(--bronze-border);padding:14px 18px;font-style:italic;color:var(--bronze);margin:8px 0;min-height:48px;line-height:1.55;}
-.checkbox-list{list-style:none;padding:0;margin:8px 0 14px 4px;}
-.checkbox-list li{padding:4px 0 4px 30px;position:relative;line-height:1.5;font-size:10pt;}
-.checkbox-list li::before{content:'';position:absolute;left:0;top:6px;width:15px;height:15px;border:1.5px solid var(--bronze);background:var(--white);}
-.checkbox-list li.checked::before{content:'\\2713';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bronze);background:var(--white);}
+.checkbox-group{padding:0;margin:8px 0 14px 4px;}
+.checkbox-item{padding:4px 0;display:flex;align-items:flex-start;gap:10px;line-height:1.5;font-size:10pt;}
+.checkbox-box{display:inline-block;flex-shrink:0;width:14px;height:14px;border:1.5px solid var(--bronze);background:var(--white);position:relative;margin-top:3px;}
+.checkbox-item.checked .checkbox-box::after{content:'';position:absolute;left:3px;top:0px;width:5px;height:9px;border-right:2px solid var(--bronze);border-bottom:2px solid var(--bronze);transform:rotate(45deg);}
+.checkbox-label{flex:1;}
 .data-table{width:100%;border-collapse:collapse;margin:10px 0 18px 0;font-size:9.5pt;page-break-inside:avoid;}
 .data-table th{background:var(--navy);color:var(--white);padding:9px 14px;text-align:left;font-weight:600;font-size:8.5pt;text-transform:uppercase;letter-spacing:0.6px;}
 .data-table td{padding:8px 14px;border-bottom:1px solid var(--rule);vertical-align:top;}
@@ -214,27 +215,27 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <p class="body-text">The following are the areas of insurance advice that you are requesting. Unless noted below, discussions and advice will be limited to assisting you and your family's financial security in the event of:</p>
 
 <div class="sub-heading"><span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
-<ul class="checkbox-list">
-  <li{% if LIFE_INCLUDED %} class="checked"{% endif %}>Untimely death (Life Insurance)</li>
-  <li{% if TRAUMA_INCLUDED %} class="checked"{% endif %}>Suffering a serious critical illness or injury (Trauma Insurance)</li>
-  <li{% if TPD_INCLUDED %} class="checked"{% endif %}>Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</li>
-  <li{% if IP_INCLUDED or MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to sickness or injury (Income Protection Insurance)</li>
-  <li{% if MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</li>
-  <li{% if HEALTH_INCLUDED %} class="checked"{% endif %}>Requiring hospital or specialist treatment (Health Insurance)</li>
-  <li>This is a limited advice engagement process</li>
-</ul>
+<div class="checkbox-group">
+  <div class="checkbox-item{% if LIFE_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Untimely death (Life Insurance)</span></div>
+  <div class="checkbox-item{% if TRAUMA_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Suffering a serious critical illness or injury (Trauma Insurance)</span></div>
+  <div class="checkbox-item{% if TPD_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</span></div>
+  <div class="checkbox-item{% if IP_INCLUDED or MP_INCLUDED or INCOME_MP_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Loss of income due to sickness or injury (Income Protection Insurance)</span></div>
+  <div class="checkbox-item{% if MP_INCLUDED or INCOME_MP_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</span></div>
+  <div class="checkbox-item{% if HEALTH_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Requiring hospital or specialist treatment (Health Insurance)</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">This is a limited advice engagement process</span></div>
+</div>
 
 {% if IS_PARTNER %}
 <div class="sub-heading"><span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
-<ul class="checkbox-list">
-  <li{% if LIFE_INCLUDED %} class="checked"{% endif %}>Untimely death (Life Insurance)</li>
-  <li{% if TRAUMA_INCLUDED %} class="checked"{% endif %}>Suffering a serious critical illness or injury (Trauma Insurance)</li>
-  <li{% if TPD_INCLUDED %} class="checked"{% endif %}>Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</li>
-  <li{% if IP_INCLUDED or MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to sickness or injury (Income Protection Insurance)</li>
-  <li{% if MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</li>
-  <li{% if HEALTH_INCLUDED %} class="checked"{% endif %}>Requiring hospital or specialist treatment (Health Insurance)</li>
-  <li>This is a limited advice engagement process</li>
-</ul>
+<div class="checkbox-group">
+  <div class="checkbox-item{% if LIFE_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Untimely death (Life Insurance)</span></div>
+  <div class="checkbox-item{% if TRAUMA_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Suffering a serious critical illness or injury (Trauma Insurance)</span></div>
+  <div class="checkbox-item{% if TPD_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</span></div>
+  <div class="checkbox-item{% if IP_INCLUDED or MP_INCLUDED or INCOME_MP_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Loss of income due to sickness or injury (Income Protection Insurance)</span></div>
+  <div class="checkbox-item{% if MP_INCLUDED or INCOME_MP_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</span></div>
+  <div class="checkbox-item{% if HEALTH_INCLUDED %} checked{% endif %}"><span class="checkbox-box"></span><span class="checkbox-label">Requiring hospital or specialist treatment (Health Insurance)</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">This is a limited advice engagement process</span></div>
+</div>
 {% endif %}
 
 <div class="sub-heading" style="border-bottom:1.5px solid var(--bronze); padding-bottom:4px;">Special Instructions / Objectives / Comments</div>
@@ -502,16 +503,16 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <div class="section-heading"><div class="num">14</div><h2>Declaration of Continued Good Health</h2></div>
 <p class="body-text">As your Financial Adviser, I want to ensure the cover applied for can operate correctly at claim time.</p>
-<ul class="checkbox-list" style="margin:16px 0 16px 12px;">
-  <li>You have not received therapy or treatment since completing the application form</li>
-  <li>You are not currently receiving treatment not already disclosed</li>
-  <li>There have not been any changes in your health, occupation, or pastimes</li>
-  <li>I can confirm that I provided all the answers myself</li>
-  <li>The adviser explained any additional exclusions applicable to this policy</li>
-  <li>The adviser explained the payment dates and premium amounts</li>
-  <li>The adviser explained the risk of non-disclosure or misstatement</li>
-  <li>The adviser explained the difference between my new and previous insurance policy</li>
-</ul>
+<div class="checkbox-group" style="margin:16px 0 16px 12px;">
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">You have not received therapy or treatment since completing the application form</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">You are not currently receiving treatment not already disclosed</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">There have not been any changes in your health, occupation, or pastimes</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">I can confirm that I provided all the answers myself</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">The adviser explained any additional exclusions applicable to this policy</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">The adviser explained the payment dates and premium amounts</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">The adviser explained the risk of non-disclosure or misstatement</span></div>
+  <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label">The adviser explained the difference between my new and previous insurance policy</span></div>
+</div>
 <div class="warning-box"><strong>Important:</strong> The adviser, {{ ADVISER_NAME }}, also explained the risks of shifting insurance cover which manifests if your health has changed since the initial policy was issued. {{ CLIENT_A_NEW_INSURER }} have underwritten the insurance risk as of today with the information you provided to us.</div>
 {% endif %}
 
@@ -537,11 +538,11 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   {% else %}
   <p class="body-text">I, <strong><em>{{ CLIENT_A_NAME }}</em></strong>, have read and understand this report and wish to:</p>
   {% endif %}
-  <ul class="checkbox-list" style="margin:14px 0;">
-    <li><strong>ACCEPT</strong> the sign-off document</li>
-    <li><strong>DECLINE</strong> the sign-off document</li>
-    <li><strong>MODIFY</strong> the sign-off document (see notes below)</li>
-  </ul>
+  <div class="checkbox-group" style="margin:14px 0;">
+    <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label"><strong>ACCEPT</strong> the sign-off document</span></div>
+    <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label"><strong>DECLINE</strong> the sign-off document</span></div>
+    <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label"><strong>MODIFY</strong> the sign-off document (see notes below)</span></div>
+  </div>
 </div>
 
 <div class="sub-heading">Modification Notes (if applicable):</div>
