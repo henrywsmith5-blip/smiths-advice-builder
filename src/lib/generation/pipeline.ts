@@ -102,21 +102,22 @@ export async function runGenerationPipeline(
     timeZone: "Pacific/Auckland", day: "numeric", month: "long", year: "numeric",
   });
 
-  const existingCovers = extractedJson.existing_cover?.covers || {};
-  const newCovers = extractedJson.new_cover?.covers || {};
+  // Direct field mapping from new schema → template variables
+  const d = extractedJson;
+  const v = (val: string | null | undefined, fallback = "N/A") => val || fallback;
 
   const context: RenderContext = {
     // Client info
-    CLIENT_NAME: extractedJson.client.name || input.clientOverrides?.name || "Client",
-    CLIENT_A_NAME: extractedJson.client.name || input.clientOverrides?.name || "Client A",
-    CLIENT_B_NAME: extractedJson.client.name_b || input.clientOverrides?.nameB || "Client B",
-    CLIENT_EMAIL: extractedJson.client.email || input.clientOverrides?.email || "",
-    CLIENT_PHONE: extractedJson.client.phone || "",
+    CLIENT_NAME: v(d.client.name_a, input.clientOverrides?.name || "Client"),
+    CLIENT_A_NAME: v(d.client.name_a, input.clientOverrides?.name || "Client A"),
+    CLIENT_B_NAME: v(d.client.name_b, input.clientOverrides?.nameB || "Client B"),
+    CLIENT_EMAIL: v(d.client.email, input.clientOverrides?.email || ""),
+    CLIENT_PHONE: v(d.client.phone, ""),
     DATE: nzDate,
     SIGNOFF_DATE: nzDate,
     ENGAGEMENT_DATE: nzDate,
 
-    // Adviser defaults
+    // Adviser
     ADVISER_NAME: "Craig Smith",
     ADVISER_EMAIL: "craig@smiths.net.nz",
     ADVISER_PHONE: "0274 293 939",
@@ -127,71 +128,82 @@ export async function runGenerationPipeline(
     HAS_EXISTING_COVER: hasAnyExistingCover,
     NEW_COVER_ONLY: !hasAnyExistingCover,
 
-    // Section includes
-    LIFE_INCLUDED: extractedJson.sections.life?.included ?? false,
-    TRAUMA_INCLUDED: extractedJson.sections.trauma?.included ?? false,
-    TPD_INCLUDED: extractedJson.sections.tpd?.included ?? false,
-    INCOME_MP_INCLUDED: extractedJson.sections.income_protection?.included ?? false,
-    IP_INCLUDED: extractedJson.sections.income_protection?.included ?? false,
-    MP_INCLUDED: extractedJson.sections.mortgage?.included ?? false,
-    AIC_INCLUDED: extractedJson.sections.other?.included ?? false,
-    PREMIUM_COVER_INCLUDED: false,
+    // Section includes (from extractor)
+    LIFE_INCLUDED: d.sections_included.life,
+    TRAUMA_INCLUDED: d.sections_included.trauma,
+    TPD_INCLUDED: d.sections_included.tpd,
+    INCOME_MP_INCLUDED: d.sections_included.income_protection || d.sections_included.mortgage_protection,
+    IP_INCLUDED: d.sections_included.income_protection,
+    MP_INCLUDED: d.sections_included.mortgage_protection,
+    AIC_INCLUDED: d.sections_included.accidental_injury,
 
-    // Premium data
-    OLD_INSURER: extractedJson.existing_cover?.insurer || "",
-    NEW_INSURER: extractedJson.new_cover?.insurer || "",
-    OLD_PREMIUM: extractedJson.existing_cover?.premium || "",
-    NEW_PREMIUM: extractedJson.new_cover?.premium || "",
-    PREMIUM_FREQUENCY: "per month",
+    // Premium
+    OLD_PREMIUM: v(d.premium.existing_total, ""),
+    NEW_PREMIUM: v(d.premium.new_total, ""),
+    PREMIUM_FREQUENCY: d.premium.frequency || "per month",
     PREMIUM_CHANGE_LABEL: "Savings",
-    PREMIUM_CHANGE: "",
-    MONTHLY_SAVINGS: "",
-    ANNUAL_SAVINGS: "",
+    PREMIUM_CHANGE: v(d.premium.savings, ""),
+    MONTHLY_SAVINGS: v(d.premium.savings, ""),
+    ANNUAL_SAVINGS: v(d.premium.annual_savings, ""),
 
-    // Client A existing cover
-    CLIENT_A_EXISTING_INSURER: extractedJson.existing_cover?.insurer || "",
-    CLIENT_A_ADVICE_TYPE_LABEL: hasAnyExistingCover ? "Summary of changes — migration from existing cover" : "",
-    CLIENT_A_OLD_LIFE: existingCovers["CLIENT_A_OLD_LIFE"] || existingCovers["OLD_LIFE"] || "N/A",
-    CLIENT_A_OLD_TRAUMA: existingCovers["CLIENT_A_OLD_TRAUMA"] || existingCovers["OLD_TRAUMA"] || "N/A",
-    CLIENT_A_OLD_TPD: existingCovers["CLIENT_A_OLD_TPD"] || existingCovers["OLD_TPD"] || "N/A",
-    CLIENT_A_OLD_IP: existingCovers["CLIENT_A_OLD_IP"] || existingCovers["OLD_IP"] || "N/A",
-    CLIENT_A_OLD_MP: existingCovers["CLIENT_A_OLD_MP"] || existingCovers["OLD_MP"] || "N/A",
-    CLIENT_A_OLD_AIC: existingCovers["CLIENT_A_OLD_AIC"] || existingCovers["OLD_AIC"] || "N/A",
-    CLIENT_A_OLD_PREMIUM_COVER: existingCovers["CLIENT_A_OLD_PREMIUM_COVER"] || "N/A",
+    // Client A — existing cover
+    CLIENT_A_EXISTING_INSURER: v(d.client_a_existing_insurer, ""),
+    CLIENT_A_ADVICE_TYPE_LABEL: hasAnyExistingCover
+      ? `Summary of changes from ${v(d.client_a_existing_insurer, "existing insurer")} to ${v(d.client_a_new_insurer, "new insurer")}`
+      : "",
+    CLIENT_A_OLD_LIFE: v(d.client_a_old_cover.life),
+    CLIENT_A_OLD_TRAUMA: v(d.client_a_old_cover.trauma),
+    CLIENT_A_OLD_TPD: v(d.client_a_old_cover.tpd),
+    CLIENT_A_OLD_IP: v(d.client_a_old_cover.income_protection),
+    CLIENT_A_OLD_MP: v(d.client_a_old_cover.mortgage_protection),
+    CLIENT_A_OLD_AIC: v(d.client_a_old_cover.accidental_injury),
+    CLIENT_A_OLD_PREMIUM_COVER: v(d.client_a_old_cover.premium_cover),
 
-    // Client A new cover
-    CLIENT_A_NEW_INSURER: extractedJson.new_cover?.insurer || "",
-    CLIENT_A_NEW_LIFE: newCovers["CLIENT_A_NEW_LIFE"] || newCovers["NEW_LIFE"] || "N/A",
-    CLIENT_A_NEW_TRAUMA: newCovers["CLIENT_A_NEW_TRAUMA"] || newCovers["NEW_TRAUMA"] || "N/A",
-    CLIENT_A_NEW_TPD: newCovers["CLIENT_A_NEW_TPD"] || newCovers["NEW_TPD"] || "N/A",
-    CLIENT_A_NEW_IP: newCovers["CLIENT_A_NEW_IP"] || newCovers["NEW_IP"] || "N/A",
-    CLIENT_A_NEW_MP: newCovers["CLIENT_A_NEW_MP"] || newCovers["NEW_MP"] || "N/A",
-    CLIENT_A_NEW_AIC: newCovers["CLIENT_A_NEW_AIC"] || newCovers["NEW_AIC"] || "N/A",
-    CLIENT_A_NEW_PREMIUM_COVER: newCovers["CLIENT_A_NEW_PREMIUM_COVER"] || "N/A",
+    // Client A — new cover
+    CLIENT_A_NEW_INSURER: v(d.client_a_new_insurer, ""),
+    CLIENT_A_NEW_LIFE: v(d.client_a_new_cover.life),
+    CLIENT_A_NEW_TRAUMA: v(d.client_a_new_cover.trauma),
+    CLIENT_A_NEW_TPD: v(d.client_a_new_cover.tpd),
+    CLIENT_A_NEW_IP: v(d.client_a_new_cover.income_protection),
+    CLIENT_A_NEW_MP: v(d.client_a_new_cover.mortgage_protection),
+    CLIENT_A_NEW_AIC: v(d.client_a_new_cover.accidental_injury),
+    CLIENT_A_NEW_PREMIUM_COVER: v(d.client_a_new_cover.premium_cover),
 
-    // Client B existing cover
-    CLIENT_B_EXISTING_INSURER: existingCovers["CLIENT_B_EXISTING_INSURER"] || extractedJson.existing_cover?.insurer || "",
-    CLIENT_B_ADVICE_TYPE_LABEL: hasAnyExistingCover ? "Summary of changes — migration from existing cover" : "",
-    CLIENT_B_OLD_LIFE: existingCovers["CLIENT_B_OLD_LIFE"] || "N/A",
-    CLIENT_B_OLD_TRAUMA: existingCovers["CLIENT_B_OLD_TRAUMA"] || "N/A",
-    CLIENT_B_OLD_TPD: existingCovers["CLIENT_B_OLD_TPD"] || "N/A",
-    CLIENT_B_OLD_IP: existingCovers["CLIENT_B_OLD_IP"] || "N/A",
-    CLIENT_B_OLD_MP: existingCovers["CLIENT_B_OLD_MP"] || "N/A",
-    CLIENT_B_OLD_AIC: existingCovers["CLIENT_B_OLD_AIC"] || "N/A",
-    CLIENT_B_OLD_PREMIUM_COVER: existingCovers["CLIENT_B_OLD_PREMIUM_COVER"] || "N/A",
+    // Client B — existing cover
+    CLIENT_B_EXISTING_INSURER: v(d.client_b_existing_insurer, ""),
+    CLIENT_B_ADVICE_TYPE_LABEL: hasAnyExistingCover
+      ? `Summary of changes from ${v(d.client_b_existing_insurer, "existing insurer")} to ${v(d.client_b_new_insurer, "new insurer")}`
+      : "",
+    CLIENT_B_OLD_LIFE: v(d.client_b_old_cover.life),
+    CLIENT_B_OLD_TRAUMA: v(d.client_b_old_cover.trauma),
+    CLIENT_B_OLD_TPD: v(d.client_b_old_cover.tpd),
+    CLIENT_B_OLD_IP: v(d.client_b_old_cover.income_protection),
+    CLIENT_B_OLD_MP: v(d.client_b_old_cover.mortgage_protection),
+    CLIENT_B_OLD_AIC: v(d.client_b_old_cover.accidental_injury),
+    CLIENT_B_OLD_PREMIUM_COVER: v(d.client_b_old_cover.premium_cover),
 
-    // Client B new cover
-    CLIENT_B_NEW_INSURER: newCovers["CLIENT_B_NEW_INSURER"] || extractedJson.new_cover?.insurer || "",
-    CLIENT_B_NEW_LIFE: newCovers["CLIENT_B_NEW_LIFE"] || "N/A",
-    CLIENT_B_NEW_TRAUMA: newCovers["CLIENT_B_NEW_TRAUMA"] || "N/A",
-    CLIENT_B_NEW_TPD: newCovers["CLIENT_B_NEW_TPD"] || "N/A",
-    CLIENT_B_NEW_IP: newCovers["CLIENT_B_NEW_IP"] || "N/A",
-    CLIENT_B_NEW_MP: newCovers["CLIENT_B_NEW_MP"] || "N/A",
-    CLIENT_B_NEW_AIC: newCovers["CLIENT_B_NEW_AIC"] || "N/A",
-    CLIENT_B_NEW_PREMIUM_COVER: newCovers["CLIENT_B_NEW_PREMIUM_COVER"] || "N/A",
+    // Client B — new cover
+    CLIENT_B_NEW_INSURER: v(d.client_b_new_insurer, ""),
+    CLIENT_B_NEW_LIFE: v(d.client_b_new_cover.life),
+    CLIENT_B_NEW_TRAUMA: v(d.client_b_new_cover.trauma),
+    CLIENT_B_NEW_TPD: v(d.client_b_new_cover.tpd),
+    CLIENT_B_NEW_IP: v(d.client_b_new_cover.income_protection),
+    CLIENT_B_NEW_MP: v(d.client_b_new_cover.mortgage_protection),
+    CLIENT_B_NEW_AIC: v(d.client_b_new_cover.accidental_injury),
+    CLIENT_B_NEW_PREMIUM_COVER: v(d.client_b_new_cover.premium_cover),
 
-    // Writer section HTML snippets
-    SPECIAL_INSTRUCTIONS: sec("special_instructions"),
+    // Benefits summary (from extractor)
+    MP_MONTHLY: v(d.benefits.mortgage_protection.monthly_amount),
+    MP_WAIT: v(d.benefits.mortgage_protection.wait_period),
+    MP_BENEFIT_PERIOD: v(d.benefits.mortgage_protection.benefit_period),
+    MP_PREMIUM: v(d.benefits.mortgage_protection.premium),
+    IP_MONTHLY: v(d.benefits.income_protection.monthly_amount),
+    IP_WAIT: v(d.benefits.income_protection.wait_period),
+    IP_BENEFIT_PERIOD: v(d.benefits.income_protection.benefit_period),
+    IP_PREMIUM: v(d.benefits.income_protection.premium),
+
+    // Writer narrative sections
+    SPECIAL_INSTRUCTIONS: sec("special_instructions") || d.special_instructions || "",
     REASON_LIFE_COVER: sec("reasons_life"),
     REASON_TRAUMA: sec("reasons_trauma"),
     REASON_PROGRESSIVE_CARE: sec("reasons_progressive_care"),
@@ -206,7 +218,7 @@ export async function runGenerationPipeline(
     ROA_DEVIATIONS: sec("deviations") || input.roaDeviations || "",
     MODIFICATION_NOTES: sec("modification_notes") || "",
 
-    // Pros/cons
+    // Pros/cons (from writer)
     LIFE_PROS: sec("pros_life"),
     LIFE_CONS: sec("cons_life"),
     TRAUMA_PROS: sec("pros_trauma"),
@@ -217,16 +229,6 @@ export async function runGenerationPipeline(
     INCOME_MP_CONS: sec("cons_income_mp"),
     AIC_PROS: sec("pros_aic"),
     AIC_CONS: sec("cons_aic"),
-
-    // Benefits summary
-    MP_MONTHLY: sec("mp_monthly") || "N/A",
-    MP_WAIT: sec("mp_wait") || "N/A",
-    MP_BENEFIT_PERIOD: sec("mp_benefit_period") || "N/A",
-    MP_PREMIUM: sec("mp_premium") || "N/A",
-    IP_MONTHLY: sec("ip_monthly") || "N/A",
-    IP_WAIT: sec("ip_wait") || "N/A",
-    IP_BENEFIT_PERIOD: sec("ip_benefit_period") || "N/A",
-    IP_PREMIUM: sec("ip_premium") || "N/A",
   };
 
   // ── Step 6: Render template ──

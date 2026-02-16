@@ -1,74 +1,94 @@
 import { z } from "zod";
 
-// ── Extractor output schema ──
-const RecommendationSchema = z.object({
-  provider: z.string().optional(),
-  product: z.string().optional(),
-  cover_type: z.string(),
-  sum_insured: z.string().optional(),
-  premium: z.string().optional(),
-  frequency: z.string().optional(),
-  term: z.string().optional(),
-  notes: z.string().optional(),
+// ══════════════════════════════════════════════════════════════
+// EXTRACTOR OUTPUT — maps directly to template variables
+// ══════════════════════════════════════════════════════════════
+
+const emptyCover = { life: null, trauma: null, tpd: null, income_protection: null, mortgage_protection: null, accidental_injury: null, premium_cover: null, health: null };
+const emptyBenefit = { monthly_amount: null, wait_period: null, benefit_period: null, premium: null };
+
+const CoverLineSchema = z.object({
+  life: z.string().nullable().default(null),
+  trauma: z.string().nullable().default(null),
+  tpd: z.string().nullable().default(null),
+  income_protection: z.string().nullable().default(null),
+  mortgage_protection: z.string().nullable().default(null),
+  accidental_injury: z.string().nullable().default(null),
+  premium_cover: z.string().nullable().default(null),
+  health: z.string().nullable().default(null),
 });
 
-const AlternativeSchema = z.object({
-  provider: z.string(),
-  premium: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-const SectionSchema = z.object({
-  included: z.boolean(),
-  summary_points: z.array(z.string()).default([]),
-  recommendations: z.array(RecommendationSchema).default([]),
-  alternatives_considered: z.array(AlternativeSchema).default([]),
-  evidence_quotes: z.array(z.string()).default([]),
+const BenefitDetailSchema = z.object({
+  monthly_amount: z.string().nullable().default(null),
+  wait_period: z.string().nullable().default(null),
+  benefit_period: z.string().nullable().default(null),
+  premium: z.string().nullable().default(null),
 });
 
 export const ExtractedJsonSchema = z.object({
+  // Client info
   client: z.object({
-    name: z.string().optional(),
-    name_b: z.string().optional(),
-    email: z.string().optional(),
-    phone: z.string().optional(),
-    has_existing_cover_a: z.boolean().default(false),
-    has_existing_cover_b: z.boolean().default(false),
+    name_a: z.string().nullable().default(null),
+    name_b: z.string().nullable().default(null),
+    email: z.string().nullable().default(null),
+    phone: z.string().nullable().default(null),
   }),
+
   doc_type: z.enum(["SOA", "ROA", "SOE"]),
-  sections: z.object({
-    life: SectionSchema.optional(),
-    trauma: SectionSchema.optional(),
-    tpd: SectionSchema.optional(),
-    income_protection: SectionSchema.optional(),
-    health: SectionSchema.optional(),
-    mortgage: SectionSchema.optional(),
-    business: SectionSchema.optional(),
-    kiwisaver: SectionSchema.optional(),
-    other: SectionSchema.optional(),
+
+  // Which cover types are included
+  sections_included: z.object({
+    life: z.boolean().default(false),
+    trauma: z.boolean().default(false),
+    tpd: z.boolean().default(false),
+    income_protection: z.boolean().default(false),
+    mortgage_protection: z.boolean().default(false),
+    accidental_injury: z.boolean().default(false),
+    health: z.boolean().default(false),
   }),
-  existing_cover: z.object({
-    insurer: z.string().optional(),
-    covers: z.record(z.string(), z.string()).optional(),
-    premium: z.string().optional(),
-  }).optional(),
-  new_cover: z.object({
-    insurer: z.string().optional(),
-    covers: z.record(z.string(), z.string()).optional(),
-    premium: z.string().optional(),
-  }).optional(),
-  compliance: z.object({
-    assumptions: z.array(z.string()).default([]),
-    limitations: z.array(z.string()).default([]),
-    disclosures: z.array(z.string()).default([]),
-  }).optional(),
-  unknowns: z.array(z.string()).default([]),
-  deviations: z.array(z.string()).default([]),
+
+  // Client A cover data
+  client_a_existing_insurer: z.string().nullable().default(null),
+  client_a_new_insurer: z.string().nullable().default(null),
+  client_a_old_cover: CoverLineSchema.default(emptyCover),
+  client_a_new_cover: CoverLineSchema.default(emptyCover),
+
+  // Client B cover data (partner only)
+  client_b_existing_insurer: z.string().nullable().default(null),
+  client_b_new_insurer: z.string().nullable().default(null),
+  client_b_old_cover: CoverLineSchema.default(emptyCover),
+  client_b_new_cover: CoverLineSchema.default(emptyCover),
+
+  // Premium summary
+  premium: z.object({
+    existing_total: z.string().nullable().default(null),
+    new_total: z.string().nullable().default(null),
+    frequency: z.string().default("per month"),
+    savings: z.string().nullable().default(null),
+    annual_savings: z.string().nullable().default(null),
+  }).default({ existing_total: null, new_total: null, frequency: "per month", savings: null, annual_savings: null }),
+
+  // Benefits (IP/MP details)
+  benefits: z.object({
+    mortgage_protection: BenefitDetailSchema.default(emptyBenefit),
+    income_protection: BenefitDetailSchema.default(emptyBenefit),
+  }).default({ mortgage_protection: emptyBenefit, income_protection: emptyBenefit }),
+
+  // Situation / context extracted from transcript
+  situation_summary: z.string().nullable().default(null),
+  special_instructions: z.string().nullable().default(null),
+
+  // Fields the AI could NOT find in the documents
+  missing_fields: z.array(z.string()).default([]),
 });
 
 export type ExtractedJson = z.infer<typeof ExtractedJsonSchema>;
 
-// ── Writer output schema ──
+// ══════════════════════════════════════════════════════════════
+// WRITER OUTPUT — section key → HTML fragment
+// These keys map EXACTLY to the template {{ VARIABLES }}
+// ══════════════════════════════════════════════════════════════
+
 export const WriterOutputSchema = z.object({
   sections: z.record(
     z.string(),
@@ -80,7 +100,6 @@ export const WriterOutputSchema = z.object({
   meta: z.object({
     document_title: z.string().optional(),
     client_name: z.string().optional(),
-    client_email: z.string().optional(),
   }).optional(),
 });
 
