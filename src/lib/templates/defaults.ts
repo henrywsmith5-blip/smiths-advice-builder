@@ -45,8 +45,8 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .header img.logo{height:44px;width:auto;}
 .header .doc-label{font-family:var(--font-body);font-size:8.5pt;font-weight:600;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;}
 .cover-hero{width:calc(100% + 88px);height:400px;background-image:url('/images/image1.jpg');background-size:cover;background-position:center 35%;background-repeat:no-repeat;position:relative;margin:0 -44px;}
-.cover-logo-overlay{position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);padding:16px 30px;box-shadow:0 2px 16px rgba(0,0,0,0.07);}
-.cover-logo-overlay img{height:44px;width:auto;display:block;}
+.cover-logo-overlay{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);padding:10px 18px;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.cover-logo-overlay img{height:56px;width:auto;display:block;}
 .cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:72px 0 0 0;position:relative;}
 .cover-page h1{font-family:var(--font-display);font-size:34pt;font-weight:700;color:var(--black);letter-spacing:-0.5px;line-height:1.1;margin-bottom:10px;}
 .cover-page .cover-type{font-family:var(--font-body);font-size:8.5pt;font-weight:500;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:0;}
