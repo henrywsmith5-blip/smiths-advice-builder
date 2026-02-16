@@ -108,7 +108,7 @@ Return ONLY valid JSON. No markdown, no explanation, just the JSON object.`;
   }
 
   if (input.additionalContext) {
-    prompt += `\n\n=== ADVISER NOTES ===\n${input.additionalContext.substring(0, 10000)}`;
+    prompt += `\n\n=== ADVISER NOTES / ADDITIONAL CONTEXT ===\nThis may contain ALL client data including cover details, premiums, pros/cons, and reasons. Treat this as a PRIMARY source.\n${input.additionalContext.substring(0, 60000)}`;
   }
 
   if (input.roaDeviations) {

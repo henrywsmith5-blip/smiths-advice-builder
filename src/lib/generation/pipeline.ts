@@ -85,10 +85,17 @@ export async function runGenerationPipeline(
   console.log("[Pipeline] Writer complete");
 
   // ── Step 4: Compute cover logic ──
-  const hasAnyExistingCover =
-    input.clientType === ClientType.INDIVIDUAL
-      ? input.clientAHasExisting
-      : input.clientAHasExisting || input.clientBHasExisting;
+  // Auto-detect from extracted data if user didn't toggle manually
+  const clientAHasExisting = input.clientAHasExisting || !!extractedJson.client_a_existing_insurer;
+  const clientBHasExisting = input.clientBHasExisting || !!extractedJson.client_b_existing_insurer;
+  const isPartner = input.clientType === ClientType.PARTNER || !!extractedJson.client.name_b;
+  const effectiveClientType = isPartner ? ClientType.PARTNER : ClientType.INDIVIDUAL;
+
+  const hasAnyExistingCover = effectiveClientType === ClientType.INDIVIDUAL
+    ? clientAHasExisting
+    : clientAHasExisting || clientBHasExisting;
+
+  console.log(`[Pipeline] Detected: partner=${isPartner}, existingCover=${hasAnyExistingCover}, clientA=${extractedJson.client.name_a}, clientB=${extractedJson.client.name_b}`);
 
   // ── Step 5: Build render context ──
   // Helper to safely access writer sections by string key
@@ -123,8 +130,8 @@ export async function runGenerationPipeline(
     ADVISER_PHONE: "0274 293 939",
     ADVISER_FSP: "FSP33042",
 
-    // Structure flags
-    IS_PARTNER: input.clientType === ClientType.PARTNER,
+    // Structure flags (auto-detected from extraction)
+    IS_PARTNER: isPartner,
     HAS_EXISTING_COVER: hasAnyExistingCover,
     NEW_COVER_ONLY: !hasAnyExistingCover,
 
@@ -233,7 +240,7 @@ export async function runGenerationPipeline(
 
   // ── Step 6: Render template ──
   console.log("[Pipeline] Rendering template...");
-  const clientType = input.docType === DocType.SOE ? null : input.clientType;
+  const clientType = input.docType === DocType.SOE ? null : effectiveClientType;
   const renderedHtml = await renderTemplate(input.docType, clientType, context, hasAnyExistingCover);
 
   // ── Step 7: Generate PDF ──

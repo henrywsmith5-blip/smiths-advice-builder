@@ -31,8 +31,8 @@ Each cover object has: life, trauma, tpd, income_protection, mortgage_protection
   if (input.firefliesText) prompt += `\n\n=== TRANSCRIPT ===\n${input.firefliesText.substring(0, 60000)}`;
   if (input.quotesText) prompt += `\n\n=== QUOTES (primary source for numbers) ===\n${input.quotesText.substring(0, 60000)}`;
   if (input.otherDocsText) prompt += `\n\n=== OTHER DOCS ===\n${input.otherDocsText.substring(0, 30000)}`;
-  if (input.additionalContext) prompt += `\n\n=== ADVISER NOTES ===\n${input.additionalContext.substring(0, 10000)}`;
-  if (input.roaDeviations) prompt += `\n\n=== DEVIATIONS ===\n${input.roaDeviations.substring(0, 10000)}`;
+  if (input.additionalContext) prompt += `\n\n=== ADVISER NOTES / ADDITIONAL CONTEXT (PRIMARY SOURCE) ===\n${input.additionalContext.substring(0, 60000)}`;
+  if (input.roaDeviations) prompt += `\n\n=== DEVIATIONS ===\n${input.roaDeviations.substring(0, 30000)}`;
 
   return prompt;
 }
