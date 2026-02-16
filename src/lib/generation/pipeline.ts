@@ -73,14 +73,20 @@ function v(val: string | null | undefined, fallback = "N/A"): string {
   return val || fallback;
 }
 
-/** Parse a premium amount from various formats */
+/** Parse a premium amount from various formats: "$68.49 per fortnight", "68.49", "$107.34/fortnight" */
 function parsePremiumAmount(block: { premiumAmount?: number | null; totalPremium?: string | null } | null): number | null {
   if (!block) return null;
-  if (block.premiumAmount !== null && block.premiumAmount !== undefined) return block.premiumAmount;
+  if (block.premiumAmount !== null && block.premiumAmount !== undefined && typeof block.premiumAmount === "number") {
+    return block.premiumAmount;
+  }
   if (block.totalPremium) {
-    const cleaned = block.totalPremium.replace(/[,$\s]/g, "").split("/")[0].replace(/per.*$/, "").trim();
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? null : num;
+    // Extract first number from the string (handles any format)
+    const match = block.totalPremium.match(/[\d,]+\.?\d*/);
+    if (match) {
+      const num = parseFloat(match[0].replace(/,/g, ""));
+      if (!isNaN(num)) return num;
+    }
+    console.warn(`[Pipeline] Could not parse premium from: "${block.totalPremium}"`);
   }
   return null;
 }
@@ -188,17 +194,52 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
   type RecBlock = FactPack["recommendedCover"][number];
 
   function matchCoverBlock<T extends { clientName: string }>(blocks: T[], name: string, label: string, idx: number): T | null {
-    const firstName = name.split(" ")[0];
-    return blocks.find(b =>
-      b.clientName?.toLowerCase().includes(firstName.toLowerCase()) ||
-      b.clientName?.toLowerCase().includes(label.toLowerCase())
-    ) || (blocks.length > idx ? blocks[idx] : null) || null;
+    if (!blocks || blocks.length === 0) return null;
+    const nameLower = name.toLowerCase();
+    const firstName = name.split(" ")[0].toLowerCase();
+    const labelLower = label.toLowerCase();
+
+    // 1. Try full name match (either direction)
+    let match = blocks.find(b => {
+      const bn = (b.clientName || "").toLowerCase();
+      return bn && (bn.includes(nameLower) || nameLower.includes(bn));
+    });
+
+    // 2. Try first name match
+    if (!match && firstName.length > 1) {
+      match = blocks.find(b => {
+        const bn = (b.clientName || "").toLowerCase();
+        return bn && bn.includes(firstName);
+      });
+    }
+
+    // 3. Try label match ("client a", "client b", "a", "b")
+    if (!match) {
+      match = blocks.find(b => {
+        const bn = (b.clientName || "").toLowerCase();
+        return bn && (bn.includes(labelLower) || bn === "a" || bn === "b");
+      });
+    }
+
+    // 4. Fallback to array position
+    if (!match && blocks.length > idx) {
+      match = blocks[idx];
+    }
+
+    return match || null;
   }
 
   const existCoverA: CoverBlock | null = matchCoverBlock(factPack.existingCover, clientAName, "client a", 0);
   const existCoverB: CoverBlock | null = matchCoverBlock(factPack.existingCover, clientBName, "client b", 1);
   const recCoverA: RecBlock | null = matchCoverBlock(factPack.recommendedCover, clientAName, "client a", 0);
   const recCoverB: RecBlock | null = matchCoverBlock(factPack.recommendedCover, clientBName, "client b", 1);
+
+  // Diagnostic warnings
+  if (uiState.hasExistingCover && !existCoverA) console.warn("[Pipeline] WARNING: Existing cover toggle ON but no existing cover block found for Client A");
+  if (uiState.isPartner && !recCoverB) console.warn("[Pipeline] WARNING: Partner mode ON but no recommended cover block found for Client B");
+  if (recCoverA && recCoverA.covers.length === 0) console.warn("[Pipeline] WARNING: Client A recommended cover block exists but has 0 cover items");
+  if (existCoverA) console.log(`[Pipeline] Client A existing: ${existCoverA.insurer}, ${existCoverA.covers.length} covers, premium=${existCoverA.premiumAmount || existCoverA.totalPremium}`);
+  if (recCoverA) console.log(`[Pipeline] Client A recommended: ${recCoverA.insurer}, ${recCoverA.covers.length} covers, premium=${recCoverA.premiumAmount || recCoverA.totalPremium}`);
 
   console.log(`[Pipeline] Cover blocks: existA=${!!existCoverA}, existB=${!!existCoverB}, recA=${!!recCoverA}, recB=${!!recCoverB}`);
 
