@@ -143,6 +143,7 @@ export async function runGenerationPipeline(
     IP_INCLUDED: d.sections_included.income_protection,
     MP_INCLUDED: d.sections_included.mortgage_protection,
     AIC_INCLUDED: d.sections_included.accidental_injury,
+    HEALTH_INCLUDED: d.sections_included.health,
 
     // Premium
     OLD_PREMIUM: v(d.premium.existing_total, ""),

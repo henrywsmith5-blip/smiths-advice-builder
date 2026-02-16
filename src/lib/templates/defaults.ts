@@ -79,6 +79,7 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .checkbox-list{list-style:none;padding:0;margin:8px 0 14px 4px;}
 .checkbox-list li{padding:4px 0 4px 30px;position:relative;line-height:1.5;font-size:10pt;}
 .checkbox-list li::before{content:'';position:absolute;left:0;top:6px;width:15px;height:15px;border:1.5px solid var(--bronze);background:var(--white);}
+.checkbox-list li.checked::before{content:'\\2713';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--bronze);background:var(--white);}
 .data-table{width:100%;border-collapse:collapse;margin:10px 0 18px 0;font-size:9.5pt;page-break-inside:avoid;}
 .data-table th{background:var(--navy);color:var(--white);padding:9px 14px;text-align:left;font-weight:600;font-size:8.5pt;text-transform:uppercase;letter-spacing:0.6px;}
 .data-table td{padding:8px 14px;border-bottom:1px solid var(--rule);vertical-align:top;}
@@ -199,24 +200,24 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <div class="sub-heading">Client A: <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
 <ul class="checkbox-list">
-  <li>Untimely death (Life Insurance)</li>
-  <li>Suffering a serious critical illness or injury (Trauma Insurance)</li>
-  <li>Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</li>
-  <li>Loss of income due to sickness or injury (Income Protection Insurance)</li>
-  <li>Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</li>
-  <li>Requiring hospital or specialist treatment (Health Insurance)</li>
+  <li{% if LIFE_INCLUDED %} class="checked"{% endif %}>Untimely death (Life Insurance)</li>
+  <li{% if TRAUMA_INCLUDED %} class="checked"{% endif %}>Suffering a serious critical illness or injury (Trauma Insurance)</li>
+  <li{% if TPD_INCLUDED %} class="checked"{% endif %}>Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</li>
+  <li{% if IP_INCLUDED or MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to sickness or injury (Income Protection Insurance)</li>
+  <li{% if MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</li>
+  <li{% if HEALTH_INCLUDED %} class="checked"{% endif %}>Requiring hospital or specialist treatment (Health Insurance)</li>
   <li>This is a limited advice engagement process</li>
 </ul>
 
 {% if IS_PARTNER %}
 <div class="sub-heading">Client B: <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
 <ul class="checkbox-list">
-  <li>Untimely death (Life Insurance)</li>
-  <li>Suffering a serious critical illness or injury (Trauma Insurance)</li>
-  <li>Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</li>
-  <li>Loss of income due to sickness or injury (Income Protection Insurance)</li>
-  <li>Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</li>
-  <li>Requiring hospital or specialist treatment (Health Insurance)</li>
+  <li{% if LIFE_INCLUDED %} class="checked"{% endif %}>Untimely death (Life Insurance)</li>
+  <li{% if TRAUMA_INCLUDED %} class="checked"{% endif %}>Suffering a serious critical illness or injury (Trauma Insurance)</li>
+  <li{% if TPD_INCLUDED %} class="checked"{% endif %}>Suffering a permanent disability (Total &amp; Permanent Disability Insurance)</li>
+  <li{% if IP_INCLUDED or MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to sickness or injury (Income Protection Insurance)</li>
+  <li{% if MP_INCLUDED or INCOME_MP_INCLUDED %} class="checked"{% endif %}>Loss of income due to redundancy (Added benefit to Income/Mortgage Protection)</li>
+  <li{% if HEALTH_INCLUDED %} class="checked"{% endif %}>Requiring hospital or specialist treatment (Health Insurance)</li>
   <li>This is a limited advice engagement process</li>
 </ul>
 {% endif %}
