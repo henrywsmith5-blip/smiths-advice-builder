@@ -204,15 +204,25 @@ export async function runGenerationPipeline(
     CLIENT_B_NEW_AIC: vc(d.client_b_new_cover.accidental_injury),
     CLIENT_B_NEW_PREMIUM_COVER: vc(d.client_b_new_cover.premium_cover),
 
-    // Benefits summary (from extractor)
-    MP_MONTHLY: v(d.benefits.mortgage_protection.monthly_amount),
-    MP_WAIT: v(d.benefits.mortgage_protection.wait_period),
-    MP_BENEFIT_PERIOD: v(d.benefits.mortgage_protection.benefit_period),
-    MP_PREMIUM: v(d.benefits.mortgage_protection.premium),
-    IP_MONTHLY: v(d.benefits.income_protection.monthly_amount),
-    IP_WAIT: v(d.benefits.income_protection.wait_period),
-    IP_BENEFIT_PERIOD: v(d.benefits.income_protection.benefit_period),
-    IP_PREMIUM: v(d.benefits.income_protection.premium),
+    // Benefits summary — Client A (from extractor)
+    MP_MONTHLY: v(d.benefits.mortgage_protection.monthly_amount, "N/A"),
+    MP_WAIT: v(d.benefits.mortgage_protection.wait_period, "N/A"),
+    MP_BENEFIT_PERIOD: v(d.benefits.mortgage_protection.benefit_period, "N/A"),
+    MP_PREMIUM: v(d.benefits.mortgage_protection.premium, "N/A"),
+    IP_MONTHLY: v(d.benefits.income_protection.monthly_amount, "N/A"),
+    IP_WAIT: v(d.benefits.income_protection.wait_period, "N/A"),
+    IP_BENEFIT_PERIOD: v(d.benefits.income_protection.benefit_period, "N/A"),
+    IP_PREMIUM: v(d.benefits.income_protection.premium, "N/A"),
+
+    // Benefits summary — Client B (partner only, from benefits_b)
+    CLIENT_B_MP_MONTHLY: v(d.benefits_b.mortgage_protection.monthly_amount, "N/A"),
+    CLIENT_B_MP_WAIT: v(d.benefits_b.mortgage_protection.wait_period, "N/A"),
+    CLIENT_B_MP_BENEFIT_PERIOD: v(d.benefits_b.mortgage_protection.benefit_period, "N/A"),
+    CLIENT_B_MP_PREMIUM: v(d.benefits_b.mortgage_protection.premium, "N/A"),
+    CLIENT_B_IP_MONTHLY: v(d.benefits_b.income_protection.monthly_amount, "N/A"),
+    CLIENT_B_IP_WAIT: v(d.benefits_b.income_protection.wait_period, "N/A"),
+    CLIENT_B_IP_BENEFIT_PERIOD: v(d.benefits_b.income_protection.benefit_period, "N/A"),
+    CLIENT_B_IP_PREMIUM: v(d.benefits_b.income_protection.premium, "N/A"),
 
     // Writer narrative sections
     SPECIAL_INSTRUCTIONS: sec("special_instructions") || d.special_instructions || "",

@@ -68,8 +68,14 @@ export const ExtractedJsonSchema = z.object({
     annual_savings: z.string().nullable().default(null),
   }).default({ existing_total: null, new_total: null, frequency: "per month", savings: null, annual_savings: null }),
 
-  // Benefits (IP/MP details)
+  // Benefits — Client A (IP/MP details)
   benefits: z.object({
+    mortgage_protection: BenefitDetailSchema.default(emptyBenefit),
+    income_protection: BenefitDetailSchema.default(emptyBenefit),
+  }).default({ mortgage_protection: emptyBenefit, income_protection: emptyBenefit }),
+
+  // Benefits — Client B (partner only)
+  benefits_b: z.object({
     mortgage_protection: BenefitDetailSchema.default(emptyBenefit),
     income_protection: BenefitDetailSchema.default(emptyBenefit),
   }).default({ mortgage_protection: emptyBenefit, income_protection: emptyBenefit }),

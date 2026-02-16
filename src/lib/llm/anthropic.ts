@@ -83,6 +83,10 @@ YOU MUST RETURN THIS EXACT JSON STRUCTURE:
     "mortgage_protection": { "monthly_amount": "$3,200", "wait_period": "4 weeks", "benefit_period": "5 years", "premium": null },
     "income_protection": { "monthly_amount": "$5,500", "wait_period": "4 weeks", "benefit_period": "To age 65", "premium": null }
   },
+  "benefits_b": {
+    "mortgage_protection": { "monthly_amount": null, "wait_period": null, "benefit_period": null, "premium": null },
+    "income_protection": { "monthly_amount": "$4,000", "wait_period": "4 weeks", "benefit_period": "5 years", "premium": null }
+  },
   "situation_summary": "Brief summary...",
   "special_instructions": "Client objectives...",
   "missing_fields": []
@@ -234,6 +238,24 @@ function normalizeFactPack(raw: any, docType: string): ExtractedJson {
         premium: g(g(ben, "income_protection", "incomeProtection", "ip"), "premium") ?? null,
       },
     },
+    // Client B benefits
+    benefits_b: (() => {
+      const benB = g(raw, "benefits_b", "benefitsB", "benefits_client_b") || {};
+      return {
+        mortgage_protection: {
+          monthly_amount: g(g(benB, "mortgage_protection", "mortgageProtection", "mp"), "monthly_amount", "monthlyAmount") ?? null,
+          wait_period: g(g(benB, "mortgage_protection", "mortgageProtection", "mp"), "wait_period", "waitPeriod") ?? null,
+          benefit_period: g(g(benB, "mortgage_protection", "mortgageProtection", "mp"), "benefit_period", "benefitPeriod") ?? null,
+          premium: g(g(benB, "mortgage_protection", "mortgageProtection", "mp"), "premium") ?? null,
+        },
+        income_protection: {
+          monthly_amount: g(g(benB, "income_protection", "incomeProtection", "ip"), "monthly_amount", "monthlyAmount") ?? null,
+          wait_period: g(g(benB, "income_protection", "incomeProtection", "ip"), "wait_period", "waitPeriod") ?? null,
+          benefit_period: g(g(benB, "income_protection", "incomeProtection", "ip"), "benefit_period", "benefitPeriod") ?? null,
+          premium: g(g(benB, "income_protection", "incomeProtection", "ip"), "premium") ?? null,
+        },
+      };
+    })(),
     situation_summary: g(raw, "situation_summary", "situationSummary") ?? null,
     special_instructions: g(raw, "special_instructions", "specialInstructions") ?? null,
     missing_fields: g(raw, "missing_fields", "missingFields") || [],

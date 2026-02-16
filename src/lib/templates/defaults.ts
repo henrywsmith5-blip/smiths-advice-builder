@@ -426,6 +426,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 {% if IS_PARTNER %}
 <div class="sub-heading">{{ CLIENT_A_NAME }}</div>
 {% endif %}
+{% if MP_MONTHLY != "N/A" or IP_MONTHLY != "N/A" %}
 <table class="data-table">
   <thead><tr><th>Benefit Type</th><th>Monthly Amount</th><th>Wait Period</th><th>Benefit Period</th><th>Premium</th></tr></thead>
   <tbody>
@@ -433,8 +434,10 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
     <tr><td>Income Protection</td><td class="na">{{ IP_MONTHLY }}</td><td class="na">{{ IP_WAIT }}</td><td class="na">{{ IP_BENEFIT_PERIOD }}</td><td class="na">{{ IP_PREMIUM }}</td></tr>
   </tbody>
 </table>
+{% endif %}
 
 {% if IS_PARTNER %}
+{% if CLIENT_B_MP_MONTHLY != "N/A" or CLIENT_B_IP_MONTHLY != "N/A" %}
 <div class="sub-heading">{{ CLIENT_B_NAME }}</div>
 <table class="data-table">
   <thead><tr><th>Benefit Type</th><th>Monthly Amount</th><th>Wait Period</th><th>Benefit Period</th><th>Premium</th></tr></thead>
@@ -443,6 +446,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
     <tr><td>Income Protection</td><td class="na">{{ CLIENT_B_IP_MONTHLY }}</td><td class="na">{{ CLIENT_B_IP_WAIT }}</td><td class="na">{{ CLIENT_B_IP_BENEFIT_PERIOD }}</td><td class="na">{{ CLIENT_B_IP_PREMIUM }}</td></tr>
   </tbody>
 </table>
+{% endif %}
 {% endif %}
 
 {% endif %}
