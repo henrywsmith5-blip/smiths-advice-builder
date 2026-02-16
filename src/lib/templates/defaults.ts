@@ -44,26 +44,19 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px 0;border-bottom:1px solid var(--rule);}
 .header img.logo{height:44px;width:auto;}
 .header .doc-label{font-family:var(--font-body);font-size:8.5pt;font-weight:600;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;}
-.cover-hero{width:calc(100% + 88px);height:320px;background-image:url('/images/image1.jpg');background-size:cover;background-position:center 40%;background-repeat:no-repeat;position:relative;margin:0 -44px;}
-.cover-logo-overlay{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);padding:14px 28px;box-shadow:0 4px 20px rgba(0,0,0,0.10);border-radius:0;}
-.cover-logo-overlay img{height:48px;width:auto;display:block;}
-.cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:42px 0 16px 0;position:relative;}
-.cover-page .cover-logo{height:72px;width:auto;margin-bottom:48px;}
-.cover-rule{width:60px;height:2px;background:var(--bronze);margin:0 auto 18px auto;}
-.cover-page h1{font-family:var(--font-display);font-size:30pt;font-weight:700;color:var(--black);letter-spacing:-0.6px;line-height:1.15;margin-bottom:4px;}
-.cover-page .cover-subtitle{font-family:var(--font-display);font-size:13pt;font-weight:400;color:var(--bronze);letter-spacing:0.3px;margin-bottom:4px;}
-.cover-page .cover-type{font-family:var(--font-body);font-size:9pt;font-weight:500;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
-.cover-meta{margin-top:12px;width:100%;max-width:380px;}
-.cover-meta-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule);}
-.cover-meta-row:last-child{border-bottom:none;}
-.cover-meta-row .cm-label{font-weight:600;color:var(--dark);font-size:9.5pt;}
-.cover-meta-row .cm-value{font-style:italic;color:var(--bronze);font-size:9.5pt;}
-.cover-adviser-block{margin-top:18px;background:var(--white);border:1px solid var(--rule);padding:16px 24px;text-align:left;width:100%;max-width:500px;}
-.cover-adviser-block .cac-title{font-family:var(--font-body);font-size:8pt;font-weight:700;color:var(--bronze);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
-.cover-adviser-block p{font-size:8.5pt;line-height:1.45;color:var(--body);margin-bottom:2px;}
-.cover-adviser-block p strong{color:var(--dark);}
-.cover-adviser-block a{color:var(--bronze);text-decoration:none;}
-.cover-confidential{margin-top:18px;font-size:8.5pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--navy);background:var(--navy-soft);padding:5px 18px;}
+.cover-hero{width:calc(100% + 88px);height:400px;background-image:url('/images/image1.jpg');background-size:cover;background-position:center 35%;background-repeat:no-repeat;position:relative;margin:0 -44px;}
+.cover-logo-overlay{position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);padding:16px 30px;box-shadow:0 2px 16px rgba(0,0,0,0.07);}
+.cover-logo-overlay img{height:44px;width:auto;display:block;}
+.cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:72px 0 0 0;position:relative;}
+.cover-page h1{font-family:var(--font-display);font-size:34pt;font-weight:700;color:var(--black);letter-spacing:-0.5px;line-height:1.1;margin-bottom:10px;}
+.cover-page .cover-type{font-family:var(--font-body);font-size:8.5pt;font-weight:500;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:0;}
+.cover-rule{width:40px;height:1.5px;background:var(--bronze);margin:32px auto 0 auto;}
+.cover-meta{margin-top:32px;text-align:center;}
+.cover-meta .cm-label{display:block;font-family:var(--font-body);font-size:8pt;font-weight:500;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.cover-meta .cm-value{display:block;font-family:var(--font-display);font-size:13pt;font-weight:400;color:var(--black);margin-bottom:22px;}
+.cover-adviser-block{margin-top:auto;padding-top:40px;text-align:center;width:100%;}
+.cover-adviser-block p{font-family:var(--font-body);font-size:8pt;line-height:1.7;color:var(--muted);margin:0;}
+.cover-adviser-block p strong{color:var(--dark);font-size:8.5pt;}
 .section-heading{display:flex;align-items:center;gap:14px;margin:var(--section-gap) 0 16px 0;page-break-after:avoid;}
 .section-heading .num{width:28px;height:28px;min-width:28px;background:var(--bronze);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11pt;font-family:var(--font-body);}
 .section-heading h2{font-family:var(--font-display);font-size:15pt;font-weight:700;color:var(--black);letter-spacing:-0.2px;}
@@ -141,7 +134,7 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .footer{border-top:1.5px solid var(--bronze);padding-top:10px;margin-top:36px;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--muted);}
 .footer a{color:var(--bronze);text-decoration:none;}
 .page-break{page-break-before:always;margin-top:0;}
-@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:320px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}}
+@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}}
 `;
 
 const LOGO_URL = "https://images.squarespace-cdn.com/content/v1/6033fe3152058c67d1e84e7f/1614286673894-ZH98E19GRUKA55E6Z17W/Smiths_wide_withouttagline_RGB_COLOUR-300dpi.jpg?format=1500w";
@@ -173,32 +166,34 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 </div>
 
 <div class="cover-page">
-  <div class="cover-rule"></div>
+
   <h1>${title}</h1>
   {% if HAS_EXISTING_COVER %}
-  <div class="cover-type">— Insurance Review —</div>
+  <div class="cover-type">Insurance Review</div>
   {% else %}
-  <div class="cover-type">— New Insurance —</div>
+  <div class="cover-type">Personal Risk Advisory</div>
   {% endif %}
 
+  <div class="cover-rule"></div>
+
   <div class="cover-meta">
+    <span class="cm-label">Prepared for</span>
     {% if IS_PARTNER %}
-    <div class="cover-meta-row"><span class="cm-label">Prepared For:</span><span class="cm-value">{{ CLIENT_A_NAME }} &amp; {{ CLIENT_B_NAME }}</span></div>
+    <span class="cm-value">{{ CLIENT_A_NAME }} &amp; {{ CLIENT_B_NAME }}</span>
     {% else %}
-    <div class="cover-meta-row"><span class="cm-label">Prepared For:</span><span class="cm-value">{{ CLIENT_A_NAME }}</span></div>
+    <span class="cm-value">{{ CLIENT_A_NAME }}</span>
     {% endif %}
-    <div class="cover-meta-row"><span class="cm-label">Date:</span><span class="cm-value">{{ DATE }}</span></div>
+    <span class="cm-label">Date</span>
+    <span class="cm-value">{{ DATE }}</span>
   </div>
 
   <div class="cover-adviser-block">
-    <div class="cac-title">Your Financial Adviser</div>
-    <p><strong>{{ ADVISER_NAME }}</strong> | FAP License #33042 | Level 5 Certificate in Financial Services</p>
-    <p>Trading Name: Smiths Insurance and KiwiSaver</p>
-    <p>Financial Advice Provider: Craig Smith Business Services Limited | FAP License #712931</p>
-    <p>Address: Powell Fenwick House Level 2, 383 Colombo Street, Sydenham, Christchurch</p>
-    <p>Website: <a href="https://www.smiths.net.nz">www.smiths.net.nz</a></p>
+    <p><strong>{{ ADVISER_NAME }}</strong></p>
+    <p>Financial Adviser | FSP #33042</p>
+    <p>Craig Smith Business Services Limited</p>
+    <p>FAP Licence #712931</p>
   </div>
-  <div class="cover-confidential">Confidential</div>
+
 </div>
 
 <!-- ═══ SECTION 1 — SCOPE ═══ -->
