@@ -11,7 +11,7 @@ function buildExtractPrompt(input: ExtractInput): string {
   const isROA = input.docType === "ROA";
   let prompt = `You are a data extraction specialist for Smiths Insurance & KiwiSaver, a New Zealand financial advice provider.
 TASK: Extract structured data from insurance documents into precise JSON.
-DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice — what was IMPLEMENTED" : "Statement of Advice — what is being RECOMMENDED"})
+DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice - what was IMPLEMENTED" : "Statement of Advice - what is being RECOMMENDED"})
 
 RULES:
 1. NEVER invent numbers. If not explicitly stated, use null.
@@ -43,12 +43,13 @@ function buildWriterPrompt(extractedJson: ExtractedJson, docType: string): strin
 
   return `You write polished HTML sections for Smiths Insurance & KiwiSaver ${docType} documents.
 TENSE: ${tense}. TONE: Professional NZ financial adviser. FORMAT: HTML fragments only (p, ul, li, strong, em).
-NEVER invent numbers. Use only data below. Sections not included → { "included": false, "html": "" }.
+NEVER invent numbers. Use only data below. Sections not included -> { "included": false, "html": "" }.
+NEVER use the em dash character (\u2014). It is strictly banned. Use a normal hyphen (-) or rewrite the sentence instead.
 
 DATA: ${JSON.stringify(extractedJson, null, 2)}
 
 Return JSON with "sections": { key: { "included": bool, "html": "..." } } and "meta": { "document_title", "client_name" }.
-Keys: special_instructions, reasons_life, reasons_trauma, reasons_progressive_care, reasons_tpd, reasons_income_mortgage, reasons_aic, pros_life, cons_life, pros_trauma, cons_trauma, pros_tpd, cons_tpd, pros_income_mp, cons_income_mp, pros_aic, cons_aic, modification_notes, summary, scope, out_of_scope, responsibilities.`;
+Keys: special_instructions, reasons_life, reasons_trauma, reasons_progressive_care, reasons_tpd, reasons_income_mortgage, reasons_aic, reasons_health, pros_life, cons_life, pros_trauma, cons_trauma, pros_tpd, cons_tpd, pros_income_mp, cons_income_mp, pros_aic, cons_aic, modification_notes, summary, scope, out_of_scope, responsibilities.`;
 }
 
 export class OpenAIProvider implements LLMProvider {

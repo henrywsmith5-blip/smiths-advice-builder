@@ -13,7 +13,7 @@ function buildExtractPrompt(input: ExtractInput): string {
   let prompt = `You are a data extraction specialist for Smiths Insurance & KiwiSaver, a New Zealand financial advice provider.
 
 TASK: Extract structured data from the provided documents into the EXACT JSON format below.
-DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice — what was IMPLEMENTED" : "Statement of Advice — what is being RECOMMENDED"})
+DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice - what was IMPLEMENTED" : "Statement of Advice - what is being RECOMMENDED"})
 
 CRITICAL RULES:
 1. NEVER invent or guess numbers. If not explicitly stated, use null.
@@ -96,7 +96,7 @@ IMPORTANT: Return ONLY the JSON object. No markdown code fences. No explanation.
 
   // === ADDITIONAL CONTEXT GOES FIRST (PRIMARY SOURCE) ===
   if (input.additionalContext) {
-    prompt += `\n\n=== ADDITIONAL CONTEXT (PRIMARY AUTHORITATIVE SOURCE — extract ALL data from this first) ===\n${input.additionalContext}`;
+    prompt += `\n\n=== ADDITIONAL CONTEXT (PRIMARY AUTHORITATIVE SOURCE - extract ALL data from this first) ===\n${input.additionalContext}`;
   }
 
   // === Other sources ===
@@ -134,8 +134,8 @@ function buildWriterPrompt(extractedJson: ExtractedJson, docType: string): strin
 TASK: Write polished HTML content sections for a ${docType} (${isROA ? "Record of Advice" : "Statement of Advice"}).
 
 TENSE: ALL narrative must be in ${tense}.
-TONE: Professional NZ financial adviser. Concise, clear, authoritative. Mid-formal — professional but accessible.
-FORMAT: Return HTML fragments ONLY — use <p>, <ul>, <li>, <strong>, <em>. No <html>, <body>, <head>.
+TONE: Professional NZ financial adviser. Concise, clear, authoritative. Mid-formal - professional but accessible.
+FORMAT: Return HTML fragments ONLY - use <p>, <ul>, <li>, <strong>, <em>. No <html>, <body>, <head>.
 
 RULES:
 1. NEVER invent numbers. Use ONLY what is in the data below.
@@ -145,6 +145,7 @@ RULES:
 5. For reasons: explain WHY tied to the client's specific situation (mortgage, family, income).
 6. Use NZ English spelling (favour, analyse, organise).
 7. Address client as "you" / "your". Use "I" for personal actions. "we" for firm scope.
+8. NEVER use the em dash character (\u2014). It is strictly banned. Use a normal hyphen (-) or rewrite the sentence instead.
 
 EXTRACTED DATA:
 ${JSON.stringify(extractedJson, null, 2)}
@@ -153,7 +154,7 @@ Return JSON with "sections" object. Each key maps to { "included": boolean, "htm
 
 SECTION KEYS:
 - "special_instructions": Client objectives narrative (purpose of meeting, current situation, what they want, recommendation, reasoning)
-- "reasons_life", "reasons_trauma", "reasons_progressive_care", "reasons_tpd", "reasons_income_mortgage", "reasons_aic"
+- "reasons_life", "reasons_trauma", "reasons_progressive_care", "reasons_tpd", "reasons_income_mortgage", "reasons_aic", "reasons_health"
 - "pros_life", "cons_life", "pros_trauma", "cons_trauma", "pros_tpd", "cons_tpd", "pros_income_mp", "cons_income_mp", "pros_aic", "cons_aic"
 - "modification_notes", "summary"
 
