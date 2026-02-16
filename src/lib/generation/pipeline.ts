@@ -207,6 +207,7 @@ export async function runGenerationPipeline(
     CLIENT_A_OLD_MP: vc(d.client_a_old_cover.mortgage_protection),
     CLIENT_A_OLD_AIC: vc(d.client_a_old_cover.accidental_injury),
     CLIENT_A_OLD_PREMIUM_COVER: vc(d.client_a_old_cover.premium_cover),
+    CLIENT_A_OLD_HEALTH: d.client_a_old_cover.health ? "Yes" : "Not included",
 
     // Client A — new cover
     CLIENT_A_NEW_INSURER: v(d.client_a_new_insurer, ""),
@@ -218,6 +219,7 @@ export async function runGenerationPipeline(
     CLIENT_A_NEW_MP: vc(d.client_a_new_cover.mortgage_protection),
     CLIENT_A_NEW_AIC: vc(d.client_a_new_cover.accidental_injury),
     CLIENT_A_NEW_PREMIUM_COVER: vc(d.client_a_new_cover.premium_cover),
+    CLIENT_A_NEW_HEALTH: d.client_a_new_cover.health ? "Yes" : "Not included",
 
     // Client B — existing cover
     CLIENT_B_EXISTING_INSURER: v(d.client_b_existing_insurer, ""),
@@ -232,6 +234,7 @@ export async function runGenerationPipeline(
     CLIENT_B_OLD_MP: vc(d.client_b_old_cover.mortgage_protection),
     CLIENT_B_OLD_AIC: vc(d.client_b_old_cover.accidental_injury),
     CLIENT_B_OLD_PREMIUM_COVER: vc(d.client_b_old_cover.premium_cover),
+    CLIENT_B_OLD_HEALTH: d.client_b_old_cover.health ? "Yes" : "Not included",
 
     // Client B — new cover
     CLIENT_B_NEW_INSURER: v(d.client_b_new_insurer, ""),
@@ -243,6 +246,7 @@ export async function runGenerationPipeline(
     CLIENT_B_NEW_MP: vc(d.client_b_new_cover.mortgage_protection),
     CLIENT_B_NEW_AIC: vc(d.client_b_new_cover.accidental_injury),
     CLIENT_B_NEW_PREMIUM_COVER: vc(d.client_b_new_cover.premium_cover),
+    CLIENT_B_NEW_HEALTH: d.client_b_new_cover.health ? "Yes" : "Not included",
 
     // Benefits summary — Client A (from extractor)
     MP_MONTHLY: v(d.benefits.mortgage_protection.monthly_amount, "N/A"),

@@ -329,6 +329,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
         <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_A_NEW_TRAUMA }}</td><td class="spacer-col"></td><td>Trauma</td><td style="text-align:right;">{{ CLIENT_A_OLD_TRAUMA }}</td></tr>
         <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_NEW_TPD }}</td><td class="spacer-col"></td><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_OLD_TPD }}</td></tr>
         <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_IP }}</td><td class="spacer-col"></td><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_OLD_IP }}</td></tr>
+        <tr><td>Health Insurance</td><td style="text-align:right;">{{ CLIENT_A_NEW_HEALTH }}</td><td class="spacer-col"></td><td>Health Insurance</td><td style="text-align:right;">{{ CLIENT_A_OLD_HEALTH }}</td></tr>
         <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_MP }}</td><td class="spacer-col"></td><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_OLD_MP }}</td></tr>
         <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_NEW_AIC }}</td><td class="spacer-col"></td><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_OLD_AIC }}</td></tr>
         <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_NEW_PREMIUM_COVER }}</td><td class="spacer-col"></td><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_OLD_PREMIUM_COVER }}</td></tr>
@@ -345,6 +346,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
       <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_A_NEW_TRAUMA }}</td></tr>
       <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_NEW_TPD }}</td></tr>
       <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_IP }}</td></tr>
+      <tr><td>Health Insurance</td><td style="text-align:right;">{{ CLIENT_A_NEW_HEALTH }}</td></tr>
       <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_MP }}</td></tr>
       <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_NEW_AIC }}</td></tr>
       <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_NEW_PREMIUM_COVER }}</td></tr>
@@ -375,6 +377,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
         <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_B_NEW_TRAUMA }}</td><td class="spacer-col"></td><td>Trauma</td><td style="text-align:right;">{{ CLIENT_B_OLD_TRAUMA }}</td></tr>
         <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_NEW_TPD }}</td><td class="spacer-col"></td><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_OLD_TPD }}</td></tr>
         <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_IP }}</td><td class="spacer-col"></td><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_OLD_IP }}</td></tr>
+        <tr><td>Health Insurance</td><td style="text-align:right;">{{ CLIENT_B_NEW_HEALTH }}</td><td class="spacer-col"></td><td>Health Insurance</td><td style="text-align:right;">{{ CLIENT_B_OLD_HEALTH }}</td></tr>
         <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_MP }}</td><td class="spacer-col"></td><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_OLD_MP }}</td></tr>
         <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_NEW_AIC }}</td><td class="spacer-col"></td><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_OLD_AIC }}</td></tr>
         <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_NEW_PREMIUM_COVER }}</td><td class="spacer-col"></td><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_OLD_PREMIUM_COVER }}</td></tr>
@@ -391,6 +394,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
       <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_B_NEW_TRAUMA }}</td></tr>
       <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_NEW_TPD }}</td></tr>
       <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_IP }}</td></tr>
+      <tr><td>Health Insurance</td><td style="text-align:right;">{{ CLIENT_B_NEW_HEALTH }}</td></tr>
       <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_MP }}</td></tr>
       <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_NEW_AIC }}</td></tr>
       <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_NEW_PREMIUM_COVER }}</td></tr>
