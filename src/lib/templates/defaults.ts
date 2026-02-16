@@ -137,7 +137,9 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .footer{border-top:1.5px solid var(--bronze);padding-top:10px;margin-top:36px;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--muted);}
 .footer a{color:var(--bronze);text-decoration:none;}
 .page-break{page-break-before:always;margin-top:0;}
-@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}}
+.section-block{page-break-inside:avoid;}
+.section-block-break{page-break-before:always;}
+@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{page-break-before:always;}}
 `;
 
 const LOGO_URL = "https://images.squarespace-cdn.com/content/v1/6033fe3152058c67d1e84e7f/1614286673894-ZH98E19GRUKA55E6Z17W/Smiths_wide_withouttagline_RGB_COLOUR-300dpi.jpg?format=1500w";
@@ -302,90 +304,98 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <div class="section-heading"><div class="num">7</div><h2>Sign-Off Document</h2></div>
 <p class="body-text"><strong>Date:</strong> <span class="placeholder">{{ SIGNOFF_DATE }}</span></p>
 
-<!-- CLIENT A -->
-<div class="client-divider"><span>{{ CLIENT_A_NAME }}</span></div>
-<div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
+<!-- CLIENT A BREAKDOWN -->
+<div class="section-block">
+  <div class="client-divider"><span>{{ CLIENT_A_NAME }}</span></div>
+  <div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
 
-{% if HAS_EXISTING_COVER %}
-<p class="body-text"><em>{{ CLIENT_A_ADVICE_TYPE_LABEL }}</em></p>
-<div class="dual-cover-wrapper">
-  <table>
-    <thead>
-      <tr><th class="header-proposed" colspan="2">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_A_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_A_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
-      <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_A_NEW_LIFE }}</td><td class="spacer-col"></td><td>Life</td><td style="text-align:right;">{{ CLIENT_A_OLD_LIFE }}</td></tr>
-      <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_A_NEW_TRAUMA }}</td><td class="spacer-col"></td><td>Trauma</td><td style="text-align:right;">{{ CLIENT_A_OLD_TRAUMA }}</td></tr>
-      <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_NEW_TPD }}</td><td class="spacer-col"></td><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_OLD_TPD }}</td></tr>
-      <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_IP }}</td><td class="spacer-col"></td><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_OLD_IP }}</td></tr>
-      <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_MP }}</td><td class="spacer-col"></td><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_OLD_MP }}</td></tr>
-      <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_NEW_AIC }}</td><td class="spacer-col"></td><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_OLD_AIC }}</td></tr>
-      <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_NEW_PREMIUM_COVER }}</td><td class="spacer-col"></td><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_OLD_PREMIUM_COVER }}</td></tr>
-    </tbody>
-  </table>
+  {% if HAS_EXISTING_COVER %}
+  <p class="body-text"><em>{{ CLIENT_A_ADVICE_TYPE_LABEL }}</em></p>
+  <div class="dual-cover-wrapper">
+    <table>
+      <thead>
+        <tr><th class="header-proposed" colspan="2">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_A_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_A_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
+        <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_A_NEW_LIFE }}</td><td class="spacer-col"></td><td>Life</td><td style="text-align:right;">{{ CLIENT_A_OLD_LIFE }}</td></tr>
+        <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_A_NEW_TRAUMA }}</td><td class="spacer-col"></td><td>Trauma</td><td style="text-align:right;">{{ CLIENT_A_OLD_TRAUMA }}</td></tr>
+        <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_NEW_TPD }}</td><td class="spacer-col"></td><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_OLD_TPD }}</td></tr>
+        <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_IP }}</td><td class="spacer-col"></td><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_OLD_IP }}</td></tr>
+        <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_MP }}</td><td class="spacer-col"></td><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_OLD_MP }}</td></tr>
+        <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_NEW_AIC }}</td><td class="spacer-col"></td><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_OLD_AIC }}</td></tr>
+        <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_NEW_PREMIUM_COVER }}</td><td class="spacer-col"></td><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_OLD_PREMIUM_COVER }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="body-text"><em>Recommended new cover</em></p>
+  <div class="single-cover-wrapper">
+    <div class="side-header">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
+    <table>
+      <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
+      <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_A_NEW_LIFE }}</td></tr>
+      <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_A_NEW_TRAUMA }}</td></tr>
+      <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_NEW_TPD }}</td></tr>
+      <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_IP }}</td></tr>
+      <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_MP }}</td></tr>
+      <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_NEW_AIC }}</td></tr>
+      <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_NEW_PREMIUM_COVER }}</td></tr>
+    </table>
+  </div>
+  {% endif %}
 </div>
-{% else %}
-<p class="body-text"><em>Recommended new cover</em></p>
-<div class="single-cover-wrapper">
-  <div class="side-header">{% if CLIENT_A_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_A_NEW_INSURER_LOGO }}" alt="{{ CLIENT_A_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
-  <table>
-    <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
-    <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_A_NEW_LIFE }}</td></tr>
-    <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_A_NEW_TRAUMA }}</td></tr>
-    <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_A_NEW_TPD }}</td></tr>
-    <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_IP }}</td></tr>
-    <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_A_NEW_MP }}</td></tr>
-    <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_A_NEW_AIC }}</td></tr>
-    <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_A_NEW_PREMIUM_COVER }}</td></tr>
-  </table>
-</div>
-{% endif %}
 
 {% if IS_PARTNER %}
-<!-- CLIENT B -->
-<div class="client-divider"><span>{{ CLIENT_B_NAME }}</span></div>
-<div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
+<!-- CLIENT B BREAKDOWN — forced new page -->
+<div class="section-block section-block-break">
+  <div class="header">
+    <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">${titleShort}</span>
+  </div>
+  <div class="client-divider"><span>{{ CLIENT_B_NAME }}</span></div>
+  <div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
 
-{% if HAS_EXISTING_COVER %}
-<p class="body-text"><em>{{ CLIENT_B_ADVICE_TYPE_LABEL }}</em></p>
-<div class="dual-cover-wrapper">
-  <table>
-    <thead>
-      <tr><th class="header-proposed" colspan="2">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_B_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_B_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
-      <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_B_NEW_LIFE }}</td><td class="spacer-col"></td><td>Life</td><td style="text-align:right;">{{ CLIENT_B_OLD_LIFE }}</td></tr>
-      <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_B_NEW_TRAUMA }}</td><td class="spacer-col"></td><td>Trauma</td><td style="text-align:right;">{{ CLIENT_B_OLD_TRAUMA }}</td></tr>
-      <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_NEW_TPD }}</td><td class="spacer-col"></td><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_OLD_TPD }}</td></tr>
-      <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_IP }}</td><td class="spacer-col"></td><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_OLD_IP }}</td></tr>
-      <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_MP }}</td><td class="spacer-col"></td><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_OLD_MP }}</td></tr>
-      <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_NEW_AIC }}</td><td class="spacer-col"></td><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_OLD_AIC }}</td></tr>
-      <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_NEW_PREMIUM_COVER }}</td><td class="spacer-col"></td><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_OLD_PREMIUM_COVER }}</td></tr>
-    </tbody>
-  </table>
-</div>
-{% else %}
-<p class="body-text"><em>Recommended new cover</em></p>
-<div class="single-cover-wrapper">
-  <div class="side-header">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
-  <table>
-    <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
-    <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_B_NEW_LIFE }}</td></tr>
-    <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_B_NEW_TRAUMA }}</td></tr>
-    <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_NEW_TPD }}</td></tr>
-    <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_IP }}</td></tr>
-    <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_MP }}</td></tr>
-    <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_NEW_AIC }}</td></tr>
-    <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_NEW_PREMIUM_COVER }}</td></tr>
-  </table>
+  {% if HAS_EXISTING_COVER %}
+  <p class="body-text"><em>{{ CLIENT_B_ADVICE_TYPE_LABEL }}</em></p>
+  <div class="dual-cover-wrapper">
+    <table>
+      <thead>
+        <tr><th class="header-proposed" colspan="2">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Proposed Cover</th><th class="spacer-col"></th><th class="header-existing" colspan="2">{% if CLIENT_B_EXISTING_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_EXISTING_INSURER_LOGO }}" alt="{{ CLIENT_B_EXISTING_INSURER }}"> {% endif %}Existing Cover</th></tr>
+        <tr><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th><th class="spacer-col"></th><th style="background:var(--white);color:var(--dark);">Cover Type</th><th style="background:var(--white);color:var(--dark);text-align:right;">Sum Insured</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_B_NEW_LIFE }}</td><td class="spacer-col"></td><td>Life</td><td style="text-align:right;">{{ CLIENT_B_OLD_LIFE }}</td></tr>
+        <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_B_NEW_TRAUMA }}</td><td class="spacer-col"></td><td>Trauma</td><td style="text-align:right;">{{ CLIENT_B_OLD_TRAUMA }}</td></tr>
+        <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_NEW_TPD }}</td><td class="spacer-col"></td><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_OLD_TPD }}</td></tr>
+        <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_IP }}</td><td class="spacer-col"></td><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_OLD_IP }}</td></tr>
+        <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_MP }}</td><td class="spacer-col"></td><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_OLD_MP }}</td></tr>
+        <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_NEW_AIC }}</td><td class="spacer-col"></td><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_OLD_AIC }}</td></tr>
+        <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_NEW_PREMIUM_COVER }}</td><td class="spacer-col"></td><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_OLD_PREMIUM_COVER }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="body-text"><em>Recommended new cover</em></p>
+  <div class="single-cover-wrapper">
+    <div class="side-header">{% if CLIENT_B_NEW_INSURER_LOGO %}<img class="insurer-logo" src="{{ CLIENT_B_NEW_INSURER_LOGO }}" alt="{{ CLIENT_B_NEW_INSURER }}"> {% endif %}Recommended Cover</div>
+    <table>
+      <tr><th>Cover Type</th><th style="text-align:right;">Sum Insured</th></tr>
+      <tr><td>Life</td><td style="text-align:right;">{{ CLIENT_B_NEW_LIFE }}</td></tr>
+      <tr><td>Progressive Care / Trauma</td><td style="text-align:right;">{{ CLIENT_B_NEW_TRAUMA }}</td></tr>
+      <tr><td>T.P.D.</td><td style="text-align:right;">{{ CLIENT_B_NEW_TPD }}</td></tr>
+      <tr><td>Income Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_IP }}</td></tr>
+      <tr><td>Mortgage Protection</td><td style="text-align:right;">{{ CLIENT_B_NEW_MP }}</td></tr>
+      <tr><td>Accidental Injury</td><td style="text-align:right;">{{ CLIENT_B_NEW_AIC }}</td></tr>
+      <tr><td>Premium Cover</td><td style="text-align:right;">{{ CLIENT_B_NEW_PREMIUM_COVER }}</td></tr>
+    </table>
+  </div>
+  {% endif %}
 </div>
 {% endif %}
-{% endif %}
 
-<!-- ═══ SECTION 8 — PREMIUM SUMMARY ═══ -->
-<div class="header page-break">
+<!-- ═══ SECTION 8 — PREMIUM SUMMARY (forced new page) ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">${titleShort}</span>
 </div>
 
@@ -403,6 +413,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   </div>
   {% endif %}
 </div>
+</div><!-- /section-block-break: Premium Summary -->
 
 <!-- ═══ SECTION 9 — MIGRATION ANALYSIS (existing cover only) ═══ -->
 {% if HAS_EXISTING_COVER %}
