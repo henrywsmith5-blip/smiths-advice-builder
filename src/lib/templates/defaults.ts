@@ -44,10 +44,10 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px 0;border-bottom:1px solid var(--rule);}
 .header img.logo{height:44px;width:auto;}
 .header .doc-label{font-family:var(--font-body);font-size:8.5pt;font-weight:600;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;}
-.cover-hero{width:calc(100% + 88px);height:320px;background:linear-gradient(135deg, #1B2A4A 0%, #2C3E6B 40%, #B07D56 100%);position:relative;margin:0 -44px;}
-.cover-logo-overlay{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);padding:10px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.08);border-radius:0;}
-.cover-logo-overlay img{height:40px;width:auto;display:block;}
-.cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 0 16px 0;position:relative;}
+.cover-hero{width:calc(100% + 88px);height:320px;background-image:url('/images/image1.jpg');background-size:cover;background-position:center 40%;background-repeat:no-repeat;position:relative;margin:0 -44px;}
+.cover-logo-overlay{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);z-index:10;background:var(--white);padding:14px 28px;box-shadow:0 4px 20px rgba(0,0,0,0.10);border-radius:0;}
+.cover-logo-overlay img{height:48px;width:auto;display:block;}
+.cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:42px 0 16px 0;position:relative;}
 .cover-page .cover-logo{height:72px;width:auto;margin-bottom:48px;}
 .cover-rule{width:60px;height:2px;background:var(--bronze);margin:0 auto 18px auto;}
 .cover-page h1{font-family:var(--font-display);font-size:30pt;font-weight:700;color:var(--black);letter-spacing:-0.6px;line-height:1.15;margin-bottom:4px;}
@@ -168,7 +168,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <!-- ═══ COVER PAGE ═══ -->
 <div class="cover-hero">
   <div class="cover-logo-overlay">
-    <img src="${LOGO_URL}" alt="Smiths Insurance &amp; KiwiSaver">
+    <img src="/images/coverlogo.jpg" alt="Smiths Insurance &amp; KiwiSaver">
   </div>
 </div>
 
