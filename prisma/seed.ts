@@ -26,16 +26,18 @@ async function main() {
     console.log(`  Seeded user: ${u.email}`);
   }
 
-  // Clear any placeholder templates so the app uses the full built-in
-  // Nunjucks templates from src/lib/templates/defaults.ts
-  // Users can later paste their own templates via the /templates admin page
+  // Clear ALL old templates that don't have hasCover set properly
+  // (legacy templates from before the 4-template split)
   const deleted = await prisma.template.deleteMany({
     where: {
-      name: { contains: "Default" },
+      OR: [
+        { name: { contains: "Default" } },
+        { hasCover: null, docType: "SOA" }, // Old SOA templates without hasCover
+      ],
     },
   });
   if (deleted.count > 0) {
-    console.log(`  Cleared ${deleted.count} placeholder templates (full built-in templates will be used)`);
+    console.log(`  Cleared ${deleted.count} legacy templates`);
   }
 
   console.log("  Templates: using built-in defaults from code (editable via /templates)");
