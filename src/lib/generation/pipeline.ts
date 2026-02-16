@@ -39,11 +39,33 @@ export interface GenerateResult {
 
 // ── Helpers ──
 
-/** Find a cover item by type (case-insensitive partial match) */
+/** Cover type aliases for flexible matching */
+const COVER_ALIASES: Record<string, string[]> = {
+  life: ["life", "life cover", "life insurance", "life - lump sum", "life - drip feed"],
+  trauma: ["trauma", "progressive care", "critical", "trauma insurance", "progressive care / trauma"],
+  tpd: ["tpd", "total and permanent", "total & permanent", "permanent disability"],
+  income: ["income protection", "income", "ip"],
+  mortgage: ["mortgage protection", "mortgage", "mp"],
+  accident: ["accidental injury", "accident", "aic", "accidental"],
+  premium: ["premium cover", "premium waiver", "premium protection"],
+  health: ["health", "health insurance", "medical", "hospital"],
+};
+
+/** Find a cover item by type with fuzzy matching across aliases */
 function findCover(covers: CoverItem[], type: string): string {
-  const t = type.toLowerCase();
-  const item = covers.find(c => c.coverType.toLowerCase().includes(t));
-  return item?.sumInsured || "N/A";
+  if (!covers || covers.length === 0) return "N/A";
+  const aliases = COVER_ALIASES[type.toLowerCase()] || [type.toLowerCase()];
+  for (const alias of aliases) {
+    const item = covers.find(c => c.coverType.toLowerCase().includes(alias));
+    if (item?.sumInsured) return item.sumInsured;
+  }
+  return "N/A";
+}
+
+/** Check if ANY cover of a type exists in a covers array */
+function hasCoverType(covers: CoverItem[], type: string): boolean {
+  const aliases = COVER_ALIASES[type.toLowerCase()] || [type.toLowerCase()];
+  return covers.some(c => aliases.some(a => c.coverType.toLowerCase().includes(a)));
 }
 
 /** Safe string value */
@@ -51,28 +73,57 @@ function v(val: string | null | undefined, fallback = "N/A"): string {
   return val || fallback;
 }
 
-/** Detect frequency from various string formats */
-function detectFrequency(fp: FactPack): PremiumFrequency {
-  // Check caseMeta first (if present from old schema)
-  const meta = fp as Record<string, unknown>;
-  if (meta.caseMeta && typeof meta.caseMeta === "object") {
-    const cm = meta.caseMeta as Record<string, unknown>;
-    if (cm.frequency === "fortnight" || cm.frequency === "month" || cm.frequency === "year") {
-      return cm.frequency as PremiumFrequency;
-    }
+/** Parse a premium amount from various formats */
+function parsePremiumAmount(block: { premiumAmount?: number | null; totalPremium?: string | null } | null): number | null {
+  if (!block) return null;
+  if (block.premiumAmount !== null && block.premiumAmount !== undefined) return block.premiumAmount;
+  if (block.totalPremium) {
+    const cleaned = block.totalPremium.replace(/[,$\s]/g, "").split("/")[0].replace(/per.*$/, "").trim();
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? null : num;
   }
-  // Check existing/recommended cover premium frequencies
+  return null;
+}
+
+/** Detect frequency from various fields in the fact pack */
+function detectFrequency(fp: FactPack): PremiumFrequency {
+  // Check all possible sources
+  const sources: (string | null | undefined)[] = [];
+
   for (const ec of fp.existingCover) {
-    if (ec.premiumFrequency?.toLowerCase().includes("fortnight")) return "fortnight";
-    if (ec.premiumFrequency?.toLowerCase().includes("month")) return "month";
-    if (ec.premiumFrequency?.toLowerCase().includes("year")) return "year";
+    sources.push(ec.premiumFrequency, ec.totalPremium);
   }
   for (const rc of fp.recommendedCover) {
-    if (rc.premiumFrequency?.toLowerCase().includes("fortnight")) return "fortnight";
-    if (rc.premiumFrequency?.toLowerCase().includes("month")) return "month";
-    if (rc.premiumFrequency?.toLowerCase().includes("year")) return "year";
+    sources.push(rc.premiumFrequency, rc.totalPremium);
+  }
+
+  for (const s of sources) {
+    if (!s) continue;
+    const lower = s.toLowerCase();
+    if (lower.includes("fortnight")) return "fortnight";
+    if (lower.includes("week") && !lower.includes("fortnight")) return "fortnight"; // weekly → treat as fortnight for now
+    if (lower.includes("month")) return "month";
+    if (lower.includes("year") || lower.includes("annual")) return "year";
   }
   return "month";
+}
+
+/** Derive which sections are included from actual cover data (fallback when scope not populated) */
+function deriveSectionsFromCovers(fp: FactPack): Record<string, boolean> {
+  const allCovers: CoverItem[] = [
+    ...fp.recommendedCover.flatMap(r => r.covers),
+    ...fp.existingCover.flatMap(e => e.covers),
+  ];
+
+  return {
+    life: hasCoverType(allCovers, "life"),
+    trauma: hasCoverType(allCovers, "trauma"),
+    tpd: hasCoverType(allCovers, "tpd"),
+    incomeProtection: hasCoverType(allCovers, "income"),
+    mortgageProtection: hasCoverType(allCovers, "mortgage"),
+    accidentalInjury: hasCoverType(allCovers, "accident"),
+    health: hasCoverType(allCovers, "health"),
+  };
 }
 
 export async function runGenerationPipeline(input: GenerateInput): Promise<GenerateResult> {
@@ -126,37 +177,43 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
   console.log("[Pipeline] Writer complete");
 
   // ── Step 5: Map fact pack to template variables ──
-  // Get client data
   const clientA = factPack.clients[0];
   const clientB = factPack.clients.length > 1 ? factPack.clients[1] : null;
 
-  // Get existing/recommended cover blocks per client
   const clientAName = clientA?.fullName || input.clientOverrides?.name || "Client A";
   const clientBName = clientB?.fullName || input.clientOverrides?.nameB || "Client B";
 
-  const existA = factPack.existingCover.find(e => e.clientName?.includes(clientAName.split(" ")[0]) || e.clientName?.includes("Client A") || e.clientName?.includes("A"));
-  const existB = factPack.existingCover.find(e => e.clientName?.includes(clientBName.split(" ")[0]) || e.clientName?.includes("Client B") || e.clientName?.includes("B"));
-  const recA = factPack.recommendedCover.find(r => r.clientName?.includes(clientAName.split(" ")[0]) || r.clientName?.includes("Client A") || r.clientName?.includes("A"));
-  const recB = factPack.recommendedCover.find(r => r.clientName?.includes(clientBName.split(" ")[0]) || r.clientName?.includes("Client B") || r.clientName?.includes("B"));
+  // Match cover blocks to clients (flexible: by first name, label, or position)
+  type CoverBlock = FactPack["existingCover"][number];
+  type RecBlock = FactPack["recommendedCover"][number];
 
-  // Fallbacks: if only one block and not partner, use it for A
-  const existCoverA = existA || (factPack.existingCover.length === 1 ? factPack.existingCover[0] : null);
-  const existCoverB = existB || null;
-  const recCoverA = recA || (factPack.recommendedCover.length === 1 ? factPack.recommendedCover[0] : null);
-  const recCoverB = recB || null;
+  function matchCoverBlock<T extends { clientName: string }>(blocks: T[], name: string, label: string, idx: number): T | null {
+    const firstName = name.split(" ")[0];
+    return blocks.find(b =>
+      b.clientName?.toLowerCase().includes(firstName.toLowerCase()) ||
+      b.clientName?.toLowerCase().includes(label.toLowerCase())
+    ) || (blocks.length > idx ? blocks[idx] : null) || null;
+  }
+
+  const existCoverA: CoverBlock | null = matchCoverBlock(factPack.existingCover, clientAName, "client a", 0);
+  const existCoverB: CoverBlock | null = matchCoverBlock(factPack.existingCover, clientBName, "client b", 1);
+  const recCoverA: RecBlock | null = matchCoverBlock(factPack.recommendedCover, clientAName, "client a", 0);
+  const recCoverB: RecBlock | null = matchCoverBlock(factPack.recommendedCover, clientBName, "client b", 1);
+
+  console.log(`[Pipeline] Cover blocks: existA=${!!existCoverA}, existB=${!!existCoverB}, recA=${!!recCoverA}, recB=${!!recCoverB}`);
 
   const freq = detectFrequency(factPack);
 
   // ── Step 6: DETERMINISTIC premium math ──
   const premiumSummary = computePremiumSummary(
     {
-      existingAmount: existCoverA?.premiumAmount ?? null,
-      newAmount: recCoverA?.premiumAmount ?? null,
+      existingAmount: parsePremiumAmount(existCoverA),
+      newAmount: parsePremiumAmount(recCoverA),
       frequency: freq,
     },
     uiState.isPartner ? {
-      existingAmount: existCoverB?.premiumAmount ?? null,
-      newAmount: recCoverB?.premiumAmount ?? null,
+      existingAmount: parsePremiumAmount(existCoverB),
+      newAmount: parsePremiumAmount(recCoverB),
       frequency: freq,
     } : null,
     uiState,
@@ -173,8 +230,16 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     uiState
   );
 
-  // ── Step 8: Sections included ──
-  const si = factPack.scopeOfAdvice.perClient[0] || { lifeInsurance: false, traumaInsurance: false, tpdInsurance: false, incomeProtection: false, redundancyCover: false, healthInsurance: false };
+  // ── Step 8: Sections included (derive from covers if scope not populated) ──
+  const scopeClient = factPack.scopeOfAdvice.perClient[0];
+  const scopePopulated = scopeClient && (scopeClient.lifeInsurance || scopeClient.traumaInsurance || scopeClient.tpdInsurance || scopeClient.incomeProtection || scopeClient.healthInsurance);
+  const derived = deriveSectionsFromCovers(factPack);
+
+  const si = scopePopulated
+    ? { lifeInsurance: scopeClient.lifeInsurance, traumaInsurance: scopeClient.traumaInsurance, tpdInsurance: scopeClient.tpdInsurance, incomeProtection: scopeClient.incomeProtection, redundancyCover: scopeClient.redundancyCover, healthInsurance: scopeClient.healthInsurance }
+    : { lifeInsurance: derived.life, traumaInsurance: derived.trauma, tpdInsurance: derived.tpd, incomeProtection: derived.incomeProtection, redundancyCover: derived.mortgageProtection, healthInsurance: derived.health };
+
+  console.log(`[Pipeline] Sections (${scopePopulated ? "from scope" : "derived from covers"}): life=${si.lifeInsurance} trauma=${si.traumaInsurance} tpd=${si.tpdInsurance} ip=${si.incomeProtection}`);
 
   // ── Step 9: Build Nunjucks context ──
   const sec = (key: string): string => {
@@ -218,7 +283,7 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     INCOME_MP_INCLUDED: si.incomeProtection || si.redundancyCover,
     IP_INCLUDED: si.incomeProtection,
     MP_INCLUDED: si.redundancyCover,
-    AIC_INCLUDED: newCoversA.some(c => c.coverType.toLowerCase().includes("accident")),
+    AIC_INCLUDED: derived.accidentalInjury || (recCoverA?.covers || []).some(c => c.coverType.toLowerCase().includes("accident")),
     HEALTH_INCLUDED: si.healthInsurance,
 
     // Premium (deterministic)
