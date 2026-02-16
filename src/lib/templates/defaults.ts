@@ -18,6 +18,11 @@ export function getDefaultTemplate(
 // SHARED CSS — Bronze / Satoshi / Instrument Serif design system
 // ══════════════════════════════════════════════════════════════
 const SHARED_CSS = `
+@font-face{font-family:'Satoshi';src:url('/fonts/Satoshi-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:block;}
+@font-face{font-family:'Satoshi';src:url('/fonts/Satoshi-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:block;}
+@font-face{font-family:'Satoshi';src:url('/fonts/Satoshi-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:block;}
+@font-face{font-family:'Satoshi';src:url('/fonts/Satoshi-Italic.woff2') format('woff2');font-weight:400;font-style:italic;font-display:block;}
+@font-face{font-family:'Instrument Serif';src:url('/fonts/instrument-serif-latin-400-normal.woff2') format('woff2');font-weight:400;font-style:normal;font-display:block;}
 :root {
   --bronze:#B07D56;--bronze-muted:#C49A78;--bronze-wash:rgba(184,132,95,0.06);--bronze-border:rgba(184,132,95,0.22);
   --navy:#1B2A4A;--navy-soft:rgba(27,42,74,0.07);
@@ -150,7 +155,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title} — Smiths Insurance &amp; KiwiSaver</title>
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&f[]=instrument-serif@400&display=swap" rel="stylesheet">
+<!-- Fonts embedded locally via @font-face in CSS -->
 <style>${SHARED_CSS}</style>
 </head>
 <body>
@@ -554,7 +559,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 // ══════════════════════════════════════════════════════════════
 const SOE_DEFAULT = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><title>Scope of Engagement — Smiths</title>
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&f[]=instrument-serif@400&display=swap" rel="stylesheet">
+<!-- Fonts embedded locally via @font-face in CSS -->
 <style>${SHARED_CSS}</style>
 </head><body>
 <div class="accent-bar"></div>

@@ -18,12 +18,15 @@ export async function generatePdf(html: string): Promise<Buffer> {
   const page = await browser.newPage();
 
   try {
-    await page.setContent(html, { waitUntil: "networkidle" });
+    // Inject <base> tag so /fonts/ paths resolve to the running app
+    const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const htmlWithBase = html.replace("<head>", `<head><base href="${baseUrl}">`);
 
-    // Wait for all fonts to load properly (external fonts from Fontshare/Google can be slow)
+    await page.setContent(htmlWithBase, { waitUntil: "networkidle" });
+
+    // Wait for all locally-served fonts to load
     await page.evaluate(() => document.fonts.ready);
-    // Extra buffer for font rendering to stabilize
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(1500);
 
     const pdfBuffer = await page.pdf({
       format: "A4",
