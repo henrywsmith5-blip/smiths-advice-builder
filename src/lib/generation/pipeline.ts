@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/db";
 import { getLLMProvider, type ExtractInput } from "@/lib/llm/provider";
-import type { FactPack, CoverItem } from "@/lib/llm/schemas";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
-import { computePremiumSummary, type UIState, type PremiumFrequency } from "./premium";
-import { buildBenefitsSummary } from "./benefits";
-import { preflightValidate, type ValidationResult } from "./validator";
 import { DocType, ClientType } from "@prisma/client";
+import { v4 as uuid } from "uuid";
+import fs from "fs/promises";
+import path from "path";
+
+const DATA_DIR = process.env.DATA_DIR || "/data";
 
 export interface GenerateInput {
   caseId: string;
@@ -16,7 +17,11 @@ export interface GenerateInput {
   otherDocsText?: string;
   additionalContext?: string;
   roaDeviations?: string;
-  clientOverrides?: { name?: string; nameB?: string; email?: string };
+  clientOverrides?: {
+    name?: string;
+    nameB?: string;
+    email?: string;
+  };
   clientType: ClientType;
   clientAHasExisting: boolean;
   clientBHasExisting: boolean;
@@ -27,124 +32,16 @@ export interface GenerateResult {
   docId: string;
   renderedHtml: string;
   pdfPath: string | null;
-  validation: ValidationResult;
-  premiumSummary: {
-    existingTotal: number | null;
-    newTotal: number | null;
-    delta: number | null;
-    deltaLabel: string | null;
-    frequency: string;
-  };
 }
 
-// ── Helpers ──
-
-/** Cover type aliases for flexible matching */
-const COVER_ALIASES: Record<string, string[]> = {
-  life: ["life", "life cover", "life insurance", "life - lump sum", "life - drip feed"],
-  trauma: ["trauma", "progressive care", "critical", "trauma insurance", "progressive care / trauma"],
-  tpd: ["tpd", "total and permanent", "total & permanent", "permanent disability"],
-  income: ["income protection", "income", "ip"],
-  mortgage: ["mortgage protection", "mortgage", "mp"],
-  accident: ["accidental injury", "accident", "aic", "accidental"],
-  premium: ["premium cover", "premium waiver", "premium protection"],
-  health: ["health", "health insurance", "medical", "hospital"],
-};
-
-/** Find a cover item by type with fuzzy matching across aliases */
-function findCover(covers: CoverItem[], type: string): string {
-  if (!covers || covers.length === 0) return "N/A";
-  const aliases = COVER_ALIASES[type.toLowerCase()] || [type.toLowerCase()];
-  for (const alias of aliases) {
-    const item = covers.find(c => c.coverType.toLowerCase().includes(alias));
-    if (item?.sumInsured) return item.sumInsured;
-  }
-  return "N/A";
-}
-
-/** Check if ANY cover of a type exists in a covers array */
-function hasCoverType(covers: CoverItem[], type: string): boolean {
-  const aliases = COVER_ALIASES[type.toLowerCase()] || [type.toLowerCase()];
-  return covers.some(c => aliases.some(a => c.coverType.toLowerCase().includes(a)));
-}
-
-/** Safe string value */
-function v(val: string | null | undefined, fallback = "N/A"): string {
-  return val || fallback;
-}
-
-/** Parse a premium amount from various formats: "$68.49 per fortnight", "68.49", "$107.34/fortnight" */
-function parsePremiumAmount(block: { premiumAmount?: number | null; totalPremium?: string | null } | null): number | null {
-  if (!block) return null;
-  if (block.premiumAmount !== null && block.premiumAmount !== undefined && typeof block.premiumAmount === "number") {
-    return block.premiumAmount;
-  }
-  if (block.totalPremium) {
-    // Extract first number from the string (handles any format)
-    const match = block.totalPremium.match(/[\d,]+\.?\d*/);
-    if (match) {
-      const num = parseFloat(match[0].replace(/,/g, ""));
-      if (!isNaN(num)) return num;
-    }
-    console.warn(`[Pipeline] Could not parse premium from: "${block.totalPremium}"`);
-  }
-  return null;
-}
-
-/** Detect frequency from various fields in the fact pack */
-function detectFrequency(fp: FactPack): PremiumFrequency {
-  // Check all possible sources
-  const sources: (string | null | undefined)[] = [];
-
-  for (const ec of fp.existingCover) {
-    sources.push(ec.premiumFrequency, ec.totalPremium);
-  }
-  for (const rc of fp.recommendedCover) {
-    sources.push(rc.premiumFrequency, rc.totalPremium);
-  }
-
-  for (const s of sources) {
-    if (!s) continue;
-    const lower = s.toLowerCase();
-    if (lower.includes("fortnight")) return "fortnight";
-    if (lower.includes("week") && !lower.includes("fortnight")) return "fortnight"; // weekly → treat as fortnight for now
-    if (lower.includes("month")) return "month";
-    if (lower.includes("year") || lower.includes("annual")) return "year";
-  }
-  return "month";
-}
-
-/** Derive which sections are included from actual cover data (fallback when scope not populated) */
-function deriveSectionsFromCovers(fp: FactPack): Record<string, boolean> {
-  const allCovers: CoverItem[] = [
-    ...fp.recommendedCover.flatMap(r => r.covers),
-    ...fp.existingCover.flatMap(e => e.covers),
-  ];
-
-  return {
-    life: hasCoverType(allCovers, "life"),
-    trauma: hasCoverType(allCovers, "trauma"),
-    tpd: hasCoverType(allCovers, "tpd"),
-    incomeProtection: hasCoverType(allCovers, "income"),
-    mortgageProtection: hasCoverType(allCovers, "mortgage"),
-    accidentalInjury: hasCoverType(allCovers, "accident"),
-    health: hasCoverType(allCovers, "health"),
-  };
-}
-
-export async function runGenerationPipeline(input: GenerateInput): Promise<GenerateResult> {
+export async function runGenerationPipeline(
+  input: GenerateInput
+): Promise<GenerateResult> {
   const llm = getLLMProvider();
-  console.log(`[Pipeline] Starting ${input.docType} for case ${input.caseId}`);
 
-  // ── Step 1: UI State (SOURCE OF TRUTH) ──
-  const uiState: UIState = {
-    isPartner: input.clientType === ClientType.PARTNER,
-    clientAHasExisting: input.clientAHasExisting,
-    clientBHasExisting: input.clientBHasExisting,
-    hasExistingCover: input.clientAHasExisting || input.clientBHasExisting,
-  };
+  console.log(`[Pipeline] Starting ${input.docType} generation for case ${input.caseId}`);
 
-  // ── Step 2: Save inputs ──
+  // ── Step 1: Save inputs if requested ──
   if (input.saveCase) {
     await prisma.case.update({
       where: { id: input.caseId },
@@ -159,14 +56,17 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
         clientEmail: input.clientOverrides?.email || undefined,
         clientAHasExisting: input.clientAHasExisting,
         clientBHasExisting: input.clientBHasExisting,
-        retentionDeleteAt: new Date(Date.now() + (parseInt(process.env.RETENTION_DAYS || "7") * 86400000)),
+        retentionDeleteAt: new Date(
+          Date.now() +
+            (parseInt(process.env.RETENTION_DAYS || "7") * 24 * 60 * 60 * 1000)
+        ),
       },
     });
   }
 
-  // ── Step 3: LLM Extractor ──
+  // ── Step 2: LLM Extractor ──
   console.log("[Pipeline] Running extractor...");
-  const factPack = await llm.extractCaseJson({
+  const extractInput: ExtractInput = {
     docType: input.docType,
     clientOverrides: input.clientOverrides,
     firefliesText: input.firefliesText,
@@ -174,115 +74,31 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     otherDocsText: input.otherDocsText,
     additionalContext: input.additionalContext,
     roaDeviations: input.roaDeviations,
-  });
-  console.log(`[Pipeline] Extracted: ${factPack.clients.length} clients, ${factPack.existingCover.length} existing, ${factPack.recommendedCover.length} recommended`);
+  };
 
-  // ── Step 4: LLM Writer ──
+  const extractedJson = await llm.extractCaseJson(extractInput);
+  console.log("[Pipeline] Extraction complete");
+
+  // ── Step 3: LLM Writer ──
   console.log("[Pipeline] Running writer...");
-  const writerOutput = await llm.writeSections(factPack, input.docType);
+  const writerOutput = await llm.writeSections(extractedJson, input.docType);
   console.log("[Pipeline] Writer complete");
 
-  // ── Step 5: Map fact pack to template variables ──
-  const clientA = factPack.clients[0];
-  const clientB = factPack.clients.length > 1 ? factPack.clients[1] : null;
+  // ── Step 4: Compute cover logic ──
+  // Auto-detect from extracted data if user didn't toggle manually
+  const clientAHasExisting = input.clientAHasExisting || !!extractedJson.client_a_existing_insurer;
+  const clientBHasExisting = input.clientBHasExisting || !!extractedJson.client_b_existing_insurer;
+  const isPartner = input.clientType === ClientType.PARTNER || !!extractedJson.client.name_b;
+  const effectiveClientType = isPartner ? ClientType.PARTNER : ClientType.INDIVIDUAL;
 
-  const clientAName = clientA?.fullName || input.clientOverrides?.name || "Client A";
-  const clientBName = clientB?.fullName || input.clientOverrides?.nameB || "Client B";
+  const hasAnyExistingCover = effectiveClientType === ClientType.INDIVIDUAL
+    ? clientAHasExisting
+    : clientAHasExisting || clientBHasExisting;
 
-  // Match cover blocks to clients (flexible: by first name, label, or position)
-  type CoverBlock = FactPack["existingCover"][number];
-  type RecBlock = FactPack["recommendedCover"][number];
+  console.log(`[Pipeline] Detected: partner=${isPartner}, existingCover=${hasAnyExistingCover}, clientA=${extractedJson.client.name_a}, clientB=${extractedJson.client.name_b}`);
 
-  function matchCoverBlock<T extends { clientName: string }>(blocks: T[], name: string, label: string, idx: number): T | null {
-    if (!blocks || blocks.length === 0) return null;
-    const nameLower = name.toLowerCase();
-    const firstName = name.split(" ")[0].toLowerCase();
-    const labelLower = label.toLowerCase();
-
-    // 1. Try full name match (either direction)
-    let match = blocks.find(b => {
-      const bn = (b.clientName || "").toLowerCase();
-      return bn && (bn.includes(nameLower) || nameLower.includes(bn));
-    });
-
-    // 2. Try first name match
-    if (!match && firstName.length > 1) {
-      match = blocks.find(b => {
-        const bn = (b.clientName || "").toLowerCase();
-        return bn && bn.includes(firstName);
-      });
-    }
-
-    // 3. Try label match ("client a", "client b", "a", "b")
-    if (!match) {
-      match = blocks.find(b => {
-        const bn = (b.clientName || "").toLowerCase();
-        return bn && (bn.includes(labelLower) || bn === "a" || bn === "b");
-      });
-    }
-
-    // 4. Fallback to array position
-    if (!match && blocks.length > idx) {
-      match = blocks[idx];
-    }
-
-    return match || null;
-  }
-
-  const existCoverA: CoverBlock | null = matchCoverBlock(factPack.existingCover, clientAName, "client a", 0);
-  const existCoverB: CoverBlock | null = matchCoverBlock(factPack.existingCover, clientBName, "client b", 1);
-  const recCoverA: RecBlock | null = matchCoverBlock(factPack.recommendedCover, clientAName, "client a", 0);
-  const recCoverB: RecBlock | null = matchCoverBlock(factPack.recommendedCover, clientBName, "client b", 1);
-
-  // Diagnostic warnings
-  if (uiState.hasExistingCover && !existCoverA) console.warn("[Pipeline] WARNING: Existing cover toggle ON but no existing cover block found for Client A");
-  if (uiState.isPartner && !recCoverB) console.warn("[Pipeline] WARNING: Partner mode ON but no recommended cover block found for Client B");
-  if (recCoverA && recCoverA.covers.length === 0) console.warn("[Pipeline] WARNING: Client A recommended cover block exists but has 0 cover items");
-  if (existCoverA) console.log(`[Pipeline] Client A existing: ${existCoverA.insurer}, ${existCoverA.covers.length} covers, premium=${existCoverA.premiumAmount || existCoverA.totalPremium}`);
-  if (recCoverA) console.log(`[Pipeline] Client A recommended: ${recCoverA.insurer}, ${recCoverA.covers.length} covers, premium=${recCoverA.premiumAmount || recCoverA.totalPremium}`);
-
-  console.log(`[Pipeline] Cover blocks: existA=${!!existCoverA}, existB=${!!existCoverB}, recA=${!!recCoverA}, recB=${!!recCoverB}`);
-
-  const freq = detectFrequency(factPack);
-
-  // ── Step 6: DETERMINISTIC premium math ──
-  const premiumSummary = computePremiumSummary(
-    {
-      existingAmount: parsePremiumAmount(existCoverA),
-      newAmount: parsePremiumAmount(recCoverA),
-      frequency: freq,
-    },
-    uiState.isPartner ? {
-      existingAmount: parsePremiumAmount(existCoverB),
-      newAmount: parsePremiumAmount(recCoverB),
-      frequency: freq,
-    } : null,
-    uiState,
-    freq
-  );
-  console.log(`[Pipeline] Premium: ${premiumSummary.OLD_PREMIUM} → ${premiumSummary.NEW_PREMIUM} (${premiumSummary.PREMIUM_CHANGE_LABEL})`);
-
-  // ── Step 7: DETERMINISTIC benefits ──
-  const benefitsSummary = buildBenefitsSummary(
-    clientAName,
-    factPack.benefitsSummaryA || null,
-    uiState.isPartner ? clientBName : null,
-    factPack.benefitsSummaryB || null,
-    uiState
-  );
-
-  // ── Step 8: Sections included (derive from covers if scope not populated) ──
-  const scopeClient = factPack.scopeOfAdvice.perClient[0];
-  const scopePopulated = scopeClient && (scopeClient.lifeInsurance || scopeClient.traumaInsurance || scopeClient.tpdInsurance || scopeClient.incomeProtection || scopeClient.healthInsurance);
-  const derived = deriveSectionsFromCovers(factPack);
-
-  const si = scopePopulated
-    ? { lifeInsurance: scopeClient.lifeInsurance, traumaInsurance: scopeClient.traumaInsurance, tpdInsurance: scopeClient.tpdInsurance, incomeProtection: scopeClient.incomeProtection, redundancyCover: scopeClient.redundancyCover, healthInsurance: scopeClient.healthInsurance }
-    : { lifeInsurance: derived.life, traumaInsurance: derived.trauma, tpdInsurance: derived.tpd, incomeProtection: derived.incomeProtection, redundancyCover: derived.mortgageProtection, healthInsurance: derived.health };
-
-  console.log(`[Pipeline] Sections (${scopePopulated ? "from scope" : "derived from covers"}): life=${si.lifeInsurance} trauma=${si.traumaInsurance} tpd=${si.tpdInsurance} ip=${si.incomeProtection}`);
-
-  // ── Step 9: Build Nunjucks context ──
+  // ── Step 5: Build render context ──
+  // Helper to safely access writer sections by string key
   const sec = (key: string): string => {
     const s = writerOutput.sections as Record<string, { included: boolean; html: string }> | undefined;
     if (s && key in s) return s[key].html || "";
@@ -293,92 +109,108 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     timeZone: "Pacific/Auckland", day: "numeric", month: "long", year: "numeric",
   });
 
-  const existCoversA = existCoverA?.covers || [];
-  const existCoversB = existCoverB?.covers || [];
-  const newCoversA = recCoverA?.covers || [];
-  const newCoversB = recCoverB?.covers || [];
+  // Direct field mapping from new schema → template variables
+  const d = extractedJson;
+  const v = (val: string | null | undefined, fallback = "N/A") => val || fallback;
 
   const context: RenderContext = {
-    CLIENT_NAME: clientAName,
-    CLIENT_A_NAME: clientAName,
-    CLIENT_B_NAME: clientBName,
-    CLIENT_EMAIL: v(clientA?.email, input.clientOverrides?.email || ""),
-    CLIENT_PHONE: v(clientA?.phone, ""),
+    // Client info
+    CLIENT_NAME: v(d.client.name_a, input.clientOverrides?.name || "Client"),
+    CLIENT_A_NAME: v(d.client.name_a, input.clientOverrides?.name || "Client A"),
+    CLIENT_B_NAME: v(d.client.name_b, input.clientOverrides?.nameB || "Client B"),
+    CLIENT_EMAIL: v(d.client.email, input.clientOverrides?.email || ""),
+    CLIENT_PHONE: v(d.client.phone, ""),
     DATE: nzDate,
     SIGNOFF_DATE: nzDate,
     ENGAGEMENT_DATE: nzDate,
 
-    ADVISER_NAME: factPack.documentMetadata.adviserName || "Craig Smith",
+    // Adviser
+    ADVISER_NAME: "Craig Smith",
     ADVISER_EMAIL: "craig@smiths.net.nz",
     ADVISER_PHONE: "0274 293 939",
-    ADVISER_FSP: `FSP${factPack.documentMetadata.adviserFapLicence || "33042"}`,
+    ADVISER_FSP: "FSP33042",
 
-    IS_PARTNER: uiState.isPartner,
-    HAS_EXISTING_COVER: uiState.hasExistingCover,
-    NEW_COVER_ONLY: !uiState.hasExistingCover,
+    // Structure flags (auto-detected from extraction)
+    IS_PARTNER: isPartner,
+    HAS_EXISTING_COVER: hasAnyExistingCover,
+    NEW_COVER_ONLY: !hasAnyExistingCover,
 
-    // Section includes
-    LIFE_INCLUDED: si.lifeInsurance,
-    TRAUMA_INCLUDED: si.traumaInsurance,
-    TPD_INCLUDED: si.tpdInsurance,
-    INCOME_MP_INCLUDED: si.incomeProtection || si.redundancyCover,
-    IP_INCLUDED: si.incomeProtection,
-    MP_INCLUDED: si.redundancyCover,
-    AIC_INCLUDED: derived.accidentalInjury || (recCoverA?.covers || []).some(c => c.coverType.toLowerCase().includes("accident")),
-    HEALTH_INCLUDED: si.healthInsurance,
+    // Section includes (from extractor)
+    LIFE_INCLUDED: d.sections_included.life,
+    TRAUMA_INCLUDED: d.sections_included.trauma,
+    TPD_INCLUDED: d.sections_included.tpd,
+    INCOME_MP_INCLUDED: d.sections_included.income_protection || d.sections_included.mortgage_protection,
+    IP_INCLUDED: d.sections_included.income_protection,
+    MP_INCLUDED: d.sections_included.mortgage_protection,
+    AIC_INCLUDED: d.sections_included.accidental_injury,
 
-    // Premium (deterministic)
-    ...premiumSummary,
+    // Premium
+    OLD_PREMIUM: v(d.premium.existing_total, ""),
+    NEW_PREMIUM: v(d.premium.new_total, ""),
+    PREMIUM_FREQUENCY: d.premium.frequency || "per month",
+    PREMIUM_CHANGE_LABEL: "Savings",
+    PREMIUM_CHANGE: v(d.premium.savings, ""),
+    MONTHLY_SAVINGS: v(d.premium.savings, ""),
+    ANNUAL_SAVINGS: v(d.premium.annual_savings, ""),
 
-    // Client A existing covers (from covers array)
-    CLIENT_A_EXISTING_INSURER: v(existCoverA?.insurer, ""),
-    CLIENT_A_NEW_INSURER: v(recCoverA?.insurer, ""),
-    CLIENT_A_ADVICE_TYPE_LABEL: uiState.hasExistingCover
-      ? `Summary of changes from ${v(existCoverA?.insurer, "existing")} to ${v(recCoverA?.insurer, "new")}`
+    // Client A — existing cover
+    CLIENT_A_EXISTING_INSURER: v(d.client_a_existing_insurer, ""),
+    CLIENT_A_ADVICE_TYPE_LABEL: hasAnyExistingCover
+      ? `Summary of changes from ${v(d.client_a_existing_insurer, "existing insurer")} to ${v(d.client_a_new_insurer, "new insurer")}`
       : "",
-    CLIENT_A_OLD_LIFE: findCover(existCoversA, "life"),
-    CLIENT_A_OLD_TRAUMA: findCover(existCoversA, "trauma"),
-    CLIENT_A_OLD_TPD: findCover(existCoversA, "tpd"),
-    CLIENT_A_OLD_IP: findCover(existCoversA, "income"),
-    CLIENT_A_OLD_MP: findCover(existCoversA, "mortgage"),
-    CLIENT_A_OLD_AIC: findCover(existCoversA, "accident"),
-    CLIENT_A_OLD_PREMIUM_COVER: findCover(existCoversA, "premium"),
+    CLIENT_A_OLD_LIFE: v(d.client_a_old_cover.life),
+    CLIENT_A_OLD_TRAUMA: v(d.client_a_old_cover.trauma),
+    CLIENT_A_OLD_TPD: v(d.client_a_old_cover.tpd),
+    CLIENT_A_OLD_IP: v(d.client_a_old_cover.income_protection),
+    CLIENT_A_OLD_MP: v(d.client_a_old_cover.mortgage_protection),
+    CLIENT_A_OLD_AIC: v(d.client_a_old_cover.accidental_injury),
+    CLIENT_A_OLD_PREMIUM_COVER: v(d.client_a_old_cover.premium_cover),
 
-    CLIENT_A_NEW_LIFE: findCover(newCoversA, "life"),
-    CLIENT_A_NEW_TRAUMA: findCover(newCoversA, "trauma"),
-    CLIENT_A_NEW_TPD: findCover(newCoversA, "tpd"),
-    CLIENT_A_NEW_IP: findCover(newCoversA, "income"),
-    CLIENT_A_NEW_MP: findCover(newCoversA, "mortgage"),
-    CLIENT_A_NEW_AIC: findCover(newCoversA, "accident"),
-    CLIENT_A_NEW_PREMIUM_COVER: findCover(newCoversA, "premium"),
+    // Client A — new cover
+    CLIENT_A_NEW_INSURER: v(d.client_a_new_insurer, ""),
+    CLIENT_A_NEW_LIFE: v(d.client_a_new_cover.life),
+    CLIENT_A_NEW_TRAUMA: v(d.client_a_new_cover.trauma),
+    CLIENT_A_NEW_TPD: v(d.client_a_new_cover.tpd),
+    CLIENT_A_NEW_IP: v(d.client_a_new_cover.income_protection),
+    CLIENT_A_NEW_MP: v(d.client_a_new_cover.mortgage_protection),
+    CLIENT_A_NEW_AIC: v(d.client_a_new_cover.accidental_injury),
+    CLIENT_A_NEW_PREMIUM_COVER: v(d.client_a_new_cover.premium_cover),
 
-    // Client B
-    CLIENT_B_EXISTING_INSURER: v(existCoverB?.insurer, ""),
-    CLIENT_B_NEW_INSURER: v(recCoverB?.insurer, ""),
-    CLIENT_B_ADVICE_TYPE_LABEL: uiState.hasExistingCover
-      ? `Summary of changes from ${v(existCoverB?.insurer, "existing")} to ${v(recCoverB?.insurer, "new")}`
+    // Client B — existing cover
+    CLIENT_B_EXISTING_INSURER: v(d.client_b_existing_insurer, ""),
+    CLIENT_B_ADVICE_TYPE_LABEL: hasAnyExistingCover
+      ? `Summary of changes from ${v(d.client_b_existing_insurer, "existing insurer")} to ${v(d.client_b_new_insurer, "new insurer")}`
       : "",
-    CLIENT_B_OLD_LIFE: findCover(existCoversB, "life"),
-    CLIENT_B_OLD_TRAUMA: findCover(existCoversB, "trauma"),
-    CLIENT_B_OLD_TPD: findCover(existCoversB, "tpd"),
-    CLIENT_B_OLD_IP: findCover(existCoversB, "income"),
-    CLIENT_B_OLD_MP: findCover(existCoversB, "mortgage"),
-    CLIENT_B_OLD_AIC: findCover(existCoversB, "accident"),
-    CLIENT_B_OLD_PREMIUM_COVER: findCover(existCoversB, "premium"),
+    CLIENT_B_OLD_LIFE: v(d.client_b_old_cover.life),
+    CLIENT_B_OLD_TRAUMA: v(d.client_b_old_cover.trauma),
+    CLIENT_B_OLD_TPD: v(d.client_b_old_cover.tpd),
+    CLIENT_B_OLD_IP: v(d.client_b_old_cover.income_protection),
+    CLIENT_B_OLD_MP: v(d.client_b_old_cover.mortgage_protection),
+    CLIENT_B_OLD_AIC: v(d.client_b_old_cover.accidental_injury),
+    CLIENT_B_OLD_PREMIUM_COVER: v(d.client_b_old_cover.premium_cover),
 
-    CLIENT_B_NEW_LIFE: findCover(newCoversB, "life"),
-    CLIENT_B_NEW_TRAUMA: findCover(newCoversB, "trauma"),
-    CLIENT_B_NEW_TPD: findCover(newCoversB, "tpd"),
-    CLIENT_B_NEW_IP: findCover(newCoversB, "income"),
-    CLIENT_B_NEW_MP: findCover(newCoversB, "mortgage"),
-    CLIENT_B_NEW_AIC: findCover(newCoversB, "accident"),
-    CLIENT_B_NEW_PREMIUM_COVER: findCover(newCoversB, "premium"),
+    // Client B — new cover
+    CLIENT_B_NEW_INSURER: v(d.client_b_new_insurer, ""),
+    CLIENT_B_NEW_LIFE: v(d.client_b_new_cover.life),
+    CLIENT_B_NEW_TRAUMA: v(d.client_b_new_cover.trauma),
+    CLIENT_B_NEW_TPD: v(d.client_b_new_cover.tpd),
+    CLIENT_B_NEW_IP: v(d.client_b_new_cover.income_protection),
+    CLIENT_B_NEW_MP: v(d.client_b_new_cover.mortgage_protection),
+    CLIENT_B_NEW_AIC: v(d.client_b_new_cover.accidental_injury),
+    CLIENT_B_NEW_PREMIUM_COVER: v(d.client_b_new_cover.premium_cover),
 
-    // Benefits (deterministic)
-    ...benefitsSummary,
+    // Benefits summary (from extractor)
+    MP_MONTHLY: v(d.benefits.mortgage_protection.monthly_amount),
+    MP_WAIT: v(d.benefits.mortgage_protection.wait_period),
+    MP_BENEFIT_PERIOD: v(d.benefits.mortgage_protection.benefit_period),
+    MP_PREMIUM: v(d.benefits.mortgage_protection.premium),
+    IP_MONTHLY: v(d.benefits.income_protection.monthly_amount),
+    IP_WAIT: v(d.benefits.income_protection.wait_period),
+    IP_BENEFIT_PERIOD: v(d.benefits.income_protection.benefit_period),
+    IP_PREMIUM: v(d.benefits.income_protection.premium),
 
-    // Writer narratives
-    SPECIAL_INSTRUCTIONS: sec("special_instructions") || factPack.specialInstructions || "",
+    // Writer narrative sections
+    SPECIAL_INSTRUCTIONS: sec("special_instructions") || d.special_instructions || "",
     REASON_LIFE_COVER: sec("reasons_life"),
     REASON_TRAUMA: sec("reasons_trauma"),
     REASON_PROGRESSIVE_CARE: sec("reasons_progressive_care"),
@@ -393,6 +225,7 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     ROA_DEVIATIONS: sec("deviations") || input.roaDeviations || "",
     MODIFICATION_NOTES: sec("modification_notes") || "",
 
+    // Pros/cons (from writer)
     LIFE_PROS: sec("pros_life"),
     LIFE_CONS: sec("cons_life"),
     TRAUMA_PROS: sec("pros_trauma"),
@@ -405,56 +238,59 @@ export async function runGenerationPipeline(input: GenerateInput): Promise<Gener
     AIC_CONS: sec("cons_aic"),
   };
 
-  // ── Step 10: Render template ──
+  // ── Step 6: Render template ──
   console.log("[Pipeline] Rendering template...");
-  const clientType = input.docType === DocType.SOE ? null : input.clientType;
-  const renderedHtml = await renderTemplate(input.docType, clientType, context, uiState.hasExistingCover);
+  const clientType = input.docType === DocType.SOE ? null : effectiveClientType;
+  const renderedHtml = await renderTemplate(input.docType, clientType, context, hasAnyExistingCover);
 
-  // ── Step 11: PREFLIGHT VALIDATION ──
-  const validation = preflightValidate({
-    uiState,
-    premiumSummary,
-    benefitsSummary,
-    renderedHtml,
-    clientAName: clientA?.fullName || input.clientOverrides?.name || null,
-    clientBName: clientB?.fullName || input.clientOverrides?.nameB || null,
-  });
+  // ── Step 7: Generate PDF ──
+  console.log("[Pipeline] Generating PDF...");
+  let pdfPath: string | null = null;
+  try {
+    const pdfBuffer = await generatePdf(renderedHtml);
+    const docId = uuid();
 
-  if (validation.errors.length > 0) console.warn("[Pipeline] ERRORS:", validation.errors);
-  if (validation.warnings.length > 0) console.warn("[Pipeline] Warnings:", validation.warnings);
+    // Save PDF to disk
+    const dir = path.join(DATA_DIR, "pdfs", input.caseId);
+    await fs.mkdir(dir, { recursive: true });
+    pdfPath = path.join(dir, `${docId}.pdf`);
+    await fs.writeFile(pdfPath, pdfBuffer);
+    console.log(`[Pipeline] PDF saved: ${pdfPath}`);
 
-  // ── Step 12: Save doc + PDF ──
-  const doc = await prisma.generatedDocument.create({
-    data: {
-      caseId: input.caseId,
-      docType: input.docType,
-      extractedJson: factPack as object,
+    // ── Step 8: Save generated document record ──
+    const doc = await prisma.generatedDocument.create({
+      data: {
+        id: docId,
+        caseId: input.caseId,
+        docType: input.docType,
+        extractedJson: extractedJson as object,
+        renderedHtml,
+        pdfPath,
+      },
+    });
+
+    return {
+      docId: doc.id,
+      renderedHtml,
+      pdfPath,
+    };
+  } catch (pdfError) {
+    console.error("[Pipeline] PDF generation failed:", pdfError);
+    // Still save the document without PDF
+    const doc = await prisma.generatedDocument.create({
+      data: {
+        caseId: input.caseId,
+        docType: input.docType,
+        extractedJson: extractedJson as object,
+        renderedHtml,
+        pdfPath: null,
+      },
+    });
+
+    return {
+      docId: doc.id,
       renderedHtml,
       pdfPath: null,
-    },
-  });
-
-  let pdfPath: string | null = null;
-  if (validation.valid) {
-    try {
-      await generatePdf(renderedHtml);
-      pdfPath = "on-demand";
-    } catch (e) {
-      console.error("[Pipeline] PDF generation failed:", e);
-    }
+    };
   }
-
-  return {
-    docId: doc.id,
-    renderedHtml,
-    pdfPath,
-    validation,
-    premiumSummary: {
-      existingTotal: premiumSummary.existingTotal,
-      newTotal: premiumSummary.newTotal,
-      delta: premiumSummary.delta,
-      deltaLabel: premiumSummary.deltaLabel,
-      frequency: premiumSummary.frequency,
-    },
-  };
 }
