@@ -139,7 +139,9 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .page-break{page-break-before:always;margin-top:0;}
 .section-block{page-break-inside:avoid;}
 .section-block-break{page-break-before:always;}
-@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{page-break-before:always;}}
+.section-page-2{page-break-before:always;page-break-after:always;}
+.section-heading{page-break-after:avoid;}
+@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.section-heading{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{page-break-before:always;}.section-page-2{page-break-before:always;page-break-after:always;}}
 `;
 
 const LOGO_URL = "https://images.squarespace-cdn.com/content/v1/6033fe3152058c67d1e84e7f/1614286673894-ZH98E19GRUKA55E6Z17W/Smiths_wide_withouttagline_RGB_COLOUR-300dpi.jpg?format=1500w";
@@ -201,8 +203,9 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 </div>
 
-<!-- ═══ SECTION 1 — SCOPE ═══ -->
-<div class="header page-break">
+<!-- ═══ SECTION 1 — SCOPE + SPECIAL INSTRUCTIONS (Page 2) ═══ -->
+<div class="section-page-2">
+<div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">${titleShort}</span>
 </div>
 
@@ -236,9 +239,11 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <div class="sub-heading" style="border-bottom:1.5px solid var(--bronze); padding-bottom:4px;">Special Instructions / Objectives / Comments</div>
 <div class="placeholder-block">{{ SPECIAL_INSTRUCTIONS }}</div>
+</div><!-- /section-page-2 -->
 
-<!-- ═══ SECTION 2 — NATURE AND SCOPE ═══ -->
-<div class="header page-break">
+<!-- ═══ SECTION 2 — NATURE AND SCOPE (forced new page) ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">${titleShort}</span>
 </div>
 
@@ -258,6 +263,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <p class="body-text">In providing you with financial advice, we will only consider existing term life, trauma, income protection and health insurance policies available through the above-mentioned insurers.</p>
 <p class="body-text">We will not provide advice on existing whole of life or endowment products. Our advice is limited to New Zealand based financial insurance products only.</p>
+</div><!-- /section-block-break: Section 2 -->
 
 <!-- ═══ SECTION 3 — OUT OF SCOPE ═══ -->
 <div class="section-heading"><div class="num">3</div><h2>Out of Scope — What We Do Not Provide</h2></div>
@@ -406,6 +412,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   <div class="premium-grid">
     <div class="premium-cell"><div class="p-label">Existing Premium</div><div class="p-amount">{{ OLD_PREMIUM }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
     <div class="premium-cell"><div class="p-label">New Premium</div><div class="p-amount">{{ NEW_PREMIUM }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
+    <div class="premium-cell"><div class="p-label">{{ PREMIUM_CHANGE_LABEL }}</div><div class="p-amount">{{ PREMIUM_CHANGE }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
   </div>
   {% else %}
   <div class="premium-grid single-row">

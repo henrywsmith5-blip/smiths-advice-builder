@@ -23,6 +23,7 @@ CRITICAL RULES:
 5. When both transcript discussion and structured cover blocks exist, STRUCTURED BLOCKS TAKE PRECEDENCE for all numerical values.
 6. If there are two clients (partner case), extract data separately for client_a and client_b.
 7. Never ignore structured data inside Additional Context.
+8. PREMIUM RULE: If the client has existing cover (client_a_existing_insurer is not null), you MUST extract BOTH premium.existing_total AND premium.new_total. There must ALWAYS be two premium figures when existing cover exists. Never leave either blank or null when existing cover is present. If new cover has no existing cover, only new_total is required.
 
 === UI STRUCTURE FLAGS ===
 isPartner: ${!!input.clientOverrides?.nameB}

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { getLLMProvider, type ExtractInput } from "@/lib/llm/provider";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
+import { computePremiumSummary, parseDollar, type PremiumFrequency, type UIState, type ClientPremiumData } from "@/lib/generation/premium";
 import { DocType, ClientType } from "@prisma/client";
 import { v4 as uuid } from "uuid";
 import fs from "fs/promises";
@@ -166,14 +167,32 @@ export async function runGenerationPipeline(
     AIC_INCLUDED: d.sections_included.accidental_injury,
     HEALTH_INCLUDED: d.sections_included.health,
 
-    // Premium
-    OLD_PREMIUM: v(d.premium.existing_total, ""),
-    NEW_PREMIUM: v(d.premium.new_total, ""),
-    PREMIUM_FREQUENCY: d.premium.frequency || "per month",
-    PREMIUM_CHANGE_LABEL: "Savings",
-    PREMIUM_CHANGE: v(d.premium.savings, ""),
-    MONTHLY_SAVINGS: v(d.premium.savings, ""),
-    ANNUAL_SAVINGS: v(d.premium.annual_savings, ""),
+    // Premium — deterministic computation, never from LLM
+    ...(() => {
+      const freqStr = (d.premium.frequency || "per month").toLowerCase();
+      const freq: PremiumFrequency = freqStr.includes("fortnight") ? "fortnight" : freqStr.includes("year") ? "year" : "month";
+      const uiPrem: UIState = { isPartner, clientAHasExisting: clientAHasExisting, clientBHasExisting, hasExistingCover: hasAnyExistingCover };
+      const clientAPrem: ClientPremiumData = {
+        existingAmount: parseDollar(d.premium.existing_total),
+        newAmount: parseDollar(d.premium.new_total),
+        frequency: freq,
+      };
+      const clientBPrem: ClientPremiumData | null = isPartner ? {
+        existingAmount: null,
+        newAmount: null,
+        frequency: freq,
+      } : null;
+      const ps = computePremiumSummary(clientAPrem, clientBPrem, uiPrem, freq);
+      return {
+        OLD_PREMIUM: ps.OLD_PREMIUM,
+        NEW_PREMIUM: ps.NEW_PREMIUM,
+        PREMIUM_FREQUENCY: ps.PREMIUM_FREQUENCY,
+        PREMIUM_CHANGE_LABEL: ps.PREMIUM_CHANGE_LABEL,
+        PREMIUM_CHANGE: ps.PREMIUM_CHANGE,
+        MONTHLY_SAVINGS: ps.MONTHLY_SAVINGS,
+        ANNUAL_SAVINGS: ps.ANNUAL_SAVINGS,
+      };
+    })(),
 
     // Client A — existing cover
     CLIENT_A_EXISTING_INSURER: v(d.client_a_existing_insurer, ""),

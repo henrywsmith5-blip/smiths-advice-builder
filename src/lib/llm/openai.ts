@@ -16,9 +16,10 @@ DOCUMENT TYPE: ${input.docType} (${isROA ? "Record of Advice - what was IMPLEMEN
 RULES:
 1. NEVER invent numbers. If not explicitly stated, use null.
 2. Monetary values include "$" (e.g. "$500,000", "$145.20").
-3. Missing values → null + add to "missing_fields" array.
+3. Missing values -> null + add to "missing_fields" array.
 4. Prefer formal quotes/schedules for amounts over transcript.
 5. Partner cases: extract client_a and client_b separately.
+6. PREMIUM RULE: If client has existing cover (client_a_existing_insurer is not null), you MUST extract BOTH premium.existing_total AND premium.new_total. There must ALWAYS be two premium figures when existing cover exists. Never leave either blank or null when existing cover is present.
 
 Return JSON with: client, doc_type, sections_included, client_a_old_cover, client_a_new_cover, client_b_old_cover, client_b_new_cover, premium, benefits, situation_summary, special_instructions, missing_fields.
 Each cover object has: life, trauma, tpd, income_protection, mortgage_protection, accidental_injury, premium_cover, health.`;
