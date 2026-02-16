@@ -203,7 +203,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <p class="body-text"><em>"How would you like us to help you?"</em></p>
 <p class="body-text">The following are the areas of insurance advice that you are requesting. Unless noted below, discussions and advice will be limited to assisting you and your family's financial security in the event of:</p>
 
-<div class="sub-heading">Client A: <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
+<div class="sub-heading"><span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
 <ul class="checkbox-list">
   <li{% if LIFE_INCLUDED %} class="checked"{% endif %}>Untimely death (Life Insurance)</li>
   <li{% if TRAUMA_INCLUDED %} class="checked"{% endif %}>Suffering a serious critical illness or injury (Trauma Insurance)</li>
@@ -215,7 +215,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 </ul>
 
 {% if IS_PARTNER %}
-<div class="sub-heading">Client B: <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
+<div class="sub-heading"><span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
 <ul class="checkbox-list">
   <li{% if LIFE_INCLUDED %} class="checked"{% endif %}>Untimely death (Life Insurance)</li>
   <li{% if TRAUMA_INCLUDED %} class="checked"{% endif %}>Suffering a serious critical illness or injury (Trauma Insurance)</li>
@@ -299,7 +299,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <!-- CLIENT A -->
 <div class="client-divider"><span>{{ CLIENT_A_NAME }}</span></div>
-<div class="sub-heading">Agreed Covers — Client A: <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
+<div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
 
 {% if HAS_EXISTING_COVER %}
 <p class="body-text"><em>{{ CLIENT_A_ADVICE_TYPE_LABEL }}</em></p>
@@ -340,7 +340,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 {% if IS_PARTNER %}
 <!-- CLIENT B -->
 <div class="client-divider"><span>{{ CLIENT_B_NAME }}</span></div>
-<div class="sub-heading">Agreed Covers — Client B: <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
+<div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
 
 {% if HAS_EXISTING_COVER %}
 <p class="body-text"><em>{{ CLIENT_B_ADVICE_TYPE_LABEL }}</em></p>
@@ -527,8 +527,8 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 {% if IS_PARTNER %}
 <div class="signature-grid">
-  <div class="sig-box"><div class="sig-name">Client A: {{ CLIENT_A_NAME }}</div><div class="sig-line"></div><div class="sig-label">Signature</div><div class="sig-line"></div><div class="sig-label">Date</div></div>
-  <div class="sig-box"><div class="sig-name">Client B: {{ CLIENT_B_NAME }}</div><div class="sig-line"></div><div class="sig-label">Signature</div><div class="sig-line"></div><div class="sig-label">Date</div></div>
+  <div class="sig-box"><div class="sig-name">{{ CLIENT_A_NAME }}</div><div class="sig-line"></div><div class="sig-label">Signature</div><div class="sig-line"></div><div class="sig-label">Date</div></div>
+  <div class="sig-box"><div class="sig-name">{{ CLIENT_B_NAME }}</div><div class="sig-line"></div><div class="sig-label">Signature</div><div class="sig-line"></div><div class="sig-label">Date</div></div>
 </div>
 {% else %}
 <div class="signature-grid single">
