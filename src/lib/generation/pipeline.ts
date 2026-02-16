@@ -77,7 +77,10 @@ export async function runGenerationPipeline(
   };
 
   const extractedJson = await llm.extractCaseJson(extractInput);
-  console.log("[Pipeline] Extraction complete");
+  console.log(`[Pipeline] Extraction complete: clientA=${extractedJson.client.name_a}, clientB=${extractedJson.client.name_b}`);
+  console.log(`[Pipeline] Insurers: existA=${extractedJson.client_a_existing_insurer}, newA=${extractedJson.client_a_new_insurer}`);
+  console.log(`[Pipeline] CoverA new: life=${extractedJson.client_a_new_cover.life}, trauma=${extractedJson.client_a_new_cover.trauma}`);
+  console.log(`[Pipeline] Premium: existing=${extractedJson.premium.existing_total}, new=${extractedJson.premium.new_total}, freq=${extractedJson.premium.frequency}`);
 
   // ── Step 3: LLM Writer ──
   console.log("[Pipeline] Running writer...");
@@ -109,9 +112,11 @@ export async function runGenerationPipeline(
     timeZone: "Pacific/Auckland", day: "numeric", month: "long", year: "numeric",
   });
 
-  // Direct field mapping from new schema → template variables
+  // Direct field mapping from schema → template variables
   const d = extractedJson;
-  const v = (val: string | null | undefined, fallback = "N/A") => val || fallback;
+  const v = (val: string | null | undefined, fallback = "—") => val || fallback;
+  // For cover cells: show "Not included" instead of just a dash
+  const vc = (val: string | null | undefined) => val || "Not included";
 
   const context: RenderContext = {
     // Client info
@@ -158,46 +163,46 @@ export async function runGenerationPipeline(
     CLIENT_A_ADVICE_TYPE_LABEL: hasAnyExistingCover
       ? `Summary of changes from ${v(d.client_a_existing_insurer, "existing insurer")} to ${v(d.client_a_new_insurer, "new insurer")}`
       : "",
-    CLIENT_A_OLD_LIFE: v(d.client_a_old_cover.life),
-    CLIENT_A_OLD_TRAUMA: v(d.client_a_old_cover.trauma),
-    CLIENT_A_OLD_TPD: v(d.client_a_old_cover.tpd),
-    CLIENT_A_OLD_IP: v(d.client_a_old_cover.income_protection),
-    CLIENT_A_OLD_MP: v(d.client_a_old_cover.mortgage_protection),
-    CLIENT_A_OLD_AIC: v(d.client_a_old_cover.accidental_injury),
-    CLIENT_A_OLD_PREMIUM_COVER: v(d.client_a_old_cover.premium_cover),
+    CLIENT_A_OLD_LIFE: vc(d.client_a_old_cover.life),
+    CLIENT_A_OLD_TRAUMA: vc(d.client_a_old_cover.trauma),
+    CLIENT_A_OLD_TPD: vc(d.client_a_old_cover.tpd),
+    CLIENT_A_OLD_IP: vc(d.client_a_old_cover.income_protection),
+    CLIENT_A_OLD_MP: vc(d.client_a_old_cover.mortgage_protection),
+    CLIENT_A_OLD_AIC: vc(d.client_a_old_cover.accidental_injury),
+    CLIENT_A_OLD_PREMIUM_COVER: vc(d.client_a_old_cover.premium_cover),
 
     // Client A — new cover
     CLIENT_A_NEW_INSURER: v(d.client_a_new_insurer, ""),
-    CLIENT_A_NEW_LIFE: v(d.client_a_new_cover.life),
-    CLIENT_A_NEW_TRAUMA: v(d.client_a_new_cover.trauma),
-    CLIENT_A_NEW_TPD: v(d.client_a_new_cover.tpd),
-    CLIENT_A_NEW_IP: v(d.client_a_new_cover.income_protection),
-    CLIENT_A_NEW_MP: v(d.client_a_new_cover.mortgage_protection),
-    CLIENT_A_NEW_AIC: v(d.client_a_new_cover.accidental_injury),
-    CLIENT_A_NEW_PREMIUM_COVER: v(d.client_a_new_cover.premium_cover),
+    CLIENT_A_NEW_LIFE: vc(d.client_a_new_cover.life),
+    CLIENT_A_NEW_TRAUMA: vc(d.client_a_new_cover.trauma),
+    CLIENT_A_NEW_TPD: vc(d.client_a_new_cover.tpd),
+    CLIENT_A_NEW_IP: vc(d.client_a_new_cover.income_protection),
+    CLIENT_A_NEW_MP: vc(d.client_a_new_cover.mortgage_protection),
+    CLIENT_A_NEW_AIC: vc(d.client_a_new_cover.accidental_injury),
+    CLIENT_A_NEW_PREMIUM_COVER: vc(d.client_a_new_cover.premium_cover),
 
     // Client B — existing cover
     CLIENT_B_EXISTING_INSURER: v(d.client_b_existing_insurer, ""),
     CLIENT_B_ADVICE_TYPE_LABEL: hasAnyExistingCover
       ? `Summary of changes from ${v(d.client_b_existing_insurer, "existing insurer")} to ${v(d.client_b_new_insurer, "new insurer")}`
       : "",
-    CLIENT_B_OLD_LIFE: v(d.client_b_old_cover.life),
-    CLIENT_B_OLD_TRAUMA: v(d.client_b_old_cover.trauma),
-    CLIENT_B_OLD_TPD: v(d.client_b_old_cover.tpd),
-    CLIENT_B_OLD_IP: v(d.client_b_old_cover.income_protection),
-    CLIENT_B_OLD_MP: v(d.client_b_old_cover.mortgage_protection),
-    CLIENT_B_OLD_AIC: v(d.client_b_old_cover.accidental_injury),
-    CLIENT_B_OLD_PREMIUM_COVER: v(d.client_b_old_cover.premium_cover),
+    CLIENT_B_OLD_LIFE: vc(d.client_b_old_cover.life),
+    CLIENT_B_OLD_TRAUMA: vc(d.client_b_old_cover.trauma),
+    CLIENT_B_OLD_TPD: vc(d.client_b_old_cover.tpd),
+    CLIENT_B_OLD_IP: vc(d.client_b_old_cover.income_protection),
+    CLIENT_B_OLD_MP: vc(d.client_b_old_cover.mortgage_protection),
+    CLIENT_B_OLD_AIC: vc(d.client_b_old_cover.accidental_injury),
+    CLIENT_B_OLD_PREMIUM_COVER: vc(d.client_b_old_cover.premium_cover),
 
     // Client B — new cover
     CLIENT_B_NEW_INSURER: v(d.client_b_new_insurer, ""),
-    CLIENT_B_NEW_LIFE: v(d.client_b_new_cover.life),
-    CLIENT_B_NEW_TRAUMA: v(d.client_b_new_cover.trauma),
-    CLIENT_B_NEW_TPD: v(d.client_b_new_cover.tpd),
-    CLIENT_B_NEW_IP: v(d.client_b_new_cover.income_protection),
-    CLIENT_B_NEW_MP: v(d.client_b_new_cover.mortgage_protection),
-    CLIENT_B_NEW_AIC: v(d.client_b_new_cover.accidental_injury),
-    CLIENT_B_NEW_PREMIUM_COVER: v(d.client_b_new_cover.premium_cover),
+    CLIENT_B_NEW_LIFE: vc(d.client_b_new_cover.life),
+    CLIENT_B_NEW_TRAUMA: vc(d.client_b_new_cover.trauma),
+    CLIENT_B_NEW_TPD: vc(d.client_b_new_cover.tpd),
+    CLIENT_B_NEW_IP: vc(d.client_b_new_cover.income_protection),
+    CLIENT_B_NEW_MP: vc(d.client_b_new_cover.mortgage_protection),
+    CLIENT_B_NEW_AIC: vc(d.client_b_new_cover.accidental_injury),
+    CLIENT_B_NEW_PREMIUM_COVER: vc(d.client_b_new_cover.premium_cover),
 
     // Benefits summary (from extractor)
     MP_MONTHLY: v(d.benefits.mortgage_protection.monthly_amount),
