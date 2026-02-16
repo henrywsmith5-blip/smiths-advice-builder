@@ -24,21 +24,87 @@ const MIME: Record<string, string> = {
   ".svg": "image/svg+xml",
 };
 
+// Pre-build a cache of all images under public/images as base64 data URIs.
+// This runs once when the module is first imported, so the files only need
+// to be readable at server startup, not at PDF-generation time.
+const imageCache: Record<string, string> = {};
+
+function buildImageCache(): void {
+  const candidates = [
+    path.join(process.cwd(), "public"),
+    "/app/public",
+    path.resolve(process.cwd(), "..", "public"),
+    path.resolve(__dirname, "../../public"),
+    path.resolve(__dirname, "../../../public"),
+    path.resolve(__dirname, "../../../../public"),
+    path.resolve(__dirname, "../../../../../public"),
+  ];
+
+  let publicDir: string | null = null;
+  for (const dir of candidates) {
+    try {
+      if (fs.existsSync(path.join(dir, "images"))) {
+        publicDir = dir;
+        break;
+      }
+    } catch { /* ignore */ }
+  }
+
+  if (!publicDir) {
+    console.error("[PDF] Could not find public/images dir. Tried:", candidates);
+    return;
+  }
+  console.log("[PDF] Found public dir at:", publicDir);
+
+  function scanDir(dir: string, prefix: string): void {
+    try {
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.name.startsWith(".")) continue;
+        const fullPath = path.join(dir, entry.name);
+        const relKey = prefix ? `${prefix}/${entry.name}` : entry.name;
+        if (entry.isDirectory()) {
+          scanDir(fullPath, relKey);
+        } else {
+          const ext = path.extname(entry.name).toLowerCase();
+          const mime = MIME[ext];
+          if (mime) {
+            try {
+              const b64 = fs.readFileSync(fullPath).toString("base64");
+              const urlKey = `/images/${relKey}`;
+              imageCache[urlKey] = `data:${mime};base64,${b64}`;
+            } catch (e) {
+              console.error("[PDF] Failed to read image:", fullPath, e);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[PDF] Failed to scan dir:", dir, e);
+    }
+  }
+
+  scanDir(path.join(publicDir, "images"), "");
+  console.log("[PDF] Cached", Object.keys(imageCache).length, "images:", Object.keys(imageCache));
+}
+
+// Build cache at module load time
+buildImageCache();
+
 function embedLocalImages(html: string): string {
-  const publicDir = path.join(process.cwd(), "public");
+  if (Object.keys(imageCache).length === 0) {
+    console.warn("[PDF] Image cache is empty, images will not be embedded");
+    return html;
+  }
 
   return html.replace(
     /(?:url\(\s*['"]?|(?:src|href)\s*=\s*['"])(\/(images\/[^'")}\s]+))/g,
-    (fullMatch, urlPath, relPath) => {
-      const filePath = path.join(publicDir, relPath);
-      if (!fs.existsSync(filePath)) return fullMatch;
-
-      const ext = path.extname(filePath).toLowerCase();
-      const mime = MIME[ext];
-      if (!mime) return fullMatch;
-
-      const b64 = fs.readFileSync(filePath).toString("base64");
-      const dataUri = `data:${mime};base64,${b64}`;
+    (fullMatch, urlPath) => {
+      const dataUri = imageCache[urlPath];
+      if (!dataUri) {
+        console.warn("[PDF] Image not in cache:", urlPath);
+        return fullMatch;
+      }
 
       if (fullMatch.startsWith("url(")) {
         const quote = fullMatch.includes("'") ? "'" : fullMatch.includes('"') ? '"' : "";
