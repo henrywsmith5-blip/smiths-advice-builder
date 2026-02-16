@@ -55,13 +55,9 @@ export async function renderTemplate(
   let templateCss: string = "";
 
   try {
+    // Look up by docType only — one template handles all variants via Nunjucks conditionals
     const tmpl = await prisma.template.findFirst({
-      where: {
-        docType,
-        clientType: clientType,
-        hasCover: hasCover ?? null,
-        isActive: true,
-      },
+      where: { docType, isActive: true },
       orderBy: { version: "desc" },
     });
 

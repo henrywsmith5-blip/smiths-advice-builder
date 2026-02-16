@@ -1,22 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { DocType, ClientType } from "@prisma/client";
+import { DocType } from "@prisma/client";
 import { getDefaultTemplate } from "@/lib/templates/defaults";
 
-// All built-in template configs (4 SOA + 2 ROA + 1 SOE)
+// Built-in template configs (one per doc type — conditionals handle variants)
 const BUILT_IN_TEMPLATES: Array<{
   docType: DocType;
-  clientType: ClientType | null;
-  hasCover: boolean | null;
   name: string;
 }> = [
-  { docType: DocType.SOA, clientType: ClientType.INDIVIDUAL, hasCover: false, name: "SOA — Individual, No Cover" },
-  { docType: DocType.SOA, clientType: ClientType.INDIVIDUAL, hasCover: true, name: "SOA — Individual, With Cover" },
-  { docType: DocType.SOA, clientType: ClientType.PARTNER, hasCover: false, name: "SOA — Partner, No Cover" },
-  { docType: DocType.SOA, clientType: ClientType.PARTNER, hasCover: true, name: "SOA — Partner, With Cover" },
-  { docType: DocType.ROA, clientType: ClientType.INDIVIDUAL, hasCover: null, name: "ROA — Individual" },
-  { docType: DocType.ROA, clientType: ClientType.PARTNER, hasCover: null, name: "ROA — Partner" },
-  { docType: DocType.SOE, clientType: null, hasCover: null, name: "SOE — Scope of Engagement" },
+  { docType: DocType.SOA, name: "Statement of Advice" },
+  { docType: DocType.ROA, name: "Record of Advice" },
+  { docType: DocType.SOE, name: "Scope of Engagement" },
 ];
 
 // GET /api/templates
@@ -30,28 +24,22 @@ export async function GET(request: NextRequest) {
 
     const dbTemplates = await prisma.template.findMany({
       where,
-      orderBy: [{ docType: "asc" }, { clientType: "asc" }, { version: "desc" }],
+      orderBy: [{ docType: "asc" }, { version: "desc" }],
     });
 
-    // For any combo that has no DB template, return the built-in default
     const templates = [...dbTemplates];
 
+    // Add built-in defaults for any docType that has no DB template
     for (const bi of BUILT_IN_TEMPLATES) {
       if (docType && bi.docType !== docType) continue;
-
-      const hasDb = dbTemplates.some(
-        (t) =>
-          t.docType === bi.docType &&
-          t.clientType === bi.clientType &&
-          t.hasCover === bi.hasCover
-      );
+      const hasDb = dbTemplates.some((t) => t.docType === bi.docType && t.isActive);
       if (!hasDb) {
-        const def = getDefaultTemplate(bi.docType, bi.clientType, bi.hasCover);
+        const def = getDefaultTemplate(bi.docType, null);
         templates.push({
-          id: `builtin-${bi.docType}-${bi.clientType || "null"}-${bi.hasCover ?? "null"}`,
+          id: `builtin-${bi.docType}`,
           docType: bi.docType,
-          clientType: bi.clientType,
-          hasCover: bi.hasCover,
+          clientType: null,
+          hasCover: null,
           name: bi.name,
           html: def.html,
           css: def.css,
@@ -72,22 +60,20 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { docType, clientType, hasCover, name, html, css } = body;
+    const { docType, name, html, css } = body;
 
     if (!docType || !html) {
       return NextResponse.json({ error: "docType and html are required" }, { status: 400 });
     }
 
-    const hc = hasCover === true ? true : hasCover === false ? false : null;
-
-    // Deactivate previous active templates of same type
+    // Deactivate previous active templates of same docType
     await prisma.template.updateMany({
-      where: { docType, clientType: clientType || null, hasCover: hc, isActive: true },
+      where: { docType, isActive: true },
       data: { isActive: false },
     });
 
     const latest = await prisma.template.findFirst({
-      where: { docType, clientType: clientType || null, hasCover: hc },
+      where: { docType },
       orderBy: { version: "desc" },
     });
 
@@ -96,8 +82,8 @@ export async function POST(request: NextRequest) {
     const template = await prisma.template.create({
       data: {
         docType,
-        clientType: clientType || null,
-        hasCover: hc,
+        clientType: null,
+        hasCover: null,
         name: name || `${docType} Template v${newVersion}`,
         html,
         css: css || "",
@@ -108,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     // Keep only last 10 versions
     const allVersions = await prisma.template.findMany({
-      where: { docType, clientType: clientType || null, hasCover: hc },
+      where: { docType },
       orderBy: { version: "desc" },
     });
 
