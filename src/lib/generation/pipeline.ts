@@ -38,6 +38,12 @@ export interface GenerateResult {
 export async function runGenerationPipeline(
   input: GenerateInput
 ): Promise<GenerateResult> {
+  // KiwiSaver has its own pipeline with different data shape
+  if (input.docType === DocType.KIWISAVER) {
+    const { runKiwisaverPipeline } = await import("./kiwisaver-pipeline");
+    return runKiwisaverPipeline(input);
+  }
+
   const llm = getLLMProvider();
 
   console.log(`[Pipeline] Starting ${input.docType} generation for case ${input.caseId}`);

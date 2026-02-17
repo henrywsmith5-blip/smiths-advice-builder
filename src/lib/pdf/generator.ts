@@ -129,6 +129,16 @@ export async function generatePdf(html: string): Promise<Buffer> {
     // Embed local images as base64 data URIs so Playwright doesn't need HTTP access
     prepared = embedLocalImages(prepared);
 
+    // Force production mode on body to strip placeholder styling in PDF
+    if (prepared.includes('class="production"') || prepared.includes("class='production'")) {
+      // Already has production class
+    } else if (prepared.includes("<body>")) {
+      prepared = prepared.replace("<body>", '<body class="production">');
+    } else if (prepared.includes("<body ")) {
+      prepared = prepared.replace(/<body\s+class="([^"]*)"/, '<body class="production $1"');
+      prepared = prepared.replace(/<body\s+class='([^']*)'/, "<body class='production $1'");
+    }
+
     await page.setContent(prepared, { waitUntil: "networkidle" });
 
     // Wait for all locally-served fonts to load

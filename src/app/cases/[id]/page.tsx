@@ -8,7 +8,7 @@ import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import FileDropzone from "@/components/FileDropzone";
 
-type DocType = "SOA" | "ROA" | "SOE";
+type DocType = "SOA" | "ROA" | "SOE" | "KIWISAVER";
 type GenStatus = "idle" | "generating" | "done" | "error";
 
 interface CaseData {
@@ -32,6 +32,7 @@ const DOC_TABS = [
   { id: "SOA", label: "SOA" },
   { id: "ROA", label: "ROA" },
   { id: "SOE", label: "Scope of Engagement" },
+  { id: "KIWISAVER", label: "KiwiSaver" },
 ];
 
 export default function CaseWorkspacePage({ params }: { params: Promise<{ id: string }> }) {
@@ -251,7 +252,8 @@ export default function CaseWorkspacePage({ params }: { params: Promise<{ id: st
                 <section>
                   <h3 className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "#8A8A8A", letterSpacing: "0.04em" }}>Client Details</h3>
 
-                  {/* Client Type Toggle */}
+                  {/* Client Type Toggle (hidden for KiwiSaver - always individual) */}
+                  {activeTab !== "KIWISAVER" && (
                   <div className="flex items-center gap-3 mb-4">
                     <div className="inline-flex p-1 rounded-lg" style={{ background: "#F5F3F0" }}>
                       {(["INDIVIDUAL", "PARTNER"] as const).map((t) => (
@@ -270,6 +272,7 @@ export default function CaseWorkspacePage({ params }: { params: Promise<{ id: st
                       ))}
                     </div>
                   </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
@@ -310,8 +313,8 @@ export default function CaseWorkspacePage({ params }: { params: Promise<{ id: st
                     />
                   </div>
 
-                  {/* Existing Cover Toggles */}
-                  <div className="flex flex-col gap-2 mt-3">
+                  {/* Existing Cover Toggles (hidden for KiwiSaver) */}
+                  {activeTab !== "KIWISAVER" && <div className="flex flex-col gap-2 mt-3">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <div
                         className="relative w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer"
@@ -342,7 +345,7 @@ export default function CaseWorkspacePage({ params }: { params: Promise<{ id: st
                         <span className="text-xs" style={{ color: "#3D3D3D" }}>Client B has existing cover</span>
                       </label>
                     )}
-                  </div>
+                  </div>}
                 </section>
 
                 <hr style={{ border: "none", borderTop: "1px solid #F0EDEA" }} />
@@ -369,14 +372,14 @@ export default function CaseWorkspacePage({ params }: { params: Promise<{ id: st
 
                 <hr style={{ border: "none", borderTop: "1px solid #F0EDEA" }} />
 
-                {/* Quote Documents */}
+                {/* Quote / Fact Find Documents */}
                 <section>
                   <FileDropzone
-                    label="Quote Documents"
+                    label={activeTab === "KIWISAVER" ? "Fact Find / KiwiSaver Documents" : "Quote Documents"}
                     accept=".pdf"
                     files={quoteFiles}
                     onFilesChange={setQuoteFiles}
-                    hint="QuoteMonster, QuoteHub, insurer quotes (PDF)"
+                    hint={activeTab === "KIWISAVER" ? "KiwiSaver statements, fact finds (PDF)" : "QuoteMonster, QuoteHub, insurer quotes (PDF)"}
                   />
                 </section>
 

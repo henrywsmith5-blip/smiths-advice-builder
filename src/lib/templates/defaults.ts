@@ -11,6 +11,9 @@ export function getDefaultTemplate(
   if (docType === DocType.ROA) {
     return { html: buildTemplate("ROA"), css: "" };
   }
+  if (docType === DocType.KIWISAVER) {
+    return { html: buildKiwisaverTemplate(), css: "" };
+  }
   return { html: SOE_DEFAULT, css: "" };
 }
 
@@ -570,6 +573,278 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 </div>
 
 </div><!-- /page -->
+</body>
+</html>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// KIWISAVER SOA TEMPLATE
+// ══════════════════════════════════════════════════════════════
+
+const KIWISAVER_EXTRA_CSS = `
+.dual-cover-wrapper .header-recommended{background:var(--bronze);color:var(--white);vertical-align:middle;}
+.dual-cover-wrapper .header-current{background:var(--navy);color:var(--white);vertical-align:middle;}
+.provider-logo{height:22px;width:auto;display:inline-block;vertical-align:middle;margin-right:8px;}
+.header-recommended .provider-logo,.header-current .provider-logo{filter:brightness(0) invert(1);}
+.dual-cover-wrapper .spacer-col{width:20px;background:var(--white);border-bottom:1px solid var(--rule);}
+.back-cover{page-break-before:always;background:var(--navy);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 44mm);display:flex;flex-direction:column;justify-content:space-between;}
+.back-cover-top{padding-top:48px;}
+.back-cover .back-logo{height:46px;width:auto;filter:brightness(0) invert(1);}
+.back-cover .back-rule{width:44px;height:2px;background:var(--bronze);margin:18px 0 0 0;}
+.back-cover-bottom{padding-bottom:46px;}
+.back-cover h3{font-family:var(--font-display);font-size:18pt;font-weight:700;letter-spacing:-0.2px;margin:0 0 10px 0;}
+.back-cover p{margin:0 0 8px 0;opacity:0.92;line-height:1.6;}
+.back-cover .muted{opacity:0.78;font-size:9.5pt;}
+.back-cover .contact{margin-top:18px;font-size:10pt;}
+.back-cover a{color:var(--white);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.25);}
+.signature-grid.single{grid-template-columns:1fr;max-width:420px;}
+.checkbox-box svg{display:none;width:11px;height:11px;}
+.checkbox-item.checked .checkbox-box svg{display:block;}
+`;
+
+function buildKiwisaverTemplate(): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statement of Advice - KiwiSaver - Smiths Insurance &amp; KiwiSaver</title>
+<style>${SHARED_CSS}${KIWISAVER_EXTRA_CSS}</style>
+</head>
+<body class="{{BODY_CLASS}}">
+<div class="page">
+
+<!-- ═══ COVER PAGE ═══ -->
+<div class="cover-hero">
+  <div class="cover-logo-overlay">
+    <img src="/images/coverlogo.jpg" alt="Smiths Insurance &amp; KiwiSaver">
+  </div>
+</div>
+
+<div class="cover-page">
+  <h1>Statement of Advice</h1>
+  <div class="cover-type">KiwiSaver Advice</div>
+  <div class="cover-rule"></div>
+
+  <div class="cover-meta">
+    <span class="cm-label">Prepared for</span>
+    <span class="cm-value"><span class="placeholder">{{ CLIENTS_PREPARED_FOR }}</span></span>
+
+    <span class="cm-label">Date</span>
+    <span class="cm-value"><span class="placeholder">{{ ADVICE_DATE_LONG }}</span></span>
+  </div>
+
+  <div class="cover-adviser-block">
+    <p><strong>Craig Smith</strong></p>
+    <p>Financial Adviser | FSP #33042</p>
+    <p>Craig Smith Business Services Limited</p>
+    <p>FAP Licence #712931</p>
+  </div>
+</div>
+
+<!-- ═══ SECTION 1 — SCOPE + SPECIAL INSTRUCTIONS (Page 2 only) ═══ -->
+<div class="section-page-2">
+  <div class="header">
+    <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+  </div>
+
+  <div class="section-heading"><div class="num">1</div><h2>Scope of Advice You Are Requesting</h2></div>
+  <p class="body-text"><em>"How would you like us to help you?"</em></p>
+  <p class="body-text">The following are the areas of KiwiSaver advice that you are requesting. Unless noted below, discussions and advice will be limited to:</p>
+
+  <div class="sub-heading"><span class="placeholder">{{ CLIENT_1_NAME }}</span></div>
+  <div class="checkbox-group">
+    <div class="checkbox-item {{ CLIENT_1_SCOPE_RISK_PROFILE_CLASS }}">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label">Risk profile questionnaire and risk tolerance assessment</span>
+    </div>
+    <div class="checkbox-item {{ CLIENT_1_SCOPE_FUND_REVIEW_CLASS }}">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label">Reviewing your current KiwiSaver provider/fund and recommending a suitable fund</span>
+    </div>
+    <div class="checkbox-item {{ CLIENT_1_SCOPE_CONTRIBUTIONS_CLASS }}">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label">Contribution guidance (employee contribution rate and voluntary contributions)</span>
+    </div>
+    <div class="checkbox-item {{ CLIENT_1_SCOPE_WITHDRAWALS_CLASS }}">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label">General discussion on withdrawals and eligibility (first home / hardship / retirement)</span>
+    </div>
+    <div class="checkbox-item {{ CLIENT_1_SCOPE_LIMITED_ADVICE_CLASS }}">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label">This is a limited advice engagement process</span>
+    </div>
+  </div>
+
+  <div class="sub-heading" style="border-bottom:1.5px solid var(--bronze); padding-bottom:4px;">Special Instructions / Objectives / Comments</div>
+  <div class="placeholder-block">{{ SPECIAL_INSTRUCTIONS_HTML }}</div>
+</div>
+
+<!-- ═══ SECTION 2 — NATURE AND SCOPE (new page) ═══ -->
+<div class="section-block section-block-break">
+  <div class="header">
+    <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+  </div>
+
+  <div class="section-heading"><div class="num">2</div><h2>Nature and Scope of Advice Provided</h2></div>
+  <p class="body-text"><em>"What we do (and don't do) for our clients"</em></p>
+  <p class="body-text">Craig Smith (your Financial Adviser) in working for Craig Smith Business Services Limited (the Financial Advice Provider) provides advice to clients about their investments, life insurance, health insurance and certain general insurance such as home, car, and contents insurance.</p>
+  <p class="body-text">Craig Smith provides financial advice in relation to KiwiSaver, managed funds, life insurance, health insurance, home, car and contents insurance. He only provides financial advice about products from certain providers:</p>
+
+  <div class="info-card">
+    <table class="data-table" style="margin:0;">
+      <thead><tr><th>Advice Area</th><th>Product Providers Considered</th></tr></thead>
+      <tbody>
+        <tr><td>Life Insurance</td><td>Partners Life, AIA, Asteron, Fidelity Life, Chubb and Pinnacle</td></tr>
+        <tr><td>Health Insurance</td><td>Partners Life, AIA and NIB</td></tr>
+        <tr><td>KiwiSaver / Investment</td><td>Booster, Milford and Generate</td></tr>
+        <tr><td>General Insurance</td><td>AON Insurance Brokers</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-box"><strong>Important:</strong> Any fund performance information is historical only. Past performance is not a reliable indicator of future performance.</div>
+  <p class="body-text">In providing you with investment advice, we will only provide information regarding the above mentioned products in a "general" context. No personal investment advice will be offered. If you want a referral to an investment advisor that provides personalised investment advice please let us know and we will be happy to refer.</p>
+</div>
+
+<!-- ═══ SECTION 3 — YOUR CURRENT POSITION ═══ -->
+<div class="section-heading"><div class="num">3</div><h2>Your Current KiwiSaver Position</h2></div>
+
+<div class="info-card">
+  <h4>Summary ({{ CLIENT_1_NAME }})</h4>
+  <table class="data-table" style="margin:10px 0 0 0;">
+    <thead><tr><th>Item</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Meeting date</td><td>{{ MEETING_DATE_LONG }}</td></tr>
+      <tr><td>Age</td><td>{{ CLIENT_1_AGE }}</td></tr>
+      <tr><td>Annual income</td><td>{{ CLIENT_1_INCOME_ANNUAL }}</td></tr>
+      <tr><td>Employee contribution</td><td>{{ CLIENT_1_EMPLOYEE_CONTRIB }}</td></tr>
+      <tr><td>Employer contribution</td><td>{{ CLIENT_1_EMPLOYER_CONTRIB }}</td></tr>
+      <tr><td>Current provider</td><td>{{ CLIENT_1_CURRENT_PROVIDER }}</td></tr>
+      <tr><td>Current fund</td><td>{{ CLIENT_1_CURRENT_FUND }}</td></tr>
+      <tr><td>Current balance</td><td>{{ CLIENT_1_CURRENT_BALANCE }}</td></tr>
+      <tr><td>Primary goal</td><td>{{ CLIENT_1_GOAL }}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ SECTION 4 — RECOMMENDATION SUMMARY ═══ -->
+<div class="section-heading"><div class="num">4</div><h2>Your KiwiSaver Recommendation</h2></div>
+
+<p class="body-text">{{ RECOMMENDATION_SUMMARY_PARAGRAPH }}</p>
+
+{{ RECOMMENDATION_COMPARISON_BLOCKS }}
+
+<div class="warning-box"><strong>Timing:</strong> This recommendation should not be acted on after <strong>30 days</strong> from the date of this advice without prior consultation.</div>
+
+<!-- ═══ SECTION 5 — FEES & COSTS ═══ -->
+<div class="section-heading"><div class="num">5</div><h2>Fees and Costs</h2></div>
+<p class="body-text">Fees are deducted from your KiwiSaver balance and can impact long-term outcomes. Fee information below is sourced from provider disclosures as at <span class="placeholder">{{ DATA_AS_AT_DATE }}</span>.</p>
+
+{{ FEES_TABLE_BLOCKS }}
+
+<!-- ═══ SECTION 6 — PERFORMANCE ═══ -->
+<div class="section-heading"><div class="num">6</div><h2>Fund Performance</h2></div>
+<p class="body-text">Performance data is provided for context only. Past performance is not a reliable indicator of future performance.</p>
+
+{{ PERFORMANCE_TABLE_BLOCKS }}
+
+<!-- ═══ SECTION 7 — PROJECTIONS ═══ -->
+<div class="section-heading"><div class="num">7</div><h2>Projections and What This Means</h2></div>
+
+<div class="info-card">
+  <h4>Projection summary</h4>
+  <p class="body-text">{{ PROJECTIONS_EXPLANATION_PARAGRAPH }}</p>
+  <table class="data-table">
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Timeframe</td><td>{{ PROJECTION_TIMEFRAME }}</td></tr>
+      <tr><td>Projected balance</td><td>{{ PROJECTION_BALANCE }}</td></tr>
+      <tr><td>Projected income (weekly)</td><td>{{ PROJECTION_WEEKLY_INCOME }}</td></tr>
+      <tr><td>Assumptions</td><td>{{ PROJECTION_ASSUMPTIONS }}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="warning-box"><strong>Important:</strong> Projections are estimates only and are sensitive to market returns, fees, contributions, and time. Actual outcomes will differ.</div>
+
+<!-- ═══ SECTION 8 — IMPLEMENTATION ═══ -->
+<div class="section-heading"><div class="num">8</div><h2>Implementation and Next Steps</h2></div>
+
+<ul class="styled-list">
+  <li>Confirm the recommended provider and fund selection(s) shown in Section 4.</li>
+  <li>Complete the provider switch/transfer process (online application or paper form).</li>
+  <li>Confirm contribution rates with your employer (if changes are required).</li>
+  <li>We will review your position again if your income, goals, or timeframe changes.</li>
+</ul>
+
+<!-- ═══ SECTION 9 — KEY RISKS ═══ -->
+<div class="section-heading"><div class="num">9</div><h2>Key Risks and Considerations</h2></div>
+
+<ul class="styled-list">
+  <li>KiwiSaver investments can go up and down in value, particularly in Growth/Aggressive funds.</li>
+  <li>Switching funds during market volatility can crystallise losses if done at the wrong time.</li>
+  <li>Fees matter over the long term - lower fees do not guarantee better returns, but they reduce drag.</li>
+  <li>Past performance is not a reliable indicator of future performance.</li>
+  <li>This advice is based on the information you provided at the time of your meeting.</li>
+</ul>
+
+<!-- ═══ SECTION 10 — SIGN-OFF ═══ -->
+<div class="header page-break">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
+<div class="section-heading"><div class="num">10</div><h2>Declaration &amp; Sign-Off</h2></div>
+
+<div class="info-card" style="background:var(--white);">
+  <p class="body-text">{{ DECLARATION_INTRO }}</p>
+  <div class="checkbox-group" style="margin:14px 0;">
+    <div class="checkbox-item">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label"><strong>ACCEPT</strong> the recommendation(s) in this document</span>
+    </div>
+    <div class="checkbox-item">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label"><strong>DECLINE</strong> the recommendation(s) in this document</span>
+    </div>
+    <div class="checkbox-item">
+      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
+      <span class="checkbox-label"><strong>MODIFY</strong> the recommendation(s) (see notes below)</span>
+    </div>
+  </div>
+</div>
+
+<div class="sub-heading">Modification Notes (if applicable):</div>
+<div class="placeholder-block" style="min-height:56px;">{{ MODIFICATION_NOTES_HTML }}</div>
+
+{{ SIGNATURE_BLOCKS }}
+
+<div class="footer">
+  <span>Statement of Advice | Confidential</span>
+  <span>Craig Smith Business Services Limited | FAP Licence #712931 | <a href="https://www.smiths.net.nz">www.smiths.net.nz</a></span>
+</div>
+
+<!-- ═══ BACK COVER ═══ -->
+<div class="back-cover">
+  <div class="back-cover-top">
+    <img class="back-logo" src="/images/coverlogo.jpg" alt="Smiths Insurance &amp; KiwiSaver">
+    <div class="back-rule"></div>
+  </div>
+
+  <div class="back-cover-bottom">
+    <h3>Smiths Insurance &amp; KiwiSaver</h3>
+    <p class="muted">Practical advice. Clear documentation. Ongoing support when it matters.</p>
+    <div class="contact">
+      <p><strong>Craig Smith</strong> - Financial Adviser | FSP #33042</p>
+      <p>craig@smiths.net.nz | 0274 293 939</p>
+      <p>FAP Licence #712931</p>
+      <p><a href="https://www.smiths.net.nz">www.smiths.net.nz</a></p>
+    </div>
+    <p class="muted" style="margin-top:18px;">Past performance is not a reliable indicator of future performance.</p>
+  </div>
+</div>
+
+</div>
 </body>
 </html>`;
 }

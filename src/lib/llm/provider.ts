@@ -16,7 +16,7 @@ export interface ExtractInput {
   otherDocsText?: string;
   additionalContext?: string;
   roaDeviations?: string;
-  docType: "SOA" | "ROA" | "SOE";
+  docType: "SOA" | "ROA" | "SOE" | "KIWISAVER";
 }
 
 export function getLLMProvider(): LLMProvider {

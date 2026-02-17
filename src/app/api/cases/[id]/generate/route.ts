@@ -21,7 +21,7 @@ export async function POST(
     const url = new URL(request.url);
     const docTypeParam = url.searchParams.get("docType")?.toUpperCase();
 
-    if (!docTypeParam || !["SOA", "ROA", "SOE"].includes(docTypeParam)) {
+    if (!docTypeParam || !["SOA", "ROA", "SOE", "KIWISAVER"].includes(docTypeParam)) {
       return NextResponse.json({ error: "Invalid docType" }, { status: 400 });
     }
 

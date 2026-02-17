@@ -11,6 +11,7 @@ enum DocType {
   SOA
   ROA
   SOE
+  KIWISAVER
 }
 
 enum ClientType {
