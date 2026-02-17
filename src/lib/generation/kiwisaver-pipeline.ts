@@ -20,7 +20,27 @@ function v(val: string | number | null | undefined, fallback = ""): string {
   return String(val);
 }
 
+const PROVIDER_LOGO_MAP: Record<string, string> = {
+  milford: "/images/providers/milford.png",
+  fisher: "/images/providers/fisher.png",
+  "fisher funds": "/images/providers/fisher.png",
+};
+
+function getProviderLogo(name: string | null | undefined): string {
+  if (!name) return "";
+  return PROVIDER_LOGO_MAP[name.toLowerCase().trim()] || "";
+}
+
+function providerLogoImg(name: string | null | undefined, cssClass = "provider-logo-header"): string {
+  const logo = getProviderLogo(name);
+  if (logo) return `<img class="${cssClass}" src="${logo}" alt="${name}">`;
+  return `<span style="font-weight:700;">${name || "Unknown"}</span>`;
+}
+
 function buildComparisonBlock(client: KiwisaverFactPack["clients"][0]): string {
+  const recLogo = providerLogoImg(client.recommended.provider);
+  const curLogo = providerLogoImg(client.current.provider);
+
   return `
 <div class="info-card">
   <h4>Recommendation - ${v(client.name, "Client")}</h4>
@@ -28,9 +48,13 @@ function buildComparisonBlock(client: KiwisaverFactPack["clients"][0]): string {
     <table>
       <thead>
         <tr>
-          <th class="header-recommended" colspan="2">Recommended</th>
+          <th class="header-recommended" colspan="2">
+            <div class="provider-header-cell">${recLogo}<div style="margin-top:4px;">Recommended</div></div>
+          </th>
           <th class="spacer-col"></th>
-          <th class="header-current" colspan="2">Current</th>
+          <th class="header-current" colspan="2">
+            <div class="provider-header-cell">${curLogo}<div style="margin-top:4px;">Current</div></div>
+          </th>
         </tr>
         <tr>
           <th style="background:var(--white);color:var(--dark);">Item</th>
@@ -56,17 +80,26 @@ function buildFeesBlock(currentData: ProviderData | null, recommendedData: Provi
   const cAdmin = currentData?.fees.adminFee || "N/A";
   const rAdmin = recommendedData?.fees.adminFee || "N/A";
 
+  const recLogoHtml = providerLogoImg(recommendedData?.provider, "provider-logo");
+  const curLogoHtml = providerLogoImg(currentData?.provider, "provider-logo");
+
   return `
 <div class="info-card">
   <h4>Fee Comparison</h4>
-  <table class="data-table">
-    <thead><tr><th>Fee Type</th><th>${recommendedData?.provider || "Recommended"} (${recommendedData?.fund || ""})</th><th>${currentData?.provider || "Current"} (${currentData?.fund || ""})</th></tr></thead>
+  <table class="data-table fees-perf-table">
+    <thead>
+      <tr>
+        <th style="width:160px;"></th>
+        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended"}</div></th>
+        <th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current"}</div></th>
+      </tr>
+    </thead>
     <tbody>
-      <tr><td>Fund fee</td><td>${rFee}</td><td>${cFee}</td></tr>
-      <tr><td>Admin / member fee</td><td>${rAdmin}</td><td>${cAdmin}</td></tr>
+      <tr><td>Fund fee</td><td style="text-align:center;">${rFee}</td><td style="text-align:center;">${cFee}</td></tr>
+      <tr><td>Admin / member fee</td><td style="text-align:center;">${rAdmin}</td><td style="text-align:center;">${cAdmin}</td></tr>
     </tbody>
   </table>
-  ${currentData?.sources.feesUrl ? `<p class="body-text" style="font-size:8pt;color:var(--muted);">Sources: ${currentData.sources.feesUrl} | ${recommendedData?.sources.feesUrl || ""}</p>` : ""}
+  ${currentData?.sources.feesUrl ? `<p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Sources: <a href="${currentData.sources.feesUrl}" style="color:var(--bronze);">${currentData.provider}</a> | <a href="${recommendedData?.sources.feesUrl || ""}" style="color:var(--bronze);">${recommendedData?.provider || ""}</a></p>` : ""}
 </div>`;
 }
 
@@ -74,19 +107,28 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
   const cp = currentData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
   const rp = recommendedData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
 
+  const recLogoHtml = providerLogoImg(recommendedData?.provider, "provider-logo");
+  const curLogoHtml = providerLogoImg(currentData?.provider, "provider-logo");
+
   return `
 <div class="info-card">
   <h4>Performance Comparison</h4>
-  <table class="data-table">
-    <thead><tr><th>Period</th><th>${recommendedData?.provider || "Recommended"} (${recommendedData?.fund || ""})</th><th>${currentData?.provider || "Current"} (${currentData?.fund || ""})</th></tr></thead>
+  <table class="data-table fees-perf-table">
+    <thead>
+      <tr>
+        <th style="width:160px;"></th>
+        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended"}</div></th>
+        <th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current"}</div></th>
+      </tr>
+    </thead>
     <tbody>
-      <tr><td>1 Year</td><td>${rp.oneYear || "N/A"}</td><td>${cp.oneYear || "N/A"}</td></tr>
-      <tr><td>3 Years (p.a.)</td><td>${rp.threeYear || "N/A"}</td><td>${cp.threeYear || "N/A"}</td></tr>
-      <tr><td>5 Years (p.a.)</td><td>${rp.fiveYear || "N/A"}</td><td>${cp.fiveYear || "N/A"}</td></tr>
-      <tr><td>Since inception (p.a.)</td><td>${rp.sinceInception || "N/A"}</td><td>${cp.sinceInception || "N/A"}</td></tr>
+      <tr><td>1 Year</td><td style="text-align:center;">${rp.oneYear || "N/A"}</td><td style="text-align:center;">${cp.oneYear || "N/A"}</td></tr>
+      <tr><td>3 Years (p.a.)</td><td style="text-align:center;">${rp.threeYear || "N/A"}</td><td style="text-align:center;">${cp.threeYear || "N/A"}</td></tr>
+      <tr><td>5 Years (p.a.)</td><td style="text-align:center;">${rp.fiveYear || "N/A"}</td><td style="text-align:center;">${cp.fiveYear || "N/A"}</td></tr>
+      <tr><td>Since inception (p.a.)</td><td style="text-align:center;">${rp.sinceInception || "N/A"}</td><td style="text-align:center;">${cp.sinceInception || "N/A"}</td></tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:8pt;color:var(--muted);">Past performance is not a reliable indicator of future performance.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Past performance is not a reliable indicator of future performance.</p>
 </div>`;
 }
 
