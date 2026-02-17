@@ -31,15 +31,23 @@ function getProviderLogo(name: string | null | undefined): string {
   return PROVIDER_LOGO_MAP[name.toLowerCase().trim()] || "";
 }
 
-function providerLogoImg(name: string | null | undefined, cssClass = "provider-logo-header"): string {
+function providerLogoBadge(name: string | null | undefined): string {
   const logo = getProviderLogo(name);
-  if (logo) return `<img class="${cssClass}" src="${logo}" alt="${name}">`;
-  return `<span style="font-weight:700;">${name || "Unknown"}</span>`;
+  if (logo) return `<div class="provider-logo-badge"><img src="${logo}" alt="${name}"></div>`;
+  if (name) return `<div style="font-weight:700;font-size:12pt;margin-bottom:6px;">${name}</div>`;
+  return "";
+}
+
+function providerLogoInline(name: string | null | undefined): string {
+  const logo = getProviderLogo(name);
+  if (logo) return `<img class="provider-logo" src="${logo}" alt="${name}">`;
+  if (name) return `<strong>${name}</strong>`;
+  return "";
 }
 
 function buildComparisonBlock(client: KiwisaverFactPack["clients"][0]): string {
-  const recLogo = providerLogoImg(client.recommended.provider);
-  const curLogo = providerLogoImg(client.current.provider);
+  const recBadge = providerLogoBadge(client.recommended.provider);
+  const curBadge = providerLogoBadge(client.current.provider);
 
   return `
 <div class="info-card">
@@ -49,11 +57,11 @@ function buildComparisonBlock(client: KiwisaverFactPack["clients"][0]): string {
       <thead>
         <tr>
           <th class="header-recommended" colspan="2">
-            <div class="provider-header-cell">${recLogo}<div style="margin-top:4px;">Recommended</div></div>
+            <div class="provider-header-cell">${recBadge}<div class="provider-header-label">Recommended</div></div>
           </th>
           <th class="spacer-col"></th>
           <th class="header-current" colspan="2">
-            <div class="provider-header-cell">${curLogo}<div style="margin-top:4px;">Current</div></div>
+            <div class="provider-header-cell">${curBadge}<div class="provider-header-label">Current</div></div>
           </th>
         </tr>
         <tr>
@@ -80,8 +88,8 @@ function buildFeesBlock(currentData: ProviderData | null, recommendedData: Provi
   const cAdmin = currentData?.fees.adminFee || "N/A";
   const rAdmin = recommendedData?.fees.adminFee || "N/A";
 
-  const recLogoHtml = providerLogoImg(recommendedData?.provider, "provider-logo");
-  const curLogoHtml = providerLogoImg(currentData?.provider, "provider-logo");
+  const recLogoHtml = providerLogoInline(recommendedData?.provider);
+  const curLogoHtml = providerLogoInline(currentData?.provider);
 
   return `
 <div class="info-card">
@@ -107,8 +115,8 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
   const cp = currentData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
   const rp = recommendedData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
 
-  const recLogoHtml = providerLogoImg(recommendedData?.provider, "provider-logo");
-  const curLogoHtml = providerLogoImg(currentData?.provider, "provider-logo");
+  const recLogoHtml = providerLogoInline(recommendedData?.provider);
+  const curLogoHtml = providerLogoInline(currentData?.provider);
 
   return `
 <div class="info-card">

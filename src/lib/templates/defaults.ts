@@ -582,15 +582,16 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 // ══════════════════════════════════════════════════════════════
 
 const KIWISAVER_EXTRA_CSS = `
-.dual-cover-wrapper .header-recommended{background:var(--bronze);color:var(--white);vertical-align:middle;padding:12px 14px;}
-.dual-cover-wrapper .header-current{background:var(--navy);color:var(--white);vertical-align:middle;padding:12px 14px;}
-.provider-logo{height:28px;width:auto;display:inline-block;vertical-align:middle;margin-right:8px;}
-.provider-logo-header{height:36px;width:auto;display:block;margin:0 auto 6px auto;}
-.header-recommended .provider-logo,.header-current .provider-logo,.header-recommended .provider-logo-header,.header-current .provider-logo-header{filter:brightness(0) invert(1);}
-.provider-header-cell{text-align:center;font-size:8pt;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
-.fees-perf-table .provider-col-header{background:var(--white);padding:12px 14px;text-align:center;border-bottom:1px solid var(--rule);}
-.fees-perf-table .provider-col-header img{height:32px;width:auto;display:block;margin:0 auto;}
-.fees-perf-table .provider-col-header .provider-label{font-size:7.5pt;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+.dual-cover-wrapper .header-recommended{background:var(--bronze);color:var(--white);vertical-align:middle;padding:16px 14px;}
+.dual-cover-wrapper .header-current{background:var(--navy);color:var(--white);vertical-align:middle;padding:16px 14px;}
+.provider-logo{height:32px;width:auto;display:inline-block;vertical-align:middle;}
+.provider-logo-badge{display:inline-block;background:var(--white);border-radius:8px;padding:8px 18px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.provider-logo-badge img{height:38px;width:auto;display:block;}
+.provider-header-cell{text-align:center;font-size:8pt;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;}
+.provider-header-label{margin-top:6px;opacity:0.9;}
+.fees-perf-table .provider-col-header{background:var(--white);padding:14px 14px;text-align:center;border-bottom:1px solid var(--rule);}
+.fees-perf-table .provider-col-header img{height:36px;width:auto;display:block;margin:0 auto;}
+.fees-perf-table .provider-col-header .provider-label{font-size:7.5pt;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;}
 .dual-cover-wrapper .spacer-col{width:20px;background:var(--white);border-bottom:1px solid var(--rule);}
 .back-cover{page-break-before:always;background:var(--navy);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 44mm);display:flex;flex-direction:column;justify-content:space-between;}
 .back-cover-top{padding-top:48px;}
