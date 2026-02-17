@@ -764,24 +764,26 @@ function buildKiwisaverTemplate(): string {
 
 {{ PERFORMANCE_TABLE_BLOCKS }}
 
-<!-- ═══ SECTION 7 — PROJECTIONS ═══ -->
+<!-- ═══ SECTION 7 — PROJECTIONS (only if data exists) ═══ -->
+{% if HAS_PROJECTIONS %}
 <div class="section-heading"><div class="num">7</div><h2>Projections and What This Means</h2></div>
 
+{% if PROJECTIONS_EXPLANATION_PARAGRAPH %}<p class="body-text">{{ PROJECTIONS_EXPLANATION_PARAGRAPH }}</p>{% endif %}
+
 <div class="info-card">
-  <h4>Projection summary</h4>
-  <p class="body-text">{{ PROJECTIONS_EXPLANATION_PARAGRAPH }}</p>
-  <table class="data-table">
-    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+  <h4>Projection Summary</h4>
+  <table class="ks-compare">
     <tbody>
-      <tr><td>Timeframe</td><td>{{ PROJECTION_TIMEFRAME }}</td></tr>
-      <tr><td>Projected balance</td><td>{{ PROJECTION_BALANCE }}</td></tr>
-      <tr><td>Projected income (weekly)</td><td>{{ PROJECTION_WEEKLY_INCOME }}</td></tr>
-      <tr><td>Assumptions</td><td>{{ PROJECTION_ASSUMPTIONS }}</td></tr>
+      {% if PROJECTION_TIMEFRAME %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Timeframe</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ PROJECTION_TIMEFRAME }}</td></tr>{% endif %}
+      {% if PROJECTION_BALANCE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Projected balance at retirement</td><td class="ks-row-val" style="text-align:left;">{{ PROJECTION_BALANCE }}</td></tr>{% endif %}
+      {% if PROJECTION_WEEKLY_INCOME %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Estimated weekly income</td><td class="ks-row-val" style="text-align:left;">{{ PROJECTION_WEEKLY_INCOME }}</td></tr>{% endif %}
+      {% if PROJECTION_ASSUMPTIONS %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Assumptions</td><td style="padding:11px 16px;font-size:9pt;color:var(--muted);line-height:1.5;">{{ PROJECTION_ASSUMPTIONS }}</td></tr>{% endif %}
     </tbody>
   </table>
 </div>
 
 <div class="warning-box"><strong>Important:</strong> Projections are estimates only and are sensitive to market returns, fees, contributions, and time. Actual outcomes will differ.</div>
+{% endif %}
 
 <!-- ═══ SECTION 8 — IMPLEMENTATION ═══ -->
 <div class="section-heading"><div class="num">8</div><h2>Implementation and Next Steps</h2></div>

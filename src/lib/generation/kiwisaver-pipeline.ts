@@ -292,7 +292,8 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     RECOMMENDATION_SUMMARY_PARAGRAPH: sec("recommendation_summary") || v(factPack.narrativeInputs.recommendationSummaryParagraph),
     PROJECTIONS_EXPLANATION_PARAGRAPH: sec("projections_explanation") || v(factPack.narrativeInputs.projectionsExplanationParagraph),
 
-    // Projections
+    // Projections (only shown if at least one value exists)
+    HAS_PROJECTIONS: !!(client.timeframe || client.projections?.projectedBalance || client.projections?.projectedWeeklyIncome || client.projections?.assumptions),
     PROJECTION_TIMEFRAME: v(client.timeframe),
     PROJECTION_BALANCE: v(client.projections?.projectedBalance),
     PROJECTION_WEEKLY_INCOME: v(client.projections?.projectedWeeklyIncome),
