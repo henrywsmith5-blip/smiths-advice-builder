@@ -589,11 +589,18 @@ const KIWISAVER_EXTRA_CSS = `
 .provider-logo-badge img{height:38px;width:auto;display:block;}
 .provider-header-cell{text-align:center;font-size:8pt;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;}
 .provider-header-label{margin-top:6px;opacity:0.9;}
-.fees-perf-table th{background:var(--white) !important;color:var(--dark) !important;border-bottom:1px solid var(--rule);}
-.fees-perf-table .provider-col-header{padding:16px 14px;text-align:center;}
-.fees-perf-table .provider-col-header img{height:44px;width:auto;display:block;margin:0 auto;}
-.fees-perf-table .provider-col-header .provider-label{font-size:8pt;color:var(--muted);letter-spacing:0.3px;margin-top:6px;font-weight:500;}
-.fees-perf-table .label-col{font-weight:600;color:var(--dark);text-transform:uppercase;font-size:8pt;letter-spacing:0.5px;vertical-align:middle;padding:9px 14px;}
+.ks-compare{width:100%;border-collapse:collapse;margin:0;}
+.ks-compare td,.ks-compare th{padding:0;border:none;}
+.ks-compare .ks-provider-head{padding:20px 16px 14px 16px;text-align:center;vertical-align:bottom;border-bottom:2px solid var(--rule);}
+.ks-compare .ks-provider-head img{height:52px;width:auto;display:block;margin:0 auto 6px auto;}
+.ks-compare .ks-provider-head .ks-fund-name{font-family:var(--font-body);font-size:8.5pt;font-weight:600;color:var(--dark);letter-spacing:0.2px;}
+.ks-compare .ks-provider-head .ks-provider-tag{font-size:7pt;font-weight:600;color:var(--bronze);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.ks-compare .ks-label-head{padding:20px 16px 14px 0;vertical-align:bottom;border-bottom:2px solid var(--rule);}
+.ks-compare .ks-row td{padding:11px 16px;border-bottom:1px solid var(--rule-lt);vertical-align:middle;}
+.ks-compare .ks-row:last-child td{border-bottom:none;}
+.ks-compare .ks-row-label{font-size:9pt;font-weight:500;color:var(--muted);}
+.ks-compare .ks-row-val{text-align:center;font-family:var(--font-display);font-size:13pt;font-weight:400;color:var(--black);letter-spacing:-0.3px;}
+.ks-compare .ks-row-val.na{font-family:var(--font-body);font-size:9pt;color:var(--subtle);font-style:italic;font-weight:400;}
 .dual-cover-wrapper .spacer-col{width:20px;background:var(--white);border-bottom:1px solid var(--rule);}
 .back-cover{page-break-before:always;background:var(--navy);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 44mm);display:flex;flex-direction:column;justify-content:space-between;}
 .back-cover-top{padding-top:48px;}

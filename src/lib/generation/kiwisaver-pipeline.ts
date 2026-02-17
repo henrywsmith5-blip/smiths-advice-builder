@@ -82,38 +82,40 @@ function buildComparisonBlock(client: KiwisaverFactPack["clients"][0]): string {
 </div>`;
 }
 
+function ksVal(val: string | null | undefined): string {
+  if (!val || val === "N/A") return `<td class="ks-row-val na">—</td>`;
+  return `<td class="ks-row-val">${val}</td>`;
+}
+
+function ksProviderHead(name: string | null | undefined, fund: string | null | undefined, tag: string): string {
+  const logo = getProviderLogo(name);
+  const logoHtml = logo ? `<img src="${logo}" alt="${name}">` : `<div style="font-weight:700;font-size:11pt;color:var(--dark);margin-bottom:4px;">${name || ""}</div>`;
+  return `<th class="ks-provider-head">${logoHtml}<div class="ks-fund-name">${fund || ""}</div><div class="ks-provider-tag">${tag}</div></th>`;
+}
+
 function buildFeesBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
-  const cFee = currentData?.fees.fundFeePercent || "N/A";
-  const rFee = recommendedData?.fees.fundFeePercent || "N/A";
-  const cAdmin = currentData?.fees.adminFee || "N/A";
-  const rAdmin = recommendedData?.fees.adminFee || "N/A";
-
-  const recLogoHtml = providerLogoInline(recommendedData?.provider);
-  const curLogoHtml = currentData?.provider ? providerLogoInline(currentData.provider) : "";
-
-  const recName = recommendedData?.provider || "Recommended";
-  const curName = currentData?.provider || "Current";
+  const hasCurrent = !!(currentData?.provider);
 
   const feeSummary = buildFeeSummary(recommendedData, currentData);
 
   return `
 <div class="info-card">
   <h4>Fee Comparison</h4>
-  <table class="data-table fees-perf-table">
+  <table class="ks-compare">
     <thead>
       <tr>
-        <th class="label-col" style="width:180px;"></th>
-        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended Fund"}</div></th>
-        ${currentData?.provider ? `<th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current Fund"}</div></th>` : ""}
+        <th class="ks-label-head" style="width:180px;"></th>
+        ${ksProviderHead(recommendedData?.provider, recommendedData?.fund, "Recommended")}
+        ${hasCurrent ? ksProviderHead(currentData?.provider, currentData?.fund, "Current") : ""}
       </tr>
     </thead>
     <tbody>
-      <tr><td class="label-col">Fund fee (annual)</td><td style="text-align:center;font-weight:600;">${rFee}</td>${currentData?.provider ? `<td style="text-align:center;font-weight:600;">${cFee}</td>` : ""}</tr>
-      <tr><td class="label-col">Admin / member fee</td><td style="text-align:center;font-weight:600;">${rAdmin}</td>${currentData?.provider ? `<td style="text-align:center;font-weight:600;">${cAdmin}</td>` : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">Fund management fee (p.a.)</td>${ksVal(recommendedData?.fees.fundFeePercent)}${hasCurrent ? ksVal(currentData?.fees.fundFeePercent) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">Admin / member fee</td>${ksVal(recommendedData?.fees.adminFee)}${hasCurrent ? ksVal(currentData?.fees.adminFee) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">Other fees</td>${ksVal(recommendedData?.fees.other)}${hasCurrent ? ksVal(currentData?.fees.other) : ""}</tr>
     </tbody>
   </table>
   ${feeSummary}
-  ${(currentData?.sources.feesUrl || recommendedData?.sources.feesUrl) ? `<p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Fee data sourced from: ${recommendedData?.sources.feesUrl ? `<a href="${recommendedData.sources.feesUrl}" style="color:var(--bronze);">${recName} disclosure</a>` : ""}${currentData?.sources.feesUrl ? ` | <a href="${currentData.sources.feesUrl}" style="color:var(--bronze);">${curName} disclosure</a>` : ""}</p>` : ""}
 </div>`;
 }
 
@@ -147,30 +149,27 @@ function buildFeeSummary(recommendedData: ProviderData | null, currentData: Prov
 function buildPerformanceBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
   const cp = currentData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
   const rp = recommendedData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
-
-  const recLogoHtml = providerLogoInline(recommendedData?.provider);
-  const curLogoHtml = currentData?.provider ? providerLogoInline(currentData.provider) : "";
   const hasCurrent = !!currentData?.provider;
 
   return `
 <div class="info-card">
-  <h4>Performance Comparison</h4>
-  <table class="data-table fees-perf-table">
+  <h4>Annualised Returns</h4>
+  <table class="ks-compare">
     <thead>
       <tr>
-        <th class="label-col" style="width:180px;"></th>
-        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended Fund"}</div></th>
-        ${hasCurrent ? `<th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current Fund"}</div></th>` : ""}
+        <th class="ks-label-head" style="width:180px;"></th>
+        ${ksProviderHead(recommendedData?.provider, recommendedData?.fund, "Recommended")}
+        ${hasCurrent ? ksProviderHead(currentData?.provider, currentData?.fund, "Current") : ""}
       </tr>
     </thead>
     <tbody>
-      <tr><td class="label-col">1 Year</td><td style="text-align:center;font-weight:600;">${rp.oneYear || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.oneYear || "N/A"}</td>` : ""}</tr>
-      <tr><td class="label-col">3 Years (p.a.)</td><td style="text-align:center;font-weight:600;">${rp.threeYear || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.threeYear || "N/A"}</td>` : ""}</tr>
-      <tr><td class="label-col">5 Years (p.a.)</td><td style="text-align:center;font-weight:600;">${rp.fiveYear || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.fiveYear || "N/A"}</td>` : ""}</tr>
-      <tr><td class="label-col">Since inception (p.a.)</td><td style="text-align:center;font-weight:600;">${rp.sinceInception || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.sinceInception || "N/A"}</td>` : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">1 year return (p.a.)</td>${ksVal(rp.oneYear)}${hasCurrent ? ksVal(cp.oneYear) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">3 year return (p.a.)</td>${ksVal(rp.threeYear)}${hasCurrent ? ksVal(cp.threeYear) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">5 year return (p.a.)</td>${ksVal(rp.fiveYear)}${hasCurrent ? ksVal(cp.fiveYear) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">Since inception (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Past performance is not a reliable indicator of future performance. Returns shown are after fees and before tax.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.</p>
 </div>`;
 }
 
