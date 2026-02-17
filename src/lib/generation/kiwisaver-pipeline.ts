@@ -89,7 +89,12 @@ function buildFeesBlock(currentData: ProviderData | null, recommendedData: Provi
   const rAdmin = recommendedData?.fees.adminFee || "N/A";
 
   const recLogoHtml = providerLogoInline(recommendedData?.provider);
-  const curLogoHtml = providerLogoInline(currentData?.provider);
+  const curLogoHtml = currentData?.provider ? providerLogoInline(currentData.provider) : "";
+
+  const recName = recommendedData?.provider || "Recommended";
+  const curName = currentData?.provider || "Current";
+
+  const feeSummary = buildFeeSummary(recommendedData, currentData);
 
   return `
 <div class="info-card">
@@ -97,18 +102,46 @@ function buildFeesBlock(currentData: ProviderData | null, recommendedData: Provi
   <table class="data-table fees-perf-table">
     <thead>
       <tr>
-        <th style="width:160px;"></th>
-        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended"}</div></th>
-        <th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current"}</div></th>
+        <th class="label-col" style="width:180px;"></th>
+        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended Fund"}</div></th>
+        ${currentData?.provider ? `<th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current Fund"}</div></th>` : ""}
       </tr>
     </thead>
     <tbody>
-      <tr><td>Fund fee</td><td style="text-align:center;">${rFee}</td><td style="text-align:center;">${cFee}</td></tr>
-      <tr><td>Admin / member fee</td><td style="text-align:center;">${rAdmin}</td><td style="text-align:center;">${cAdmin}</td></tr>
+      <tr><td class="label-col">Fund fee (annual)</td><td style="text-align:center;font-weight:600;">${rFee}</td>${currentData?.provider ? `<td style="text-align:center;font-weight:600;">${cFee}</td>` : ""}</tr>
+      <tr><td class="label-col">Admin / member fee</td><td style="text-align:center;font-weight:600;">${rAdmin}</td>${currentData?.provider ? `<td style="text-align:center;font-weight:600;">${cAdmin}</td>` : ""}</tr>
     </tbody>
   </table>
-  ${currentData?.sources.feesUrl ? `<p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Sources: <a href="${currentData.sources.feesUrl}" style="color:var(--bronze);">${currentData.provider}</a> | <a href="${recommendedData?.sources.feesUrl || ""}" style="color:var(--bronze);">${recommendedData?.provider || ""}</a></p>` : ""}
+  ${feeSummary}
+  ${(currentData?.sources.feesUrl || recommendedData?.sources.feesUrl) ? `<p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Fee data sourced from: ${recommendedData?.sources.feesUrl ? `<a href="${recommendedData.sources.feesUrl}" style="color:var(--bronze);">${recName} disclosure</a>` : ""}${currentData?.sources.feesUrl ? ` | <a href="${currentData.sources.feesUrl}" style="color:var(--bronze);">${curName} disclosure</a>` : ""}</p>` : ""}
 </div>`;
+}
+
+function buildFeeSummary(recommendedData: ProviderData | null, currentData: ProviderData | null): string {
+  const recName = recommendedData?.provider || "the recommended provider";
+  const recFund = recommendedData?.fund || "the recommended fund";
+  const recFee = recommendedData?.fees.fundFeePercent;
+
+  if (recFee && currentData?.fees.fundFeePercent) {
+    const rNum = parseFloat(recFee.replace("%", ""));
+    const cNum = parseFloat(currentData.fees.fundFeePercent.replace("%", ""));
+    if (!isNaN(rNum) && !isNaN(cNum)) {
+      const diff = Math.abs(rNum - cNum).toFixed(2);
+      if (rNum < cNum) {
+        return `<p class="body-text" style="margin-top:10px;">The ${recName} ${recFund} has a fund fee of ${recFee} p.a., which is ${diff}% lower than your current provider. Over a long investment horizon, lower fees compound and can make a meaningful difference to your retirement balance.</p>`;
+      } else if (rNum > cNum) {
+        return `<p class="body-text" style="margin-top:10px;">The ${recName} ${recFund} has a fund fee of ${recFee} p.a., which is ${diff}% higher than your current provider. While fees are important, they should be considered alongside fund performance, investment approach, and alignment with your risk profile and goals.</p>`;
+      } else {
+        return `<p class="body-text" style="margin-top:10px;">Both providers charge a comparable fund fee of ${recFee} p.a. The fee difference is negligible, so the recommendation is based on fund performance, investment approach, and suitability for your risk profile.</p>`;
+      }
+    }
+  }
+
+  if (recFee) {
+    return `<p class="body-text" style="margin-top:10px;">The ${recName} ${recFund} charges a fund fee of ${recFee} per annum. This fee is deducted from your investment returns and covers fund management costs. Fees compound over time and can significantly impact long-term outcomes.</p>`;
+  }
+
+  return `<p class="body-text" style="margin-top:10px;">Fees are charged as a percentage of your fund balance and are deducted from your investment returns. Even small differences in fees can compound over time and impact your retirement balance.</p>`;
 }
 
 function buildPerformanceBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
@@ -116,7 +149,8 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
   const rp = recommendedData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
 
   const recLogoHtml = providerLogoInline(recommendedData?.provider);
-  const curLogoHtml = providerLogoInline(currentData?.provider);
+  const curLogoHtml = currentData?.provider ? providerLogoInline(currentData.provider) : "";
+  const hasCurrent = !!currentData?.provider;
 
   return `
 <div class="info-card">
@@ -124,19 +158,19 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
   <table class="data-table fees-perf-table">
     <thead>
       <tr>
-        <th style="width:160px;"></th>
-        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended"}</div></th>
-        <th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current"}</div></th>
+        <th class="label-col" style="width:180px;"></th>
+        <th class="provider-col-header">${recLogoHtml}<div class="provider-label">${recommendedData?.fund || "Recommended Fund"}</div></th>
+        ${hasCurrent ? `<th class="provider-col-header">${curLogoHtml}<div class="provider-label">${currentData?.fund || "Current Fund"}</div></th>` : ""}
       </tr>
     </thead>
     <tbody>
-      <tr><td>1 Year</td><td style="text-align:center;">${rp.oneYear || "N/A"}</td><td style="text-align:center;">${cp.oneYear || "N/A"}</td></tr>
-      <tr><td>3 Years (p.a.)</td><td style="text-align:center;">${rp.threeYear || "N/A"}</td><td style="text-align:center;">${cp.threeYear || "N/A"}</td></tr>
-      <tr><td>5 Years (p.a.)</td><td style="text-align:center;">${rp.fiveYear || "N/A"}</td><td style="text-align:center;">${cp.fiveYear || "N/A"}</td></tr>
-      <tr><td>Since inception (p.a.)</td><td style="text-align:center;">${rp.sinceInception || "N/A"}</td><td style="text-align:center;">${cp.sinceInception || "N/A"}</td></tr>
+      <tr><td class="label-col">1 Year</td><td style="text-align:center;font-weight:600;">${rp.oneYear || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.oneYear || "N/A"}</td>` : ""}</tr>
+      <tr><td class="label-col">3 Years (p.a.)</td><td style="text-align:center;font-weight:600;">${rp.threeYear || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.threeYear || "N/A"}</td>` : ""}</tr>
+      <tr><td class="label-col">5 Years (p.a.)</td><td style="text-align:center;font-weight:600;">${rp.fiveYear || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.fiveYear || "N/A"}</td>` : ""}</tr>
+      <tr><td class="label-col">Since inception (p.a.)</td><td style="text-align:center;font-weight:600;">${rp.sinceInception || "N/A"}</td>${hasCurrent ? `<td style="text-align:center;font-weight:600;">${cp.sinceInception || "N/A"}</td>` : ""}</tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Past performance is not a reliable indicator of future performance.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Past performance is not a reliable indicator of future performance. Returns shown are after fees and before tax.</p>
 </div>`;
 }
 

@@ -589,9 +589,11 @@ const KIWISAVER_EXTRA_CSS = `
 .provider-logo-badge img{height:38px;width:auto;display:block;}
 .provider-header-cell{text-align:center;font-size:8pt;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;}
 .provider-header-label{margin-top:6px;opacity:0.9;}
-.fees-perf-table .provider-col-header{background:var(--white);padding:14px 14px;text-align:center;border-bottom:1px solid var(--rule);}
-.fees-perf-table .provider-col-header img{height:36px;width:auto;display:block;margin:0 auto;}
-.fees-perf-table .provider-col-header .provider-label{font-size:7.5pt;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;}
+.fees-perf-table th{background:var(--white) !important;color:var(--dark) !important;border-bottom:1px solid var(--rule);}
+.fees-perf-table .provider-col-header{padding:16px 14px;text-align:center;}
+.fees-perf-table .provider-col-header img{height:44px;width:auto;display:block;margin:0 auto;}
+.fees-perf-table .provider-col-header .provider-label{font-size:8pt;color:var(--muted);letter-spacing:0.3px;margin-top:6px;font-weight:500;}
+.fees-perf-table .label-col{font-weight:600;color:var(--dark);text-transform:uppercase;font-size:8pt;letter-spacing:0.5px;vertical-align:middle;padding:9px 14px;}
 .dual-cover-wrapper .spacer-col{width:20px;background:var(--white);border-bottom:1px solid var(--rule);}
 .back-cover{page-break-before:always;background:var(--navy);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 44mm);display:flex;flex-direction:column;justify-content:space-between;}
 .back-cover-top{padding-top:48px;}
