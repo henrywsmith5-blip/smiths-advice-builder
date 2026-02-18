@@ -652,7 +652,12 @@ const KIWISAVER_EXTRA_CSS = `
 .checkbox-item.checked .checkbox-box svg{display:block;}
 
 /* ═══ DECISIONS BOX (minimalist) ═══ */
-.decisions-box{border-top:1px solid var(--panel-bdr);border-bottom:1px solid var(--panel-bdr);padding:var(--sp-md) 0;margin:var(--sp-md) 0;}
+/* ═══ PAGE CONTROL UTILITIES ═══ */
+.page-section{page-break-inside:avoid;break-inside:avoid;}
+.keep-together{page-break-inside:avoid;break-inside:avoid;}
+.decisions-section{page-break-before:always;break-before:page;page-break-inside:avoid;break-inside:avoid;display:block !important;padding-top:var(--sp-lg);margin:0;}
+.decisions-section *{page-break-inside:avoid;break-inside:avoid;}
+.decisions-box{border-top:1px solid var(--panel-bdr);border-bottom:1px solid var(--panel-bdr);padding:var(--sp-md) 0;margin:0;}
 .decisions-box h4{font-family:var(--font-body);font-size:10px;font-weight:600;color:var(--bronze);letter-spacing:0.12em;text-transform:uppercase;margin:0 0 var(--sp-sm) 0;}
 .decisions-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;}
 .decision-card{padding:0 var(--sp-md) 0 0;border-right:1px solid var(--panel-bdr);background:none;border-radius:0;box-shadow:none;}
@@ -798,7 +803,9 @@ function buildKiwisaverTemplate(): string {
     <p>Craig Smith Business Services Limited</p>
     <p>FAP Licence #712931</p>
   </div>
+</div>
 
+<section class="page-section decisions-section">
   <div class="decisions-box">
     <h4>3 Decisions You Are Making Today</h4>
     <div class="decisions-grid">
@@ -819,7 +826,7 @@ function buildKiwisaverTemplate(): string {
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ═══ SECTION 1 — SCOPE + SPECIAL INSTRUCTIONS (Page 2 only) ═══ -->
 <div class="section-page-2">
