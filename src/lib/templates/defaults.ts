@@ -614,7 +614,7 @@ const KIWISAVER_EXTRA_CSS = `
 .ks-compare{width:100%;border-collapse:collapse;margin:0;}
 .ks-compare td,.ks-compare th{padding:0;border:none;}
 .ks-compare .ks-provider-head{padding:var(--sp-md) var(--sp-sm) 14px var(--sp-sm);text-align:center;vertical-align:bottom;border-bottom:1px solid var(--panel-bdr);}
-.ks-compare .ks-provider-head img{height:72px;width:auto;display:block;margin:0 auto 10px auto;}
+.ks-compare .ks-provider-head img{height:108px;width:auto;display:block;margin:0 auto 10px auto;}
 .ks-compare .ks-provider-head .ks-fund-name{font-family:var(--font-body);font-size:9pt;font-weight:600;color:var(--dark);letter-spacing:0.2px;}
 .ks-compare .ks-provider-head .ks-provider-tag{font-size:7pt;font-weight:600;color:var(--bronze);text-transform:uppercase;letter-spacing:1.2px;margin-top:4px;}
 .ks-compare .ks-label-head{padding:var(--sp-md) var(--sp-sm) 14px 0;vertical-align:bottom;border-bottom:1px solid var(--panel-bdr);}
@@ -628,9 +628,9 @@ const KIWISAVER_EXTRA_CSS = `
 .dual-cover-wrapper .header-recommended{background:var(--bronze);color:var(--white);vertical-align:middle;padding:var(--sp-sm) 14px;}
 .dual-cover-wrapper .header-current{background:var(--navy);color:var(--white);vertical-align:middle;padding:var(--sp-sm) 14px;}
 .dual-cover-wrapper .spacer-col{width:var(--sp-md);background:var(--white);border-bottom:1px solid var(--panel-bdr);}
-.provider-logo{height:52px;width:auto;display:inline-block;vertical-align:middle;}
+.provider-logo{height:78px;width:auto;display:inline-block;vertical-align:middle;}
 .provider-logo-badge{display:inline-block;background:var(--white);padding:12px 24px;margin-bottom:10px;}
-.provider-logo-badge img{height:60px;width:auto;display:block;}
+.provider-logo-badge img{height:90px;width:auto;display:block;}
 .provider-header-cell{text-align:center;font-size:7.5pt;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
 .provider-header-label{margin-top:8px;opacity:0.85;letter-spacing:1.2px;}
 

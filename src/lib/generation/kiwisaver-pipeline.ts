@@ -53,7 +53,7 @@ function buildComparisonBlock(
 ): string {
   const recLogo = getProviderLogo(client.recommended.provider);
   const recLogoHtml = recLogo
-    ? `<img src="${recLogo}" alt="${client.recommended.provider}" style="height:72px;width:auto;display:block;margin-bottom:14px;">`
+    ? `<img src="${recLogo}" alt="${client.recommended.provider}" style="height:108px;width:auto;display:block;margin-bottom:14px;">`
     : "";
 
   const panelRows = [
@@ -303,7 +303,7 @@ function buildFundBreakdownSection(
   const incomeItems = allocEntries.filter(e => !e.isGrowth);
   const growthItems = allocEntries.filter(e => e.isGrowth);
 
-  const logoHtml = logo ? `<img src="${logo}" alt="${provider}" style="height:36px;width:auto;display:block;margin-bottom:8px;">` : "";
+  const logoHtml = logo ? `<img src="${logo}" alt="${provider}" style="height:54px;width:auto;display:block;margin-bottom:8px;">` : "";
 
   return `
 <div class="fb-section">
