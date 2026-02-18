@@ -104,18 +104,19 @@ function buildFeesBlock(currentData: ProviderData | null, recommendedData: Provi
   <table class="ks-compare">
     <thead>
       <tr>
-        <th class="ks-label-head" style="width:180px;"></th>
+        <th class="ks-label-head" style="width:220px;"></th>
         ${ksProviderHead(recommendedData?.provider, recommendedData?.fund, "Recommended")}
         ${hasCurrent ? ksProviderHead(currentData?.provider, currentData?.fund, "Current") : ""}
       </tr>
     </thead>
     <tbody>
-      <tr class="ks-row"><td class="ks-row-label">Fund management fee (p.a.)</td>${ksVal(recommendedData?.fees.fundFeePercent)}${hasCurrent ? ksVal(currentData?.fees.fundFeePercent) : ""}</tr>
-      <tr class="ks-row"><td class="ks-row-label">Admin / member fee</td>${ksVal(recommendedData?.fees.adminFee)}${hasCurrent ? ksVal(currentData?.fees.adminFee) : ""}</tr>
-      <tr class="ks-row"><td class="ks-row-label">Other fees</td>${ksVal(recommendedData?.fees.other)}${hasCurrent ? ksVal(currentData?.fees.other) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">Manager's base fee (p.a.)</td>${ksVal(recommendedData?.fees.other)}${hasCurrent ? ksVal(currentData?.fees.other) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">Other management &amp; admin charges</td>${ksVal(recommendedData?.fees.adminFee)}${hasCurrent ? ksVal(currentData?.fees.adminFee) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label"><strong>Total estimated annual fund charges</strong></td>${ksVal(recommendedData?.fees.fundFeePercent)}${hasCurrent ? ksVal(currentData?.fees.fundFeePercent) : ""}</tr>
     </tbody>
   </table>
   ${feeSummary}
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Fee data sourced from provider disclosure documents${recommendedData?.sources.feesUrl ? ': <a href="' + recommendedData.sources.feesUrl + '" style="color:var(--bronze);">' + recommendedData.sources.feesUrl + '</a>' : ''}${currentData?.sources.feesUrl ? ' and <a href="' + currentData.sources.feesUrl + '" style="color:var(--bronze);">' + currentData.sources.feesUrl + '</a>' : ''}.</p>
 </div>`;
 }
 
@@ -169,7 +170,7 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
       <tr class="ks-row"><td class="ks-row-label">Since inception (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--bronze);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
 </div>`;
 }
 
