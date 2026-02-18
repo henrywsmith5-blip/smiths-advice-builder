@@ -50,6 +50,7 @@ function buildComparisonBlock(
   client: KiwisaverFactPack["clients"][0],
   recDesc: FundDescription | null,
   recData: ProviderData | null,
+  recommendationSummaryHtml: string,
 ): string {
   const recLogo = getProviderLogo(client.recommended.provider);
   const recLogoHtml = recLogo
@@ -99,7 +100,7 @@ function buildComparisonBlock(
   return `
 <div class="rec-layout">
   <div class="rec-text">
-    {{ RECOMMENDATION_SUMMARY_PARAGRAPH }}
+    ${recommendationSummaryHtml}
     ${currentSummary}
   </div>
   <div class="rec-panel">
@@ -458,6 +459,8 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
   const clientAge = client.age ? Number(client.age) : null;
   const yearsTo65 = clientAge ? Math.max(0, 65 - clientAge) : null;
 
+  const recSummaryHtml = sec("recommendation_summary") || v(factPack.narrativeInputs.recommendationSummaryParagraph);
+
   const context: RenderContext = {
     BODY_CLASS: "production",
     CLIENTS_PREPARED_FOR: clientName,
@@ -494,9 +497,9 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     CLIENT_1_SCOPE_WITHDRAWALS_CLASS: client.scopeSelections.withdrawals ? "checked" : "",
     CLIENT_1_SCOPE_LIMITED_ADVICE_CLASS: client.scopeSelections.limitedAdvice ? "checked" : "",
 
-    // Writer sections
+    // Writer sections (resolve before block injections so we can pass into builders)
     SPECIAL_INSTRUCTIONS_HTML: sec("special_instructions") || v(factPack.narrativeInputs.specialInstructionsHtml),
-    RECOMMENDATION_SUMMARY_PARAGRAPH: sec("recommendation_summary") || v(factPack.narrativeInputs.recommendationSummaryParagraph),
+    RECOMMENDATION_SUMMARY_PARAGRAPH: recSummaryHtml,
     PROJECTIONS_EXPLANATION_PARAGRAPH: sec("projections_explanation") || v(factPack.narrativeInputs.projectionsExplanationParagraph),
     RISK_PROFILE_NARRATIVE: sec("risk_profile_narrative") || v(factPack.narrativeInputs.riskProfileNarrativeHtml),
     STRATEGY_NARRATIVE: sec("strategy_narrative") || v(factPack.narrativeInputs.strategyNarrativeHtml),
@@ -509,7 +512,7 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     PROJECTION_ASSUMPTIONS: v(client.projections?.assumptions),
 
     // Block injections
-    RECOMMENDATION_COMPARISON_BLOCKS: buildComparisonBlock(client, recFundDesc, recommendedProviderData),
+    RECOMMENDATION_COMPARISON_BLOCKS: buildComparisonBlock(client, recFundDesc, recommendedProviderData, recSummaryHtml),
     FUND_DESCRIPTION_BLOCKS: buildFundDescBlock(recommendedProviderData, recFundDesc, currentProviderData, curFundDesc),
     FEES_TABLE_BLOCKS: buildFeesBlock(currentProviderData, recommendedProviderData),
     PERFORMANCE_TABLE_BLOCKS: buildPerformanceBlock(currentProviderData, recommendedProviderData),
