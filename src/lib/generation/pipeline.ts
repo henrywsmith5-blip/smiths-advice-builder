@@ -151,7 +151,7 @@ export async function runGenerationPipeline(
 
   // Direct field mapping from schema → template variables
   const d = extractedJson;
-  const v = (val: string | null | undefined, fallback = "—") => val || fallback;
+  const v = (val: string | null | undefined, fallback = "-") => val || fallback;
   // For cover cells: show "Not included" instead of just a dash
   const vc = (val: string | null | undefined) => val || "Not included";
 

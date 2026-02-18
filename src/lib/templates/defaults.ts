@@ -270,10 +270,10 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 </div><!-- /section-block-break: Section 2 -->
 
 <!-- ═══ SECTION 3 — OUT OF SCOPE ═══ -->
-<div class="section-heading"><div class="num">3</div><h2>Out of Scope — What We Do Not Provide</h2></div>
+<div class="section-heading"><div class="num">3</div><h2>Out of Scope - What We Do Not Provide</h2></div>
 <p class="body-text">The following services are explicitly outside the scope of this engagement:</p>
 <ul class="styled-list">
-  <li>Fire and general insurance (home, contents, vehicle) — referred to Aon Insurance Brokers</li>
+  <li>Fire and general insurance (home, contents, vehicle) - referred to Aon Insurance Brokers</li>
   <li>Mortgages, lending, or budgeting services</li>
   <li>Tax advice, legal advice, or accounting services</li>
   <li>Estate planning, trust structuring, or business succession planning</li>
@@ -281,11 +281,11 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <p class="body-text">If you require advice in these areas, we recommend seeking specialist assistance. Referrals may be provided on request.</p>
 
 <!-- ═══ SECTION 4 — CLIENT RESPONSIBILITIES ═══ -->
-<div class="section-heading"><div class="num">4</div><h2>Information We Rely On — Client Responsibilities</h2></div>
+<div class="section-heading"><div class="num">4</div><h2>Information We Rely On - Client Responsibilities</h2></div>
 <p class="body-text">Our advice is based on information you provide during the Fact Find process. You have a responsibility to:</p>
 <ul class="styled-list">
   <li>Provide complete and accurate information about your circumstances, health, income, and financial position</li>
-  <li>Disclose all information that could influence an insurer's decision — this is your Duty of Disclosure under the Insurance Contracts Act</li>
+  <li>Disclose all information that could influence an insurer's decision - this is your Duty of Disclosure under the Insurance Contracts Act</li>
   <li>Inform us promptly if your circumstances change (e.g., health, occupation, income, smoking status)</li>
   <li>Read and confirm key documents including policy wordings, quotes, application forms, and disclosures</li>
 </ul>
@@ -293,7 +293,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <!-- ═══ SECTION 5 — FEES ═══ -->
 <div class="section-heading"><div class="num">5</div><h2>Fees, Commission, and Other Payments</h2></div>
 <p class="body-text">There is no fee charged to you for advisory services.</p>
-<p class="body-text">Smiths Insurance &amp; KiwiSaver receives commission from insurers when policies are placed. Commission typically includes an upfront payment (based on first-year premium) and ongoing trail commission (based on renewal premiums). Commission varies by provider and product — details are in the Disclosure Statement.</p>
+<p class="body-text">Smiths Insurance &amp; KiwiSaver receives commission from insurers when policies are placed. Commission typically includes an upfront payment (based on first-year premium) and ongoing trail commission (based on renewal premiums). Commission varies by provider and product - details are in the Disclosure Statement.</p>
 
 <!-- ═══ SECTION 6 — CONFLICTS ═══ -->
 <div class="section-heading"><div class="num">6</div><h2>Conflicts of Interest</h2></div>
@@ -317,7 +317,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <!-- CLIENT A BREAKDOWN -->
 <div class="section-block">
   <div class="client-divider"><span>{{ CLIENT_A_NAME }}</span></div>
-  <div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
+  <div class="sub-heading">Agreed Covers - <span class="placeholder">{{ CLIENT_A_NAME }}</span></div>
 
   {% if HAS_EXISTING_COVER %}
   <p class="body-text"><em>{{ CLIENT_A_ADVICE_TYPE_LABEL }}</em></p>
@@ -365,7 +365,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
     <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">${titleShort}</span>
   </div>
   <div class="client-divider"><span>{{ CLIENT_B_NAME }}</span></div>
-  <div class="sub-heading">Agreed Covers — <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
+  <div class="sub-heading">Agreed Covers - <span class="placeholder">{{ CLIENT_B_NAME }}</span></div>
 
   {% if HAS_EXISTING_COVER %}
   <p class="body-text"><em>{{ CLIENT_B_ADVICE_TYPE_LABEL }}</em></p>
@@ -432,7 +432,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <!-- ═══ SECTION 9 — MIGRATION ANALYSIS (existing cover only) ═══ -->
 {% if HAS_EXISTING_COVER %}
-<div class="section-heading"><div class="num">9</div><h2>Migration Analysis — Pros &amp; Cons</h2></div>
+<div class="section-heading"><div class="num">9</div><h2>Migration Analysis - Pros &amp; Cons</h2></div>
 {% if LIFE_INCLUDED %}<div class="sub-heading">Life Cover</div><div class="pros-cons-grid"><div class="pro-card"><div class="pc-title">Pros</div>{{ LIFE_PROS }}</div><div class="con-card"><div class="pc-title">Cons</div>{{ LIFE_CONS }}</div></div>{% endif %}
 {% if TRAUMA_INCLUDED %}<div class="sub-heading">Trauma / Progressive Care</div><div class="pros-cons-grid"><div class="pro-card"><div class="pc-title">Pros</div>{{ TRAUMA_PROS }}</div><div class="con-card"><div class="pc-title">Cons</div>{{ TRAUMA_CONS }}</div></div>{% endif %}
 {% if TPD_INCLUDED %}<div class="sub-heading">Total and Permanent Disability</div><div class="pros-cons-grid"><div class="pro-card"><div class="pc-title">Pros</div>{{ TPD_PROS }}</div><div class="con-card"><div class="pc-title">Cons</div>{{ TPD_CONS }}</div></div>{% endif %}
@@ -493,7 +493,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <p class="body-text">Following policy placement, we will provide ongoing service at no additional fee:</p>
 <ul class="styled-list">
   <li>Policy queries and administration support</li>
-  <li>Claims assistance — guidance, documentation support, and liaison with insurers</li>
+  <li>Claims assistance - guidance, documentation support, and liaison with insurers</li>
   <li>Annual review on request or when circumstances change</li>
   <li>Policy amendments, updates, and renewals</li>
 </ul>
@@ -1098,7 +1098,7 @@ function buildKiwisaverTemplate(): string {
     </div>
     <div class="risk-dim-card">
       <div class="dim-label">Time Horizon</div>
-      <div class="dim-value">{% if CLIENT_1_TIMEFRAME %}{{ CLIENT_1_TIMEFRAME }}{% else %}—{% endif %}</div>
+      <div class="dim-value">{% if CLIENT_1_TIMEFRAME %}{{ CLIENT_1_TIMEFRAME }}{% else %}-{% endif %}</div>
       <p style="font-size:7.5pt;color:var(--muted);margin:6px 0 0 0;text-align:center;">How long until you need to access these funds</p>
     </div>
   </div>

@@ -58,9 +58,9 @@ function buildComparisonBlock(
     : "";
 
   const panelRows = [
-    { label: "Provider", value: v(client.recommended.provider, "—") },
-    { label: "Fund", value: v(client.recommended.fund, "—") },
-    { label: "Risk profile", value: v(client.riskProfileOutcome, "—") },
+    { label: "Provider", value: v(client.recommended.provider, "-") },
+    { label: "Fund", value: v(client.recommended.fund, "-") },
+    { label: "Risk profile", value: v(client.riskProfileOutcome, "-") },
   ];
   if (recData?.fees.fundFeePercent) panelRows.push({ label: "Total fee (p.a.)", value: recData.fees.fundFeePercent });
   if (recDesc) {
@@ -90,8 +90,8 @@ function buildComparisonBlock(
     <h4>Your current position</h4>
     <table class="ks-compare">
       <tbody>
-        <tr class="ks-row"><td class="ks-row-label" style="width:180px;">Provider</td><td style="padding:10px 16px;font-size:10pt;">${v(client.current.provider, "—")}</td></tr>
-        <tr class="ks-row"><td class="ks-row-label" style="width:180px;">Fund</td><td style="padding:10px 16px;font-size:10pt;">${v(client.current.fund, "—")}</td></tr>
+        <tr class="ks-row"><td class="ks-row-label" style="width:180px;">Provider</td><td style="padding:10px 16px;font-size:10pt;">${v(client.current.provider, "-")}</td></tr>
+        <tr class="ks-row"><td class="ks-row-label" style="width:180px;">Fund</td><td style="padding:10px 16px;font-size:10pt;">${v(client.current.fund, "-")}</td></tr>
         ${client.current.balance ? `<tr class="ks-row"><td class="ks-row-label" style="width:180px;">Balance</td><td style="padding:10px 16px;font-size:10pt;">${client.current.balance}</td></tr>` : ""}
       </tbody>
     </table>
@@ -113,7 +113,7 @@ function buildComparisonBlock(
 }
 
 function ksVal(val: string | null | undefined): string {
-  if (!val || val === "N/A") return `<td class="ks-row-val na">—</td>`;
+  if (!val || val === "N/A") return `<td class="ks-row-val na">-</td>`;
   return `<td class="ks-row-val">${val}</td>`;
 }
 
@@ -294,8 +294,8 @@ function buildFundBreakdownSection(
     : "";
 
   const totalFeeNum = parseFloat(desc.fees.totalEstimated.replace("%", ""));
-  const tenKFee = !isNaN(totalFeeNum) ? `$${(totalFeeNum * 100).toFixed(0)}` : "—";
-  const hundredKFee = !isNaN(totalFeeNum) ? `$${(totalFeeNum * 1000).toFixed(0)}` : "—";
+  const tenKFee = !isNaN(totalFeeNum) ? `$${(totalFeeNum * 100).toFixed(0)}` : "-";
+  const hundredKFee = !isNaN(totalFeeNum) ? `$${(totalFeeNum * 1000).toFixed(0)}` : "-";
 
   const allocEntries = Object.entries(desc.allocation)
     .filter(([, pct]) => (pct as number) > 0)
@@ -318,7 +318,7 @@ function buildFundBreakdownSection(
       <div class="fb-sub-title">Fee structure</div>
       <div class="fb-fee-table">${feeTableHtml}</div>
       ${perfFeeNote}
-      <p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:8px;">On a $10,000 balance, total annual fees would be approximately <strong>${tenKFee}</strong>. On a $100,000 balance, approximately <strong>${hundredKFee}</strong>. These fees compound over time — even small differences can materially affect your retirement balance over 20–30 years.</p>
+      <p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:8px;">On a $10,000 balance, total annual fees would be approximately <strong>${tenKFee}</strong>. On a $100,000 balance, approximately <strong>${hundredKFee}</strong>. These fees compound over time - even small differences can materially affect your retirement balance over 20-30 years.</p>
 
       <div class="fb-sub-title">Asset allocation</div>
       <div class="fb-alloc-split">

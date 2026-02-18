@@ -112,5 +112,22 @@ export async function renderTemplate(
     }),
   });
 
-  return rendered;
+  return stripEmDashes(rendered);
+}
+
+/**
+ * Replace all em dashes (U+2014), en dashes (U+2013), and their HTML entities
+ * with a simple hyphen surrounded by spaces. This runs on the final rendered
+ * HTML so nothing can slip through regardless of LLM output.
+ */
+function stripEmDashes(html: string): string {
+  return html
+    .replace(/\u2014/g, " - ")
+    .replace(/\u2013/g, " - ")
+    .replace(/&mdash;/g, " - ")
+    .replace(/&ndash;/g, " - ")
+    .replace(/&#8212;/g, " - ")
+    .replace(/&#8211;/g, " - ")
+    .replace(/\s+-\s+-\s+/g, " - ")
+    .replace(/\s{2,}-\s{2,}/g, " - ");
 }
