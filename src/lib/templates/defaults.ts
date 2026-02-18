@@ -733,6 +733,31 @@ const KIWISAVER_EXTRA_CSS = `
 
 /* ═══ DATA TABLE REFINEMENT ═══ */
 .data-table th{background:var(--panel-bg);color:var(--dark);border-bottom:1px solid var(--panel-bdr);}
+
+/* ═══ FUND BREAKDOWN SECTION ═══ */
+.fb-section{page-break-inside:avoid;break-inside:avoid;margin:var(--sp-md) 0;border:1px solid var(--panel-bdr);background:var(--white);}
+.fb-layout{display:grid;grid-template-columns:1fr 220px;gap:0;}
+.fb-text{padding:var(--sp-md);border-right:1px solid var(--panel-bdr);}
+.fb-chart{padding:var(--sp-md);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--panel-bg);}
+.fb-section-title{font-family:var(--font-body);font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--bronze);margin-bottom:var(--sp-sm);}
+.fb-sub-title{font-family:var(--font-body);font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dark);margin:var(--sp-md) 0 var(--sp-sm) 0;padding-bottom:6px;border-bottom:1px solid var(--panel-bdr);}
+.fb-fee-table{margin:0;}
+.fb-fee-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(230,225,218,0.5);font-size:9pt;}
+.fb-fee-row:last-child{border-bottom:none;font-weight:600;padding-top:8px;margin-top:2px;border-top:1px solid var(--panel-bdr);}
+.fb-fee-label{color:var(--muted);}
+.fb-fee-value{color:var(--dark);font-weight:600;}
+.fb-alloc-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);}
+.fb-alloc-group{}
+.fb-alloc-group-label{font-size:8px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--bronze);margin-bottom:6px;}
+.fb-alloc-item{display:flex;justify-content:space-between;padding:3px 0;font-size:8.5pt;color:var(--dark);border-bottom:1px solid rgba(230,225,218,0.3);}
+.fb-alloc-item:last-child{border-bottom:none;}
+.fb-chart-inner{margin-bottom:var(--sp-sm);}
+.fb-chart-inner svg{display:block;max-width:180px;}
+.fb-chart-meta{width:100%;}
+.fb-meta-row{display:flex;justify-content:space-between;padding:5px 0;font-size:8.5pt;border-bottom:1px solid rgba(230,225,218,0.5);}
+.fb-meta-row:last-child{border-bottom:none;}
+.fb-meta-row span:first-child{color:var(--muted);font-weight:500;}
+.fb-meta-row span:last-child{color:var(--dark);font-weight:600;}
 `;
 
 function buildKiwisaverTemplate(): string {

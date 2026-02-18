@@ -298,15 +298,14 @@ async function fetchFisher(fund: string): Promise<ProviderData> {
 const MILFORD_FEES_URL = "https://milfordasset.com/information-hub/fees";
 const MILFORD_PERF_URL = "https://milfordasset.com/funds-performance/view-performance";
 
-// Verified from Milford PDS, kiwisavercomparison.co.nz, and smartinvestor.sorted.org.nz
-// Base fund fee (includes underlying external fund charges where applicable)
+// Verified from Milford PDS dated 18 June 2025 (Section 5 - What are the fees?)
 const MILFORD_FEES_REF: Record<string, { baseFee: string; perfFee: string; totalEstFee: string }> = {
-  cash:          { baseFee: "0.20%", perfFee: "N/A",                            totalEstFee: "0.20%" },
-  conservative:  { baseFee: "0.87%", perfFee: "15% of excess over benchmark",   totalEstFee: "0.87%" },
-  moderate:      { baseFee: "0.95%", perfFee: "15% of excess over benchmark",   totalEstFee: "0.95%" },
-  balanced:      { baseFee: "1.05%", perfFee: "15% of excess over benchmark",   totalEstFee: "1.05%" },
-  "active growth": { baseFee: "1.05%", perfFee: "15% of excess over 10% p.a.", totalEstFee: "1.25%" },
-  aggressive:    { baseFee: "1.15%", perfFee: "15% of excess over benchmark",   totalEstFee: "1.15%" },
+  cash:          { baseFee: "0.20%", perfFee: "N/A",   totalEstFee: "0.20%" },
+  conservative:  { baseFee: "0.85%", perfFee: "N/A",   totalEstFee: "0.85%" },
+  moderate:      { baseFee: "0.95%", perfFee: "0.01%", totalEstFee: "0.96%" },
+  balanced:      { baseFee: "1.05%", perfFee: "0.02%", totalEstFee: "1.07%" },
+  "active growth": { baseFee: "1.05%", perfFee: "0.20%", totalEstFee: "1.25%" },
+  aggressive:    { baseFee: "1.15%", perfFee: "N/A",   totalEstFee: "1.15%" },
 };
 
 // 5-year annualised returns from kiwisavercomparison.co.nz (data as at Oct 2025)
@@ -383,6 +382,30 @@ async function fetchMilford(fund: string): Promise<ProviderData> {
 // FUND DESCRIPTIONS (from PDS / official sources)
 // ══════════════════════════════════════════════════════════════
 
+// ══════════════════════════════════════════════════════════════
+// FUND DESCRIPTIONS — Sourced from official PDS documents
+// Fisher Funds PDS: 30 September 2025
+// Milford PDS: 18 June 2025
+// ══════════════════════════════════════════════════════════════
+
+export interface AssetAllocation {
+  cash: number;
+  nzFixedInterest: number;
+  intlFixedInterest: number;
+  ausEquities: number;
+  intlEquities: number;
+  listedProperty: number;
+  unlistedProperty: number;
+}
+
+export interface FeeBreakdown {
+  baseFee: string;
+  otherCharges: string;
+  performanceFee: string;
+  totalEstimated: string;
+  performanceFeeDetail: string | null;
+}
+
 export interface FundDescription {
   objective: string;
   suitableFor: string;
@@ -390,7 +413,12 @@ export interface FundDescription {
   riskIndicator: number;
   growthPercent: number;
   incomePercent: number;
+  allocation: AssetAllocation;
+  fees: FeeBreakdown;
+  pdsDate: string;
 }
+
+// ── Fisher Funds (PDS 30 September 2025) ────────────────────
 
 const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
   cash: {
@@ -400,6 +428,9 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 1,
     growthPercent: 0,
     incomePercent: 100,
+    allocation: { cash: 100, nzFixedInterest: 0, intlFixedInterest: 0, ausEquities: 0, intlEquities: 0, listedProperty: 0, unlistedProperty: 0 },
+    fees: { baseFee: "0.36%", otherCharges: "0.09%", performanceFee: "N/A", totalEstimated: "0.45%", performanceFeeDetail: null },
+    pdsDate: "30 September 2025",
   },
   "core conservative": {
     objective: "Aims to provide stable returns over the long term by investing mainly in income assets with a small allocation to growth assets.",
@@ -408,6 +439,9 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 2,
     growthPercent: 18,
     incomePercent: 82,
+    allocation: { cash: 27, nzFixedInterest: 25, intlFixedInterest: 30, ausEquities: 7, intlEquities: 11, listedProperty: 0, unlistedProperty: 0 },
+    fees: { baseFee: "0.42%", otherCharges: "0.09%", performanceFee: "N/A", totalEstimated: "0.51%", performanceFeeDetail: null },
+    pdsDate: "30 September 2025",
   },
   conservative: {
     objective: "Aims to provide stable returns over the long term by investing mainly in income assets with a modest allocation to growth assets.",
@@ -416,6 +450,9 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 3,
     growthPercent: 20,
     incomePercent: 80,
+    allocation: { cash: 20, nzFixedInterest: 28, intlFixedInterest: 32, ausEquities: 5, intlEquities: 11, listedProperty: 2, unlistedProperty: 2 },
+    fees: { baseFee: "0.76%", otherCharges: "0.11%", performanceFee: "N/A", totalEstimated: "0.87%", performanceFeeDetail: null },
+    pdsDate: "30 September 2025",
   },
   default: {
     objective: "Aims to provide a balance between stability of returns and growing your investment over the long term by investing in a mix of income and growth assets. An enhanced passive investment style may be used at times.",
@@ -424,6 +461,9 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 4,
     growthPercent: 55,
     incomePercent: 45,
+    allocation: { cash: 7, nzFixedInterest: 17, intlFixedInterest: 21, ausEquities: 16, intlEquities: 37, listedProperty: 2, unlistedProperty: 0 },
+    fees: { baseFee: "0.37%", otherCharges: "N/A", performanceFee: "N/A", totalEstimated: "0.37%", performanceFeeDetail: "No annual fund charge applies if your Default Fund balance is $1,500 or less." },
+    pdsDate: "30 September 2025",
   },
   balanced: {
     objective: "Aims to provide a balance between stability of returns and growing your investment over the long term by investing in a mix of income and growth assets.",
@@ -432,6 +472,9 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 4,
     growthPercent: 60,
     incomePercent: 40,
+    allocation: { cash: 5, nzFixedInterest: 16, intlFixedInterest: 19, ausEquities: 18, intlEquities: 38, listedProperty: 2, unlistedProperty: 2 },
+    fees: { baseFee: "0.91%", otherCharges: "0.19%", performanceFee: "N/A", totalEstimated: "1.10%", performanceFeeDetail: null },
+    pdsDate: "30 September 2025",
   },
   growth: {
     objective: "Aims to grow your investment over the long term by investing mainly in growth assets.",
@@ -440,6 +483,9 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 5,
     growthPercent: 80,
     incomePercent: 20,
+    allocation: { cash: 5, nzFixedInterest: 7, intlFixedInterest: 8, ausEquities: 26, intlEquities: 50, listedProperty: 2, unlistedProperty: 2 },
+    fees: { baseFee: "0.98%", otherCharges: "0.22%", performanceFee: "N/A", totalEstimated: "1.20%", performanceFeeDetail: null },
+    pdsDate: "30 September 2025",
   },
   aggressive: {
     objective: "Aims to grow your investment over the long term by investing predominantly in growth assets.",
@@ -448,57 +494,80 @@ const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
     riskIndicator: 6,
     growthPercent: 95,
     incomePercent: 5,
+    allocation: { cash: 5, nzFixedInterest: 0, intlFixedInterest: 0, ausEquities: 28, intlEquities: 63, listedProperty: 2, unlistedProperty: 2 },
+    fees: { baseFee: "1.06%", otherCharges: "0.17%", performanceFee: "N/A", totalEstimated: "1.23%", performanceFeeDetail: null },
+    pdsDate: "30 September 2025",
   },
 };
 
+// ── Milford (PDS 18 June 2025) ──────────────────────────────
+
 const MILFORD_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
   cash: {
-    objective: "Aims to outperform the Official Cash Rate (before tax and after fees) by investing in cash deposits and short-dated fixed interest securities.",
-    suitableFor: "Investors seeking low-risk exposure with a very short investment timeframe.",
+    objective: "Targets a return above the New Zealand Official Cash Rate. Primarily invests in New Zealand cash, short-dated debt securities and term deposits.",
+    suitableFor: "Investors seeking low-risk exposure with a very short investment timeframe or those looking to park funds temporarily.",
     minTimeframe: "No minimum",
     riskIndicator: 1,
     growthPercent: 0,
     incomePercent: 100,
+    allocation: { cash: 20, nzFixedInterest: 80, intlFixedInterest: 0, ausEquities: 0, intlEquities: 0, listedProperty: 0, unlistedProperty: 0 },
+    fees: { baseFee: "0.20%", otherCharges: "N/A", performanceFee: "N/A", totalEstimated: "0.20%", performanceFeeDetail: null },
+    pdsDate: "18 June 2025",
   },
   conservative: {
-    objective: "Aims to provide modest returns with a focus on capital preservation through a diversified portfolio weighted towards income assets.",
-    suitableFor: "Conservative investors seeking lower volatility and more stable returns over the medium term.",
+    objective: "To provide moderate returns and protect capital over the minimum recommended investment timeframe. A diversified fund that primarily invests in fixed interest securities, with a moderate allocation to equities.",
+    suitableFor: "Conservative investors seeking lower volatility and more stable returns over the medium term. The fund may experience short-term negative returns, particularly in times of heightened volatility.",
     minTimeframe: "3 years",
     riskIndicator: 2,
-    growthPercent: 20,
-    incomePercent: 80,
+    growthPercent: 18,
+    incomePercent: 82,
+    allocation: { cash: 7, nzFixedInterest: 25, intlFixedInterest: 50, ausEquities: 4, intlEquities: 9, listedProperty: 5, unlistedProperty: 0 },
+    fees: { baseFee: "0.85%", otherCharges: "N/A", performanceFee: "N/A", totalEstimated: "0.85%", performanceFeeDetail: null },
+    pdsDate: "18 June 2025",
   },
   moderate: {
-    objective: "Aims to provide a balance of income and growth by investing in a diversified mix of income and growth assets.",
+    objective: "To provide moderate returns and capital growth over the minimum recommended investment timeframe. A diversified fund that primarily invests in fixed interest securities with a significant allocation to equities.",
     suitableFor: "Investors seeking moderate growth with some tolerance for short-term volatility.",
-    minTimeframe: "5 years",
+    minTimeframe: "4 years",
     riskIndicator: 3,
     growthPercent: 40,
     incomePercent: 60,
+    allocation: { cash: 9, nzFixedInterest: 15, intlFixedInterest: 36, ausEquities: 15, intlEquities: 19, listedProperty: 6, unlistedProperty: 0 },
+    fees: { baseFee: "0.95%", otherCharges: "N/A", performanceFee: "0.01%", totalEstimated: "0.96%", performanceFeeDetail: "Moderate may invest in related Milford funds (including Australian Absolute Growth) that charge performance fees. The estimated performance fee component is 0.01% p.a." },
+    pdsDate: "18 June 2025",
   },
   balanced: {
-    objective: "Aims to provide long-term capital growth with a balanced allocation between income and growth assets.",
+    objective: "To provide capital growth over the minimum recommended investment timeframe. A diversified fund that primarily invests in equities, with a significant allocation to fixed interest securities.",
     suitableFor: "Investors seeking a balance between growth potential and capital stability over the medium to long term.",
     minTimeframe: "5 years",
     riskIndicator: 4,
-    growthPercent: 60,
-    incomePercent: 40,
+    growthPercent: 61,
+    incomePercent: 39,
+    allocation: { cash: 8, nzFixedInterest: 6, intlFixedInterest: 25, ausEquities: 24, intlEquities: 30, listedProperty: 7, unlistedProperty: 0 },
+    fees: { baseFee: "1.05%", otherCharges: "N/A", performanceFee: "0.02%", totalEstimated: "1.07%", performanceFeeDetail: "Balanced may invest in related Milford funds (including Australian Absolute Growth) that charge performance fees. The estimated performance fee component is 0.02% p.a." },
+    pdsDate: "18 June 2025",
   },
   "active growth": {
-    objective: "Aims to provide strong long-term capital growth by investing predominantly in growth assets, with active management seeking to outperform.",
+    objective: "Absolute return style fund. To provide annual returns of 10% (after base fund fee, before tax and performance fee) over the minimum recommended investment timeframe. A diversified fund that primarily invests in equities, with a moderate allocation to fixed interest securities.",
     suitableFor: "Long-term investors comfortable with higher volatility who want active management targeting above-market returns.",
     minTimeframe: "7 years",
     riskIndicator: 5,
-    growthPercent: 80,
-    incomePercent: 20,
+    growthPercent: 78,
+    incomePercent: 22,
+    allocation: { cash: 6, nzFixedInterest: 2, intlFixedInterest: 14, ausEquities: 30, intlEquities: 48, listedProperty: 0, unlistedProperty: 0 },
+    fees: { baseFee: "1.05%", otherCharges: "N/A", performanceFee: "0.20%", totalEstimated: "1.25%", performanceFeeDetail: "Performance fee of 15% of excess return above a 10% p.a. hurdle rate, capped at 0.95% of average NAV. Payable only if the fund exceeds its high water mark. Reviewed annually to 31 March." },
+    pdsDate: "18 June 2025",
   },
   aggressive: {
-    objective: "Aims to maximise long-term returns by investing almost entirely in growth assets including equities and listed property.",
+    objective: "To maximise capital growth over the minimum recommended investment timeframe. Primarily invests in international equities, with a moderate allocation to Australasian equities.",
     suitableFor: "Long-term investors who can tolerate significant short-term fluctuations for the potential of higher long-term returns.",
     minTimeframe: "10 years",
     riskIndicator: 6,
     growthPercent: 95,
     incomePercent: 5,
+    allocation: { cash: 5, nzFixedInterest: 0, intlFixedInterest: 0, ausEquities: 25, intlEquities: 70, listedProperty: 0, unlistedProperty: 0 },
+    fees: { baseFee: "1.15%", otherCharges: "N/A", performanceFee: "N/A", totalEstimated: "1.15%", performanceFeeDetail: null },
+    pdsDate: "18 June 2025",
   },
 };
 

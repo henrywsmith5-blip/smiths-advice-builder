@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { extractKiwisaverData } from "@/lib/llm/kiwisaver-extractor";
 import { writeKiwisaverSections } from "@/lib/llm/kiwisaver-writer";
 import { getProviderData, getFundDescription } from "@/lib/providers";
-import type { FundDescription } from "@/lib/providers";
+import type { FundDescription, AssetAllocation } from "@/lib/providers";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
 import { validateKiwisaverHtml } from "@/lib/generation/kiwisaver-validate";
@@ -203,6 +203,151 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
 </div>`;
 }
 
+// ═══ SVG DONUT CHART GENERATOR ═══
+
+const ALLOC_COLORS: Record<string, string> = {
+  cash: "#C4B5A0",
+  nzFixedInterest: "#A39580",
+  intlFixedInterest: "#8A7B66",
+  ausEquities: "#B07D56",
+  intlEquities: "#8C5E3C",
+  listedProperty: "#D4A872",
+  unlistedProperty: "#E6CCAB",
+};
+
+const ALLOC_LABELS: Record<string, string> = {
+  cash: "Cash",
+  nzFixedInterest: "NZ Fixed Interest",
+  intlFixedInterest: "Int'l Fixed Interest",
+  ausEquities: "Australasian Equities",
+  intlEquities: "International Equities",
+  listedProperty: "Listed Property",
+  unlistedProperty: "Unlisted Property",
+};
+
+function buildDonutSvg(alloc: AssetAllocation, riskIndicator: number, fundName: string): string {
+  const entries = Object.entries(alloc)
+    .filter(([, pct]) => (pct as number) > 0)
+    .map(([key, pct]) => ({ key, pct: pct as number, color: ALLOC_COLORS[key] || "#CCC", label: ALLOC_LABELS[key] || key }));
+
+  const cx = 90, cy = 90, r = 70, stroke = 28;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+
+  const segments = entries.map(e => {
+    const dashLen = (e.pct / 100) * circumference;
+    const gap = circumference - dashLen;
+    const seg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${e.color}" stroke-width="${stroke}" stroke-dasharray="${dashLen} ${gap}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset += dashLen;
+    return seg;
+  });
+
+  const riskDots = Array.from({ length: 7 }, (_, i) =>
+    `<rect x="${14 + i * 23}" y="0" width="18" height="6" rx="1" fill="${i < riskIndicator ? '#B07D56' : '#E6E1DA'}"/>`
+  ).join("");
+
+  const legendItems = entries.map((e, i) =>
+    `<g transform="translate(0, ${i * 18})">
+      <rect width="10" height="10" rx="1" fill="${e.color}"/>
+      <text x="14" y="9" font-family="'Satoshi', sans-serif" font-size="8" fill="#3D3D3D">${e.label} ${e.pct}%</text>
+    </g>`
+  ).join("");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 ${200 + entries.length * 18}" width="180">
+  <g>${segments.join("")}</g>
+  <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-family="'Instrument Serif', serif" font-size="18" fill="#1A1A1A">${fundName}</text>
+  <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-family="'Satoshi', sans-serif" font-size="8" fill="#7A7A7A" letter-spacing="0.08em" text-transform="uppercase">FUND</text>
+  <g transform="translate(10, 190)">${riskDots}</g>
+  <text x="10" y="206" font-family="'Satoshi', sans-serif" font-size="7" fill="#7A7A7A" letter-spacing="0.06em">RISK INDICATOR</text>
+  <g transform="translate(10, 220)">${legendItems}</g>
+</svg>`;
+}
+
+// ═══ FUND STRUCTURE & INVESTMENT COMPOSITION SECTION ═══
+
+function buildFundBreakdownSection(
+  provider: string,
+  fund: string,
+  desc: FundDescription,
+  logo: string,
+): string {
+  const donut = buildDonutSvg(desc.allocation, desc.riskIndicator, fund);
+
+  const feeRows = [
+    { label: "Manager's base fee", value: desc.fees.baseFee },
+  ];
+  if (desc.fees.otherCharges !== "N/A") {
+    feeRows.push({ label: "Other management & admin", value: desc.fees.otherCharges });
+  }
+  if (desc.fees.performanceFee !== "N/A") {
+    feeRows.push({ label: "Estimated performance fee", value: desc.fees.performanceFee });
+  }
+  feeRows.push({ label: "Total estimated annual charge", value: desc.fees.totalEstimated });
+
+  const feeTableHtml = feeRows.map(r =>
+    `<div class="fb-fee-row"><span class="fb-fee-label">${r.label}</span><span class="fb-fee-value">${r.value}</span></div>`
+  ).join("\n");
+
+  const perfFeeNote = desc.fees.performanceFeeDetail
+    ? `<p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:6px;">${desc.fees.performanceFeeDetail}</p>`
+    : "";
+
+  const totalFeeNum = parseFloat(desc.fees.totalEstimated.replace("%", ""));
+  const tenKFee = !isNaN(totalFeeNum) ? `$${(totalFeeNum * 100).toFixed(0)}` : "—";
+  const hundredKFee = !isNaN(totalFeeNum) ? `$${(totalFeeNum * 1000).toFixed(0)}` : "—";
+
+  const allocEntries = Object.entries(desc.allocation)
+    .filter(([, pct]) => (pct as number) > 0)
+    .map(([key, pct]) => ({ label: ALLOC_LABELS[key] || key, pct: pct as number, isGrowth: ["ausEquities", "intlEquities", "listedProperty", "unlistedProperty"].includes(key) }));
+
+  const incomeItems = allocEntries.filter(e => !e.isGrowth);
+  const growthItems = allocEntries.filter(e => e.isGrowth);
+
+  const logoHtml = logo ? `<img src="${logo}" alt="${provider}" style="height:36px;width:auto;display:block;margin-bottom:8px;">` : "";
+
+  return `
+<div class="fb-section">
+  <div class="fb-layout">
+    <div class="fb-text">
+      ${logoHtml}
+      <div class="fb-section-title">Fund Structure & Investment Composition</div>
+      <p class="body-text" style="margin-bottom:var(--sp-sm);">${desc.objective}</p>
+      <p class="body-text" style="font-size:9pt;color:var(--muted);margin-bottom:var(--sp-md);"><strong>Suitable for:</strong> ${desc.suitableFor}</p>
+
+      <div class="fb-sub-title">Fee structure</div>
+      <div class="fb-fee-table">${feeTableHtml}</div>
+      ${perfFeeNote}
+      <p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:8px;">On a $10,000 balance, total annual fees would be approximately <strong>${tenKFee}</strong>. On a $100,000 balance, approximately <strong>${hundredKFee}</strong>. These fees compound over time — even small differences can materially affect your retirement balance over 20–30 years.</p>
+
+      <div class="fb-sub-title">Asset allocation</div>
+      <div class="fb-alloc-split">
+        <div class="fb-alloc-group">
+          <div class="fb-alloc-group-label">Income assets ${desc.incomePercent}%</div>
+          ${incomeItems.map(e => `<div class="fb-alloc-item"><span>${e.label}</span><span>${e.pct}%</span></div>`).join("")}
+        </div>
+        <div class="fb-alloc-group">
+          <div class="fb-alloc-group-label">Growth assets ${desc.growthPercent}%</div>
+          ${growthItems.map(e => `<div class="fb-alloc-item"><span>${e.label}</span><span>${e.pct}%</span></div>`).join("")}
+        </div>
+      </div>
+      <p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:8px;">Source: ${provider} Product Disclosure Statement, ${desc.pdsDate}. Target allocations indicate what is expected over the course of an economic cycle; actual allocations may vary.</p>
+    </div>
+    <div class="fb-chart">
+      <div class="fb-chart-inner">
+        ${donut}
+      </div>
+      <div class="fb-chart-meta">
+        <div class="fb-meta-row"><span>Min. timeframe</span><span>${desc.minTimeframe}</span></div>
+        <div class="fb-meta-row"><span>Risk indicator</span><span>${desc.riskIndicator} / 7</span></div>
+        <div class="fb-meta-row"><span>Growth assets</span><span>${desc.growthPercent}%</span></div>
+        <div class="fb-meta-row"><span>Income assets</span><span>${desc.incomePercent}%</span></div>
+        <div class="fb-meta-row"><span>Total fee (p.a.)</span><span>${desc.fees.totalEstimated}</span></div>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
 function buildFundDescBlock(
   recData: ProviderData | null,
   recDesc: FundDescription | null,
@@ -212,23 +357,13 @@ function buildFundDescBlock(
   let html = "";
 
   if (recDesc && recData) {
-    html += `
-<div class="fund-desc">
-  <div class="fund-desc-title">About the ${v(recData.provider)} ${v(recData.fund)} Fund</div>
-  <p><strong>Objective:</strong> ${recDesc.objective}</p>
-  <p><strong>Suitable for:</strong> ${recDesc.suitableFor}</p>
-  <p><strong>Minimum suggested timeframe:</strong> ${recDesc.minTimeframe} &nbsp;|&nbsp; <strong>Risk indicator:</strong> ${recDesc.riskIndicator} / 7</p>
-</div>`;
+    const logo = getProviderLogo(recData.provider);
+    html += buildFundBreakdownSection(recData.provider, recData.fund, recDesc, logo);
   }
 
   if (curDesc && curData && curData.provider !== recData?.provider) {
-    html += `
-<div class="fund-desc">
-  <div class="fund-desc-title">About the ${v(curData.provider)} ${v(curData.fund)} Fund</div>
-  <p><strong>Objective:</strong> ${curDesc.objective}</p>
-  <p><strong>Suitable for:</strong> ${curDesc.suitableFor}</p>
-  <p><strong>Minimum suggested timeframe:</strong> ${curDesc.minTimeframe} &nbsp;|&nbsp; <strong>Risk indicator:</strong> ${curDesc.riskIndicator} / 7</p>
-</div>`;
+    const logo = getProviderLogo(curData.provider);
+    html += buildFundBreakdownSection(curData.provider, curData.fund, curDesc, logo);
   }
 
   return html;
