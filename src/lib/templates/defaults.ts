@@ -722,51 +722,112 @@ function buildKiwisaverTemplate(): string {
   <p class="body-text">In providing you with investment advice, we will only provide information regarding the above mentioned products in a "general" context. No personal investment advice will be offered. If you want a referral to an investment advisor that provides personalised investment advice please let us know and we will be happy to refer.</p>
 </div>
 
-<!-- ═══ SECTION 3 — YOUR CURRENT POSITION ═══ -->
-<div class="section-heading"><div class="num">3</div><h2>Your Current KiwiSaver Position</h2></div>
+<!-- ═══ SECTION 3 — UNDERSTANDING KIWISAVER ═══ -->
+<div class="section-heading"><div class="num">3</div><h2>Understanding KiwiSaver</h2></div>
+<p class="body-text">KiwiSaver is a voluntary, work-based savings initiative to help New Zealanders save for retirement. It is governed by the KiwiSaver Act 2006 and administered by Inland Revenue.</p>
 
 <div class="info-card">
-  <h4>Summary ({{ CLIENT_1_NAME }})</h4>
-  <table class="data-table" style="margin:10px 0 0 0;">
-    <thead><tr><th>Item</th><th>Details</th></tr></thead>
+  <h4>How contributions work</h4>
+  <p class="body-text">If you are employed, you contribute a percentage of your before-tax pay (3%, 4%, 6%, 8%, or 10%). Your employer is required to contribute a minimum of 3%. These contributions are invested in your chosen KiwiSaver fund and grow over time through compound returns.</p>
+  <p class="body-text">Self-employed or non-employed members can make voluntary contributions at any time. There is no minimum contribution for non-employees.</p>
+</div>
+
+<div class="info-card">
+  <h4>What is a PIE fund?</h4>
+  <p class="body-text">KiwiSaver funds are structured as Portfolio Investment Entities (PIEs). Your investment returns are taxed at your Prescribed Investor Rate (PIR) rather than your marginal income tax rate. PIR rates are 10.5%, 17.5%, or 28% depending on your income. This can result in a lower effective tax rate on investment earnings compared to direct investments.</p>
+</div>
+
+<div class="info-card">
+  <h4>When can you access your KiwiSaver?</h4>
+  <ul class="styled-list" style="margin:0;">
+    <li><strong>Retirement:</strong> You can withdraw your full balance at age 65 (or after 5 years of membership, whichever is later).</li>
+    <li><strong>First home purchase:</strong> You may be eligible to withdraw most of your balance (excluding the $1,000 kick-start if applicable and government contributions) after 3 years of membership.</li>
+    <li><strong>Significant financial hardship:</strong> Withdrawals may be approved by your provider if you are unable to meet minimum living expenses.</li>
+    <li><strong>Serious illness:</strong> Full withdrawal may be permitted if you have a life-threatening condition or permanent disability.</li>
+    <li><strong>Permanent emigration:</strong> You may withdraw after being overseas for at least one year (excluding moves to Australia).</li>
+  </ul>
+</div>
+
+<!-- ═══ SECTION 4 — FUND TYPES & RISK ═══ -->
+<div class="section-heading"><div class="num">4</div><h2>Fund Types and Investment Risk</h2></div>
+<p class="body-text">KiwiSaver funds are categorised by their asset allocation and risk level. The right fund depends on your investment timeframe, goals, and comfort with short-term losses.</p>
+
+<div class="info-card">
+  <h4>The five main fund types</h4>
+  <table class="ks-compare">
+    <thead>
+      <tr>
+        <th class="ks-label-head" style="width:140px;">Fund Type</th>
+        <th class="ks-label-head">Growth Assets</th>
+        <th class="ks-label-head">Risk Level</th>
+        <th class="ks-label-head">Typical Timeframe</th>
+      </tr>
+    </thead>
     <tbody>
-      <tr><td>Meeting date</td><td>{{ MEETING_DATE_LONG }}</td></tr>
-      <tr><td>Age</td><td>{{ CLIENT_1_AGE }}</td></tr>
-      <tr><td>Annual income</td><td>{{ CLIENT_1_INCOME_ANNUAL }}</td></tr>
-      <tr><td>Employee contribution</td><td>{{ CLIENT_1_EMPLOYEE_CONTRIB }}</td></tr>
-      <tr><td>Employer contribution</td><td>{{ CLIENT_1_EMPLOYER_CONTRIB }}</td></tr>
-      <tr><td>Current provider</td><td>{{ CLIENT_1_CURRENT_PROVIDER }}</td></tr>
-      <tr><td>Current fund</td><td>{{ CLIENT_1_CURRENT_FUND }}</td></tr>
-      <tr><td>Current balance</td><td>{{ CLIENT_1_CURRENT_BALANCE }}</td></tr>
-      <tr><td>Primary goal</td><td>{{ CLIENT_1_GOAL }}</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">Defensive</td><td style="padding:8px 16px;">10-25%</td><td style="padding:8px 16px;">Low</td><td style="padding:8px 16px;">1-3 years</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">Conservative</td><td style="padding:8px 16px;">10-35%</td><td style="padding:8px 16px;">Low-Medium</td><td style="padding:8px 16px;">3-5 years</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">Balanced</td><td style="padding:8px 16px;">35-63%</td><td style="padding:8px 16px;">Medium</td><td style="padding:8px 16px;">5-7 years</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">Growth</td><td style="padding:8px 16px;">63-90%</td><td style="padding:8px 16px;">Medium-High</td><td style="padding:8px 16px;">7-10+ years</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">Aggressive</td><td style="padding:8px 16px;">90-100%</td><td style="padding:8px 16px;">High</td><td style="padding:8px 16px;">10+ years</td></tr>
     </tbody>
   </table>
 </div>
 
-<!-- ═══ SECTION 4 — RECOMMENDATION SUMMARY ═══ -->
-<div class="section-heading"><div class="num">4</div><h2>Your KiwiSaver Recommendation</h2></div>
+<p class="body-text"><strong>Growth assets</strong> (shares, property, infrastructure) offer higher long-term returns but with more volatility. <strong>Income assets</strong> (bonds, cash, term deposits) provide stability but lower returns over time. The right balance depends on how long you have until you need the money.</p>
+
+<div class="callout-box"><strong>Key principle:</strong> The longer your investment timeframe, the more growth assets your portfolio can afford. Short-term losses are smoothed out over longer periods, and historically, growth-oriented funds have outperformed conservative funds over 10+ year horizons.</div>
+
+<!-- ═══ SECTION 5 — YOUR CURRENT POSITION ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
+<div class="section-heading"><div class="num">5</div><h2>Your Current KiwiSaver Position</h2></div>
+
+<div class="info-card">
+  <h4>{{ CLIENT_1_NAME }}</h4>
+  <table class="ks-compare">
+    <tbody>
+      <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Meeting date</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ MEETING_DATE_LONG }}</td></tr>
+      {% if CLIENT_1_AGE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Age</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_AGE }}</td></tr>{% endif %}
+      {% if CLIENT_1_INCOME_ANNUAL %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Annual income</td><td class="ks-row-val" style="text-align:left;">{{ CLIENT_1_INCOME_ANNUAL }}</td></tr>{% endif %}
+      <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Employee contribution</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_EMPLOYEE_CONTRIB }}</td></tr>
+      <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Employer contribution</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_EMPLOYER_CONTRIB }}</td></tr>
+      {% if CLIENT_1_CURRENT_PROVIDER %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current provider</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_CURRENT_PROVIDER }}</td></tr>{% endif %}
+      {% if CLIENT_1_CURRENT_FUND %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current fund</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_CURRENT_FUND }}</td></tr>{% endif %}
+      {% if CLIENT_1_CURRENT_BALANCE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current balance</td><td class="ks-row-val" style="text-align:left;">{{ CLIENT_1_CURRENT_BALANCE }}</td></tr>{% endif %}
+      {% if CLIENT_1_GOAL %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Primary goal</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_GOAL }}</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ═══ SECTION 6 — RECOMMENDATION ═══ -->
+<div class="section-heading"><div class="num">6</div><h2>Our Recommendation</h2></div>
 
 <p class="body-text">{{ RECOMMENDATION_SUMMARY_PARAGRAPH }}</p>
 
 {{ RECOMMENDATION_COMPARISON_BLOCKS }}
 
-<div class="warning-box"><strong>Timing:</strong> This recommendation should not be acted on after <strong>30 days</strong> from the date of this advice without prior consultation.</div>
+<div class="warning-box"><strong>Timing:</strong> This recommendation should not be acted on after <strong>30 days</strong> from the date of this advice without prior consultation. Markets and personal circumstances change, and the suitability of this advice may be affected.</div>
 
-<!-- ═══ SECTION 5 — FEES & COSTS ═══ -->
-<div class="section-heading"><div class="num">5</div><h2>Fees and Costs</h2></div>
-<p class="body-text">Fees are deducted from your KiwiSaver balance and can impact long-term outcomes. Fee information below is sourced from provider disclosures as at <span class="placeholder">{{ DATA_AS_AT_DATE }}</span>.</p>
+<!-- ═══ SECTION 7 — FEES & COSTS ═══ -->
+<div class="section-heading"><div class="num">7</div><h2>Fees and Costs</h2></div>
+<p class="body-text">All KiwiSaver funds charge fees, which are deducted from your investment balance. Fees reduce your returns and compound over time, so even small differences can have a meaningful impact on your long-term outcome.</p>
+<p class="body-text">Fee information below is sourced directly from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong>.</p>
 
 {{ FEES_TABLE_BLOCKS }}
 
-<!-- ═══ SECTION 6 — PERFORMANCE ═══ -->
-<div class="section-heading"><div class="num">6</div><h2>Fund Performance</h2></div>
-<p class="body-text">Performance data is provided for context only. Past performance is not a reliable indicator of future performance.</p>
+<!-- ═══ SECTION 8 — PERFORMANCE ═══ -->
+<div class="section-heading"><div class="num">8</div><h2>Fund Performance</h2></div>
+<p class="body-text">Historical performance provides context about how a fund has performed through different market conditions. Returns shown are annualised (the average return per year over the period) and are calculated after fund fees but before tax.</p>
 
 {{ PERFORMANCE_TABLE_BLOCKS }}
 
-<!-- ═══ SECTION 7 — PROJECTIONS (only if data exists) ═══ -->
+<!-- ═══ SECTION 9 — PROJECTIONS (only if data exists) ═══ -->
 {% if HAS_PROJECTIONS %}
-<div class="section-heading"><div class="num">7</div><h2>Projections and What This Means</h2></div>
+<div class="section-heading"><div class="num">9</div><h2>Projections</h2></div>
 
 {% if PROJECTIONS_EXPLANATION_PARAGRAPH %}<p class="body-text">{{ PROJECTIONS_EXPLANATION_PARAGRAPH }}</p>{% endif %}
 
@@ -782,36 +843,75 @@ function buildKiwisaverTemplate(): string {
   </table>
 </div>
 
-<div class="warning-box"><strong>Important:</strong> Projections are estimates only and are sensitive to market returns, fees, contributions, and time. Actual outcomes will differ.</div>
+<div class="warning-box"><strong>Important:</strong> Projections are estimates only. They are sensitive to market returns, fees, contributions, and time. Actual outcomes will differ. These figures are provided for illustration purposes and should not be relied upon as a guarantee.</div>
 {% endif %}
 
-<!-- ═══ SECTION 8 — IMPLEMENTATION ═══ -->
-<div class="section-heading"><div class="num">8</div><h2>Implementation and Next Steps</h2></div>
+<!-- ═══ SECTION 10 — IMPLEMENTATION ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
+<div class="section-heading"><div class="num">10</div><h2>Implementation and Next Steps</h2></div>
+
+<p class="body-text">To action the recommendation in this document, the following steps are required:</p>
 
 <ul class="styled-list">
-  <li>Confirm the recommended provider and fund selection(s) shown in Section 4.</li>
-  <li>Complete the provider switch/transfer process (online application or paper form).</li>
-  <li>Confirm contribution rates with your employer (if changes are required).</li>
-  <li>We will review your position again if your income, goals, or timeframe changes.</li>
+  <li><strong>Review and confirm</strong> the recommended provider and fund selection outlined in Section 6.</li>
+  <li><strong>Complete the transfer process</strong> by signing the provider switch form (online or paper). We will assist you with this.</li>
+  <li><strong>Confirm contribution rates</strong> with your employer if any changes are required (e.g. changing from 3% to 6%).</li>
+  <li><strong>Notify your current provider</strong> - your new provider will handle the transfer, but you should expect the process to take 10-15 business days.</li>
+  <li><strong>Ongoing review</strong> - we will review your KiwiSaver position if your income, goals, risk profile, or timeframe changes materially.</li>
 </ul>
 
-<!-- ═══ SECTION 9 — KEY RISKS ═══ -->
-<div class="section-heading"><div class="num">9</div><h2>Key Risks and Considerations</h2></div>
+<div class="callout-box"><strong>Note:</strong> During the transfer period, your funds will temporarily be held in cash. This is standard and typically takes 10-15 business days. Market movements during this period will not affect your balance.</div>
+</div>
+
+<!-- ═══ SECTION 11 — KEY RISKS ═══ -->
+<div class="section-heading"><div class="num">11</div><h2>Key Risks and Considerations</h2></div>
+
+<p class="body-text">All investments carry risk. It is important you understand the following before acting on this advice:</p>
 
 <ul class="styled-list">
-  <li>KiwiSaver investments can go up and down in value, particularly in Growth/Aggressive funds.</li>
-  <li>Switching funds during market volatility can crystallise losses if done at the wrong time.</li>
-  <li>Fees matter over the long term - lower fees do not guarantee better returns, but they reduce drag.</li>
-  <li>Past performance is not a reliable indicator of future performance.</li>
-  <li>This advice is based on the information you provided at the time of your meeting.</li>
+  <li><strong>Market risk:</strong> KiwiSaver investments can go up and down in value. Growth and aggressive funds will experience larger short-term fluctuations than conservative or defensive funds.</li>
+  <li><strong>Timing risk:</strong> Switching funds during periods of market volatility can crystallise losses. We recommend making changes based on long-term strategy, not short-term market conditions.</li>
+  <li><strong>Inflation risk:</strong> Conservative funds may not keep pace with inflation over long periods, which means your purchasing power could decline in real terms.</li>
+  <li><strong>Fee impact:</strong> Fees compound over time. Even a 0.5% difference in annual fees can result in a materially different retirement balance over 20-30 years.</li>
+  <li><strong>Liquidity risk:</strong> KiwiSaver funds are generally locked in until age 65 (with limited exceptions). You should maintain separate emergency savings outside of KiwiSaver.</li>
+  <li><strong>Provider risk:</strong> While KiwiSaver funds are held in trust (separate from the provider's own assets), there is still a small risk of operational failure or regulatory action.</li>
+  <li><strong>Basis of advice:</strong> This advice is based on the information you provided at the time of your meeting. If your circumstances change, please contact us for a review.</li>
 </ul>
 
-<!-- ═══ SECTION 10 — SIGN-OFF ═══ -->
+<!-- ═══ SECTION 12 — FEES, COMMISSION & CONFLICTS ═══ -->
+<div class="section-heading"><div class="num">12</div><h2>Adviser Fees, Commission &amp; Conflicts of Interest</h2></div>
+
+<p class="body-text">There is no direct fee charged to you for this KiwiSaver advice.</p>
+<p class="body-text">Smiths Insurance &amp; KiwiSaver may receive ongoing commission or trail payments from the recommended KiwiSaver provider. Commission is typically a small percentage of your fund balance and is paid by the provider (not deducted from your account in addition to the stated fees).</p>
+<p class="body-text">We manage potential conflicts of interest by:</p>
+<ul class="styled-list">
+  <li>Following a documented advice process that ensures recommendations are based on your needs</li>
+  <li>Comparing products across multiple providers before making recommendations</li>
+  <li>Disclosing any material conflict that could reasonably be seen as influencing advice</li>
+  <li>Maintaining a conflicts register and completing annual training on managing conflicts</li>
+</ul>
+
+<!-- ═══ SECTION 13 — COMPLAINTS & PRIVACY ═══ -->
+<div class="section-heading"><div class="num">13</div><h2>Complaints, Disputes &amp; Privacy</h2></div>
+
+<p class="body-text"><strong>Internal complaints:</strong> If you have a concern about our service, please contact us directly:</p>
+<p class="body-text" style="margin-left:16px;">Henry Smith: henry@smiths.net.nz | 027 344 5255<br>Craig Smith: craig@smiths.net.nz | 0274 293 939<br>Post: PO Box 8267, Riccarton, Christchurch</p>
+
+<p class="body-text"><strong>External disputes:</strong> If we are unable to resolve your complaint, you can refer the matter to our external dispute resolution scheme:</p>
+<p class="body-text" style="margin-left:16px;"><strong>Financial Dispute Resolution Service (FDRS)</strong><br>Website: fdrs.org.nz | Email: enquiries@fdrs.org.nz<br>Freepost 231075, PO Box 2272, Wellington 6140</p>
+
+<p class="body-text"><strong>Privacy:</strong> We collect personal information to provide advice and arrange financial products. Information may be shared with product providers, compliance partners, and service providers as required. Records are retained for a minimum of seven years in accordance with regulatory requirements. You may request access to or correction of your information at any time.</p>
+
+<!-- ═══ SECTION 14 — SIGN-OFF ═══ -->
 <div class="header page-break">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">10</div><h2>Declaration &amp; Sign-Off</h2></div>
+<div class="section-heading"><div class="num">14</div><h2>Declaration &amp; Sign-Off</h2></div>
 
 <div class="info-card" style="background:var(--white);">
   <p class="body-text">{{ DECLARATION_INTRO }}</p>
