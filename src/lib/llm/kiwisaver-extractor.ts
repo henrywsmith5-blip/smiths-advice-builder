@@ -47,12 +47,22 @@ YOU MUST RETURN THIS EXACT JSON STRUCTURE:
       "email": "email or null",
       "phone": "phone or null",
       "age": 55,
+      "employmentStatus": "Employed / Self-employed / Not employed or null",
       "incomeAnnual": "$85,000 or null",
       "employeeContrib": "3% or null",
       "employerContrib": "3% or null",
-      "goal": "Retirement or null",
+      "pir": "28% or 17.5% or 10.5% or null",
+      "goal": "Retirement or First home or null",
       "timeframe": "11 years or null",
-      "riskProfileOutcome": "Growth or null",
+      "firstHomeIntention": true or false or null,
+      "firstHomeTimeframe": "2-3 years or null (only if first home goal)",
+      "riskProfileOutcome": "Growth or Balanced or Conservative etc. or null",
+      "riskTolerance": "High / Medium / Low or description of comfort with volatility or null",
+      "riskCapacity": "High / Medium / Low or description of financial ability to withstand loss or null",
+      "esgPreference": "Any stated ESG/responsible investing preference or null",
+      "otherAssetsDebts": "Summary of other assets and debts mentioned or null",
+      "emergencyFund": "Has emergency fund? Amount or description or null",
+      "recommendedContribRate": "Recommended contribution rate e.g. 6% or null",
       "current": {
         "provider": "Fisher Funds or null",
         "fund": "Growth Fund or null",
@@ -79,7 +89,9 @@ YOU MUST RETURN THIS EXACT JSON STRUCTURE:
   "narrativeInputs": {
     "specialInstructionsHtml": "Client objectives or null",
     "recommendationSummaryParagraph": null,
-    "projectionsExplanationParagraph": null
+    "projectionsExplanationParagraph": null,
+    "riskProfileNarrativeHtml": null,
+    "strategyNarrativeHtml": null
   },
   "missing_fields": []
 }

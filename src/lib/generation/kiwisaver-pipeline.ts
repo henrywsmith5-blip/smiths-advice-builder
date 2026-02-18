@@ -254,6 +254,9 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
 
   const clientName = v(client.name, input.clientOverrides?.name || "Client");
 
+  const clientAge = client.age ? Number(client.age) : null;
+  const yearsTo65 = clientAge ? Math.max(0, 65 - clientAge) : null;
+
   const context: RenderContext = {
     BODY_CLASS: "production",
     CLIENTS_PREPARED_FOR: clientName,
@@ -261,13 +264,26 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     CLIENT_1_NAME: clientName,
     MEETING_DATE_LONG: v(factPack.caseMeta.meetingDate, nzDate),
     CLIENT_1_AGE: v(client.age),
+    CLIENT_1_YEARS_TO_65: yearsTo65 !== null ? String(yearsTo65) : "",
+    CLIENT_1_EMPLOYMENT_STATUS: v(client.employmentStatus),
     CLIENT_1_INCOME_ANNUAL: v(client.incomeAnnual),
+    CLIENT_1_PIR: v(client.pir),
     CLIENT_1_EMPLOYEE_CONTRIB: v(client.employeeContrib, "3%"),
     CLIENT_1_EMPLOYER_CONTRIB: v(client.employerContrib, "3%"),
     CLIENT_1_CURRENT_PROVIDER: v(client.current.provider),
     CLIENT_1_CURRENT_FUND: v(client.current.fund),
     CLIENT_1_CURRENT_BALANCE: v(client.current.balance),
     CLIENT_1_GOAL: v(client.goal),
+    CLIENT_1_TIMEFRAME: v(client.timeframe),
+    CLIENT_1_FIRST_HOME_INTENTION: client.firstHomeIntention ? "true" : "",
+    CLIENT_1_FIRST_HOME_TIMEFRAME: v(client.firstHomeTimeframe),
+    CLIENT_1_RISK_PROFILE_OUTCOME: v(client.riskProfileOutcome, "To be determined"),
+    CLIENT_1_RISK_TOLERANCE: v(client.riskTolerance, "To be assessed"),
+    CLIENT_1_RISK_CAPACITY: v(client.riskCapacity, "To be assessed"),
+    CLIENT_1_ESG_PREFERENCE: v(client.esgPreference),
+    CLIENT_1_OTHER_ASSETS_DEBTS: v(client.otherAssetsDebts),
+    CLIENT_1_EMERGENCY_FUND: v(client.emergencyFund),
+    CLIENT_1_RECOMMENDED_CONTRIB_RATE: v(client.recommendedContribRate),
     DATA_AS_AT_DATE: recommendedProviderData?.asAtDate || nzDate,
 
     // Scope checkboxes
@@ -281,6 +297,8 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     SPECIAL_INSTRUCTIONS_HTML: sec("special_instructions") || v(factPack.narrativeInputs.specialInstructionsHtml),
     RECOMMENDATION_SUMMARY_PARAGRAPH: sec("recommendation_summary") || v(factPack.narrativeInputs.recommendationSummaryParagraph),
     PROJECTIONS_EXPLANATION_PARAGRAPH: sec("projections_explanation") || v(factPack.narrativeInputs.projectionsExplanationParagraph),
+    RISK_PROFILE_NARRATIVE: sec("risk_profile_narrative") || v(factPack.narrativeInputs.riskProfileNarrativeHtml),
+    STRATEGY_NARRATIVE: sec("strategy_narrative") || v(factPack.narrativeInputs.strategyNarrativeHtml),
 
     // Projections (only shown if at least one value exists)
     HAS_PROJECTIONS: !!(client.timeframe || client.projections?.projectedBalance || client.projections?.projectedWeeklyIncome || client.projections?.assumptions),

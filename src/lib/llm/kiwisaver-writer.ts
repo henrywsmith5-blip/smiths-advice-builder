@@ -35,6 +35,8 @@ SECTION KEYS:
 - "special_instructions": Client objectives narrative. Explain the purpose of the meeting, what the client wants, and what we discussed. 2-3 paragraphs. Reference their specific goal (e.g. retirement), timeframe, and current situation.
 - "recommendation_summary": Why we recommend the specific fund/provider. Explain the rationale tied to their risk profile, goals, and timeframe. 2-3 paragraphs. Be specific about why this fund suits them.
 - "projections_explanation": What the projection numbers mean in practical terms for the client. 1-2 paragraphs. Keep it grounded and realistic - emphasise that projections are estimates only.
+- "risk_profile_narrative": Explain the client's risk profile assessment. Cover: (a) their risk tolerance (emotional comfort with market ups and downs), (b) their risk capacity (financial ability to withstand losses - income stability, timeframe, other resources), (c) how these combine to determine the recommended fund type. Reference their specific situation. 2-3 paragraphs.
+- "strategy_narrative": Personalised KiwiSaver strategy advice for the client. Cover contribution rate recommendation (referencing upcoming rate changes if relevant), government contribution maximisation strategy (contribute $1,042.86 between 1 July-30 June for max $260.72), PIR confirmation, and if relevant, first-home vs retirement priority discussion. Be specific to their situation. 2-4 paragraphs.
 
 Return ONLY valid JSON. No markdown.`;
 }
