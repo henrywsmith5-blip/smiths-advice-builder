@@ -183,16 +183,6 @@ function buildSignatureBlock(clientName: string): string {
     <div class="sig-line"></div>
     <div class="sig-label">Date</div>
   </div>
-</div>
-
-<div class="signature-grid single" style="margin-top:16px;">
-  <div class="sig-box">
-    <div class="sig-name">Craig Smith - Financial Adviser</div>
-    <div class="sig-line"></div>
-    <div class="sig-label">Signature</div>
-    <div class="sig-line"></div>
-    <div class="sig-label">Date</div>
-  </div>
 </div>`;
 }
 
