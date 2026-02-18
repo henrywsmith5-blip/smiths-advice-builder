@@ -380,6 +380,142 @@ async function fetchMilford(fund: string): Promise<ProviderData> {
 }
 
 // ══════════════════════════════════════════════════════════════
+// FUND DESCRIPTIONS (from PDS / official sources)
+// ══════════════════════════════════════════════════════════════
+
+export interface FundDescription {
+  objective: string;
+  suitableFor: string;
+  minTimeframe: string;
+  riskIndicator: number;
+  growthPercent: number;
+  incomePercent: number;
+}
+
+const FISHER_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
+  cash: {
+    objective: "Aims to provide stable returns and reduce the potential of capital loss over the short to medium term by investing in cash and New Zealand short-term fixed interest assets.",
+    suitableFor: "A short-term or naturally cautious investor looking to make a withdrawal within 12 months, most interested in low volatility of returns over achieving potential higher returns.",
+    minTimeframe: "No minimum",
+    riskIndicator: 1,
+    growthPercent: 0,
+    incomePercent: 100,
+  },
+  "core conservative": {
+    objective: "Aims to provide stable returns over the long term by investing mainly in income assets with a small allocation to growth assets.",
+    suitableFor: "A short-term or naturally cautious investor nearing retirement or intending to make a withdrawal in the short term, motivated by low volatility of returns over achieving potential higher returns.",
+    minTimeframe: "3 years",
+    riskIndicator: 2,
+    growthPercent: 18,
+    incomePercent: 82,
+  },
+  conservative: {
+    objective: "Aims to provide stable returns over the long term by investing mainly in income assets with a modest allocation to growth assets.",
+    suitableFor: "A short-term or naturally cautious investor looking to make a withdrawal within the short term, who values lower volatility of returns over achieving potential higher returns.",
+    minTimeframe: "3 years",
+    riskIndicator: 3,
+    growthPercent: 20,
+    incomePercent: 80,
+  },
+  default: {
+    objective: "Aims to provide a balance between stability of returns and growing your investment over the long term by investing in a mix of income and growth assets. An enhanced passive investment style may be used at times.",
+    suitableFor: "A medium- to long-term investor who wants a balance between volatility of returns and achieving potential higher returns.",
+    minTimeframe: "5 years",
+    riskIndicator: 4,
+    growthPercent: 55,
+    incomePercent: 45,
+  },
+  balanced: {
+    objective: "Aims to provide a balance between stability of returns and growing your investment over the long term by investing in a mix of income and growth assets.",
+    suitableFor: "A medium- to long-term investor who wants a balance between volatility of returns and achieving potential higher returns.",
+    minTimeframe: "5 years",
+    riskIndicator: 4,
+    growthPercent: 60,
+    incomePercent: 40,
+  },
+  growth: {
+    objective: "Aims to grow your investment over the long term by investing mainly in growth assets.",
+    suitableFor: "A long-term investor who can tolerate volatility of returns in the expectation of potential higher returns and has time on their side.",
+    minTimeframe: "7 years",
+    riskIndicator: 5,
+    growthPercent: 80,
+    incomePercent: 20,
+  },
+  aggressive: {
+    objective: "Aims to grow your investment over the long term by investing predominantly in growth assets.",
+    suitableFor: "A long-term investor who can tolerate significant volatility of returns in the expectation of potential higher returns and has time on their side.",
+    minTimeframe: "10 years",
+    riskIndicator: 6,
+    growthPercent: 95,
+    incomePercent: 5,
+  },
+};
+
+const MILFORD_FUND_DESCRIPTIONS: Record<string, FundDescription> = {
+  cash: {
+    objective: "Aims to outperform the Official Cash Rate (before tax and after fees) by investing in cash deposits and short-dated fixed interest securities.",
+    suitableFor: "Investors seeking low-risk exposure with a very short investment timeframe.",
+    minTimeframe: "No minimum",
+    riskIndicator: 1,
+    growthPercent: 0,
+    incomePercent: 100,
+  },
+  conservative: {
+    objective: "Aims to provide modest returns with a focus on capital preservation through a diversified portfolio weighted towards income assets.",
+    suitableFor: "Conservative investors seeking lower volatility and more stable returns over the medium term.",
+    minTimeframe: "3 years",
+    riskIndicator: 2,
+    growthPercent: 20,
+    incomePercent: 80,
+  },
+  moderate: {
+    objective: "Aims to provide a balance of income and growth by investing in a diversified mix of income and growth assets.",
+    suitableFor: "Investors seeking moderate growth with some tolerance for short-term volatility.",
+    minTimeframe: "5 years",
+    riskIndicator: 3,
+    growthPercent: 40,
+    incomePercent: 60,
+  },
+  balanced: {
+    objective: "Aims to provide long-term capital growth with a balanced allocation between income and growth assets.",
+    suitableFor: "Investors seeking a balance between growth potential and capital stability over the medium to long term.",
+    minTimeframe: "5 years",
+    riskIndicator: 4,
+    growthPercent: 60,
+    incomePercent: 40,
+  },
+  "active growth": {
+    objective: "Aims to provide strong long-term capital growth by investing predominantly in growth assets, with active management seeking to outperform.",
+    suitableFor: "Long-term investors comfortable with higher volatility who want active management targeting above-market returns.",
+    minTimeframe: "7 years",
+    riskIndicator: 5,
+    growthPercent: 80,
+    incomePercent: 20,
+  },
+  aggressive: {
+    objective: "Aims to maximise long-term returns by investing almost entirely in growth assets including equities and listed property.",
+    suitableFor: "Long-term investors who can tolerate significant short-term fluctuations for the potential of higher long-term returns.",
+    minTimeframe: "10 years",
+    riskIndicator: 6,
+    growthPercent: 95,
+    incomePercent: 5,
+  },
+};
+
+export function getFundDescription(provider: string, fund: string): FundDescription | null {
+  const pLower = provider.toLowerCase().trim();
+  if (pLower.includes("fisher")) {
+    const key = findFisherFundKey(fund);
+    return key ? FISHER_FUND_DESCRIPTIONS[key] || null : null;
+  }
+  if (pLower.includes("milford")) {
+    const key = findMilfordFundKey(fund);
+    return key ? MILFORD_FUND_DESCRIPTIONS[key] || null : null;
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════
 // PUBLIC API
 // ══════════════════════════════════════════════════════════════
 

@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
 import { extractKiwisaverData } from "@/lib/llm/kiwisaver-extractor";
 import { writeKiwisaverSections } from "@/lib/llm/kiwisaver-writer";
-import { getProviderData } from "@/lib/providers";
+import { getProviderData, getFundDescription } from "@/lib/providers";
+import type { FundDescription } from "@/lib/providers";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
 import { validateKiwisaverHtml } from "@/lib/generation/kiwisaver-validate";
@@ -45,39 +46,67 @@ function providerLogoInline(name: string | null | undefined): string {
   return "";
 }
 
-function buildComparisonBlock(client: KiwisaverFactPack["clients"][0]): string {
-  const recBadge = providerLogoBadge(client.recommended.provider);
-  const curBadge = providerLogoBadge(client.current.provider);
+function buildComparisonBlock(
+  client: KiwisaverFactPack["clients"][0],
+  recDesc: FundDescription | null,
+  recData: ProviderData | null,
+): string {
+  const recLogo = getProviderLogo(client.recommended.provider);
+  const recLogoHtml = recLogo
+    ? `<img src="${recLogo}" alt="${client.recommended.provider}" style="height:72px;width:auto;display:block;margin-bottom:14px;">`
+    : "";
 
-  return `
-<div class="info-card">
-  <h4>Recommendation - ${v(client.name, "Client")}</h4>
-  <div class="dual-cover-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th class="header-recommended" colspan="2">
-            <div class="provider-header-cell">${recBadge}<div class="provider-header-label">Recommended</div></div>
-          </th>
-          <th class="spacer-col"></th>
-          <th class="header-current" colspan="2">
-            <div class="provider-header-cell">${curBadge}<div class="provider-header-label">Current</div></div>
-          </th>
-        </tr>
-        <tr>
-          <th style="background:var(--white);color:var(--dark);">Item</th>
-          <th style="background:var(--white);color:var(--dark);">Details</th>
-          <th class="spacer-col"></th>
-          <th style="background:var(--white);color:var(--dark);">Item</th>
-          <th style="background:var(--white);color:var(--dark);">Details</th>
-        </tr>
-      </thead>
+  const panelRows = [
+    { label: "Provider", value: v(client.recommended.provider, "—") },
+    { label: "Fund", value: v(client.recommended.fund, "—") },
+    { label: "Risk profile", value: v(client.riskProfileOutcome, "—") },
+  ];
+  if (recData?.fees.fundFeePercent) panelRows.push({ label: "Total fee (p.a.)", value: recData.fees.fundFeePercent });
+  if (recDesc) {
+    panelRows.push({ label: "Min. timeframe", value: recDesc.minTimeframe });
+    panelRows.push({ label: "Risk indicator", value: `${recDesc.riskIndicator} / 7` });
+  }
+
+  const panelHtml = panelRows.map(r =>
+    `<div class="rec-row"><span class="rec-label">${r.label}</span><span class="rec-value">${r.value}</span></div>`
+  ).join("\n          ");
+
+  const allocBar = recDesc ? `
+    <div class="alloc-bar-wrap">
+      <div class="alloc-bar-label">Target asset allocation</div>
+      <div class="alloc-bar">
+        <div class="alloc-growth" style="width:${recDesc.growthPercent}%;"></div>
+        <div class="alloc-income" style="width:${recDesc.incomePercent}%;"></div>
+      </div>
+      <div class="alloc-bar-legend">
+        <span class="leg-growth">Growth ${recDesc.growthPercent}%</span>
+        <span class="leg-income">Income ${recDesc.incomePercent}%</span>
+      </div>
+    </div>` : "";
+
+  const currentSummary = client.current.provider ? `
+  <div class="info-card" style="margin-top:var(--sp-sm);">
+    <h4>Your current position</h4>
+    <table class="ks-compare">
       <tbody>
-        <tr><td>Provider</td><td>${v(client.recommended.provider, "N/A")}</td><td class="spacer-col"></td><td>Provider</td><td>${v(client.current.provider, "N/A")}</td></tr>
-        <tr><td>Fund</td><td>${v(client.recommended.fund, "N/A")}</td><td class="spacer-col"></td><td>Fund</td><td>${v(client.current.fund, "N/A")}</td></tr>
-        <tr><td>Risk profile</td><td>${v(client.riskProfileOutcome, "N/A")}</td><td class="spacer-col"></td><td>Balance</td><td>${v(client.current.balance, "N/A")}</td></tr>
+        <tr class="ks-row"><td class="ks-row-label" style="width:180px;">Provider</td><td style="padding:10px 16px;font-size:10pt;">${v(client.current.provider, "—")}</td></tr>
+        <tr class="ks-row"><td class="ks-row-label" style="width:180px;">Fund</td><td style="padding:10px 16px;font-size:10pt;">${v(client.current.fund, "—")}</td></tr>
+        ${client.current.balance ? `<tr class="ks-row"><td class="ks-row-label" style="width:180px;">Balance</td><td style="padding:10px 16px;font-size:10pt;">${client.current.balance}</td></tr>` : ""}
       </tbody>
     </table>
+  </div>` : "";
+
+  return `
+<div class="rec-layout">
+  <div class="rec-text">
+    {{ RECOMMENDATION_SUMMARY_PARAGRAPH }}
+    ${currentSummary}
+  </div>
+  <div class="rec-panel">
+    ${recLogoHtml}
+    <div class="rec-panel-title">Recommendation summary</div>
+    ${panelHtml}
+    ${allocBar}
   </div>
 </div>`;
 }
@@ -174,6 +203,37 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
 </div>`;
 }
 
+function buildFundDescBlock(
+  recData: ProviderData | null,
+  recDesc: FundDescription | null,
+  curData: ProviderData | null,
+  curDesc: FundDescription | null,
+): string {
+  let html = "";
+
+  if (recDesc && recData) {
+    html += `
+<div class="fund-desc">
+  <div class="fund-desc-title">About the ${v(recData.provider)} ${v(recData.fund)} Fund</div>
+  <p><strong>Objective:</strong> ${recDesc.objective}</p>
+  <p><strong>Suitable for:</strong> ${recDesc.suitableFor}</p>
+  <p><strong>Minimum suggested timeframe:</strong> ${recDesc.minTimeframe} &nbsp;|&nbsp; <strong>Risk indicator:</strong> ${recDesc.riskIndicator} / 7</p>
+</div>`;
+  }
+
+  if (curDesc && curData && curData.provider !== recData?.provider) {
+    html += `
+<div class="fund-desc">
+  <div class="fund-desc-title">About the ${v(curData.provider)} ${v(curData.fund)} Fund</div>
+  <p><strong>Objective:</strong> ${curDesc.objective}</p>
+  <p><strong>Suitable for:</strong> ${curDesc.suitableFor}</p>
+  <p><strong>Minimum suggested timeframe:</strong> ${curDesc.minTimeframe} &nbsp;|&nbsp; <strong>Risk indicator:</strong> ${curDesc.riskIndicator} / 7</p>
+</div>`;
+  }
+
+  return html;
+}
+
 function buildSignatureBlock(clientName: string): string {
   return `
 <div class="signature-grid single">
@@ -225,12 +285,17 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
   let currentProviderData: ProviderData | null = null;
   let recommendedProviderData: ProviderData | null = null;
 
+  let recFundDesc: FundDescription | null = null;
+  let curFundDesc: FundDescription | null = null;
+
   try {
     if (client.current.provider && client.current.fund) {
       currentProviderData = await getProviderData(client.current.provider, client.current.fund);
+      curFundDesc = getFundDescription(client.current.provider, client.current.fund);
     }
     if (client.recommended.provider && client.recommended.fund) {
       recommendedProviderData = await getProviderData(client.recommended.provider, client.recommended.fund);
+      recFundDesc = getFundDescription(client.recommended.provider, client.recommended.fund);
     }
   } catch (err) {
     console.warn("[KiwiSaver Pipeline] Provider fetch failed:", err);
@@ -309,7 +374,8 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     PROJECTION_ASSUMPTIONS: v(client.projections?.assumptions),
 
     // Block injections
-    RECOMMENDATION_COMPARISON_BLOCKS: buildComparisonBlock(client),
+    RECOMMENDATION_COMPARISON_BLOCKS: buildComparisonBlock(client, recFundDesc, recommendedProviderData),
+    FUND_DESCRIPTION_BLOCKS: buildFundDescBlock(recommendedProviderData, recFundDesc, currentProviderData, curFundDesc),
     FEES_TABLE_BLOCKS: buildFeesBlock(currentProviderData, recommendedProviderData),
     PERFORMANCE_TABLE_BLOCKS: buildPerformanceBlock(currentProviderData, recommendedProviderData),
     SIGNATURE_BLOCKS: buildSignatureBlock(clientName),

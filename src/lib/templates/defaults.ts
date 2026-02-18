@@ -582,28 +582,61 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 // ══════════════════════════════════════════════════════════════
 
 const KIWISAVER_EXTRA_CSS = `
-.dual-cover-wrapper .header-recommended{background:var(--bronze);color:var(--white);vertical-align:middle;padding:16px 14px;}
-.dual-cover-wrapper .header-current{background:var(--navy);color:var(--white);vertical-align:middle;padding:16px 14px;}
-.provider-logo{height:32px;width:auto;display:inline-block;vertical-align:middle;}
-.provider-logo-badge{display:inline-block;background:var(--white);border-radius:8px;padding:8px 18px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
-.provider-logo-badge img{height:38px;width:auto;display:block;}
-.provider-header-cell{text-align:center;font-size:8pt;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;}
-.provider-header-label{margin-top:6px;opacity:0.9;}
+/* ═══ SPACING SYSTEM ═══ */
+:root{--sp-xs:8px;--sp-sm:16px;--sp-md:24px;--sp-lg:40px;--sp-xl:64px;--panel-bg:#F8F6F3;--panel-bdr:#E6E1DA;--section-gap:var(--sp-lg);}
+
+/* ═══ PAGE BREAK CONTROL ═══ */
+.section-block-break{page-break-before:always;}
+.section-heading{page-break-after:avoid;page-break-inside:avoid;}
+.info-card,.callout-box,.warning-box,.ks-compare,.dual-cover-wrapper,.strategy-card,.risk-dimensions,.review-schedule{page-break-inside:avoid;break-inside:avoid;}
+.section-heading+.body-text,.section-heading+.info-card,.sub-heading+.info-card{page-break-before:avoid;}
+
+/* ═══ EDITORIAL SECTION HEADINGS ═══ */
+.section-heading{display:block;margin:var(--sp-lg) 0 var(--sp-md) 0;padding-bottom:var(--sp-sm);border-bottom:1px solid var(--panel-bdr);}
+.section-heading .num{display:inline;width:auto;height:auto;min-width:auto;background:none;color:var(--bronze);border-radius:0;font-family:var(--font-display);font-size:11pt;font-weight:400;letter-spacing:-0.2px;}
+.section-heading .num::after{content:'.';}
+.section-heading h2{display:inline;font-family:var(--font-body);font-size:11px;font-weight:600;color:var(--dark);letter-spacing:0.12em;text-transform:uppercase;margin-left:6px;}
+.sub-heading{font-family:var(--font-body);font-size:10px;font-weight:600;color:var(--dark);letter-spacing:0.08em;text-transform:uppercase;margin:var(--sp-md) 0 var(--sp-sm) 0;page-break-after:avoid;}
+
+/* ═══ PANELS (replace heavy cards) ═══ */
+.info-card{background:var(--panel-bg);border:1px solid var(--panel-bdr);border-radius:0;padding:var(--sp-md);margin-bottom:var(--sp-md);box-shadow:none;}
+.info-card h4{font-family:var(--font-body);font-size:10px;font-weight:600;color:var(--dark);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--sp-sm);padding-bottom:6px;border-bottom:1px solid var(--panel-bdr);display:block;}
+
+/* ═══ BODY TEXT RHYTHM ═══ */
+.body-text{margin-bottom:var(--sp-sm);line-height:1.68;font-size:10pt;}
+.body-text em{color:var(--muted);font-style:italic;}
+
+/* ═══ CALLOUT & WARNING ═══ */
+.callout-box{background:var(--panel-bg);border:1px solid var(--panel-bdr);border-left:2px solid var(--bronze);padding:var(--sp-sm) var(--sp-md);margin:var(--sp-sm) 0;font-size:9.5pt;line-height:1.6;border-radius:0;}
+.warning-box{background:#FFFBF5;border:1px solid #E8D5B8;border-left:2px solid #D4A060;padding:var(--sp-sm) var(--sp-md);margin:var(--sp-sm) 0;font-size:9.5pt;line-height:1.6;border-radius:0;}
+
+/* ═══ KS COMPARE TABLES (refined) ═══ */
 .ks-compare{width:100%;border-collapse:collapse;margin:0;}
 .ks-compare td,.ks-compare th{padding:0;border:none;}
-.ks-compare .ks-provider-head{padding:20px 16px 14px 16px;text-align:center;vertical-align:bottom;border-bottom:2px solid var(--rule);}
-.ks-compare .ks-provider-head img{height:52px;width:auto;display:block;margin:0 auto 6px auto;}
-.ks-compare .ks-provider-head .ks-fund-name{font-family:var(--font-body);font-size:8.5pt;font-weight:600;color:var(--dark);letter-spacing:0.2px;}
-.ks-compare .ks-provider-head .ks-provider-tag{font-size:7pt;font-weight:600;color:var(--bronze);text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
-.ks-compare .ks-label-head{padding:20px 16px 14px 0;vertical-align:bottom;border-bottom:2px solid var(--rule);}
-.ks-compare .ks-row td{padding:11px 16px;border-bottom:1px solid var(--rule-lt);vertical-align:middle;}
+.ks-compare .ks-provider-head{padding:var(--sp-md) var(--sp-sm) 14px var(--sp-sm);text-align:center;vertical-align:bottom;border-bottom:1px solid var(--panel-bdr);}
+.ks-compare .ks-provider-head img{height:72px;width:auto;display:block;margin:0 auto 10px auto;}
+.ks-compare .ks-provider-head .ks-fund-name{font-family:var(--font-body);font-size:9pt;font-weight:600;color:var(--dark);letter-spacing:0.2px;}
+.ks-compare .ks-provider-head .ks-provider-tag{font-size:7pt;font-weight:600;color:var(--bronze);text-transform:uppercase;letter-spacing:1.2px;margin-top:4px;}
+.ks-compare .ks-label-head{padding:var(--sp-md) var(--sp-sm) 14px 0;vertical-align:bottom;border-bottom:1px solid var(--panel-bdr);}
+.ks-compare .ks-row td{padding:12px var(--sp-sm);border-bottom:1px solid rgba(230,225,218,0.5);vertical-align:middle;}
 .ks-compare .ks-row:last-child td{border-bottom:none;}
 .ks-compare .ks-row-label{font-size:9pt;font-weight:500;color:var(--muted);}
 .ks-compare .ks-row-val{text-align:center;font-family:var(--font-display);font-size:13pt;font-weight:400;color:var(--black);letter-spacing:-0.3px;}
 .ks-compare .ks-row-val.na{font-family:var(--font-body);font-size:9pt;color:var(--subtle);font-style:italic;font-weight:400;}
-.dual-cover-wrapper .spacer-col{width:20px;background:var(--white);border-bottom:1px solid var(--rule);}
+
+/* ═══ DUAL COVER / COMPARISON ═══ */
+.dual-cover-wrapper .header-recommended{background:var(--bronze);color:var(--white);vertical-align:middle;padding:var(--sp-sm) 14px;}
+.dual-cover-wrapper .header-current{background:var(--navy);color:var(--white);vertical-align:middle;padding:var(--sp-sm) 14px;}
+.dual-cover-wrapper .spacer-col{width:var(--sp-md);background:var(--white);border-bottom:1px solid var(--panel-bdr);}
+.provider-logo{height:52px;width:auto;display:inline-block;vertical-align:middle;}
+.provider-logo-badge{display:inline-block;background:var(--white);padding:12px 24px;margin-bottom:10px;}
+.provider-logo-badge img{height:60px;width:auto;display:block;}
+.provider-header-cell{text-align:center;font-size:7.5pt;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.provider-header-label{margin-top:8px;opacity:0.85;letter-spacing:1.2px;}
+
+/* ═══ BACK COVER ═══ */
 .back-cover{page-break-before:always;background:var(--navy);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 44mm);display:flex;flex-direction:column;justify-content:space-between;}
-.back-cover-top{padding-top:48px;}
+.back-cover-top{padding-top:var(--sp-xl);}
 .back-cover .back-logo{height:46px;width:auto;filter:brightness(0) invert(1);}
 .back-cover .back-rule{width:44px;height:2px;background:var(--bronze);margin:18px 0 0 0;}
 .back-cover-bottom{padding-bottom:46px;}
@@ -612,44 +645,94 @@ const KIWISAVER_EXTRA_CSS = `
 .back-cover .muted{opacity:0.78;font-size:9.5pt;}
 .back-cover .contact{margin-top:18px;font-size:10pt;}
 .back-cover a{color:var(--white);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.25);}
+
+/* ═══ SIGNATURE / CHECKBOX ═══ */
 .signature-grid.single{grid-template-columns:1fr;max-width:420px;}
 .checkbox-box svg{display:none;width:11px;height:11px;}
 .checkbox-item.checked .checkbox-box svg{display:block;}
-.decisions-box{background:var(--bronze-wash);border:1.5px solid var(--bronze-border);border-radius:10px;padding:22px 24px;margin:18px 0 22px 0;}
-.decisions-box h4{font-family:var(--font-display);font-size:12pt;color:var(--bronze);margin:0 0 14px 0;letter-spacing:-0.2px;}
-.decisions-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.decision-card{background:var(--white);border-radius:8px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.decision-num{font-family:var(--font-display);font-size:18pt;color:var(--bronze);font-weight:700;line-height:1;}
-.decision-title{font-weight:600;font-size:9pt;text-transform:uppercase;letter-spacing:0.5px;color:var(--dark);margin:6px 0 4px 0;}
-.decision-desc{font-size:8.5pt;color:var(--muted);line-height:1.45;}
-.strategy-card{background:var(--bronze-wash);border-left:3px solid var(--bronze);border-radius:0 8px 8px 0;padding:16px 20px;margin:14px 0;}
-.strategy-card h5{font-family:var(--font-display);font-size:10pt;color:var(--bronze);margin:0 0 8px 0;font-weight:600;}
-.strategy-card p{margin:0;font-size:9.5pt;line-height:1.55;color:var(--dark);}
-.research-funnel{margin:18px 0;border-collapse:collapse;width:100%;}
-.research-funnel td{padding:10px 16px;vertical-align:top;border-bottom:1px solid var(--rule-lt);}
-.research-funnel .funnel-stage{font-weight:600;font-size:9pt;color:var(--bronze);text-transform:uppercase;letter-spacing:0.5px;width:140px;}
-.research-funnel .funnel-desc{font-size:9.5pt;color:var(--dark);line-height:1.5;}
+
+/* ═══ DECISIONS BOX (minimalist) ═══ */
+.decisions-box{border-top:1px solid var(--panel-bdr);border-bottom:1px solid var(--panel-bdr);padding:var(--sp-md) 0;margin:var(--sp-md) 0;}
+.decisions-box h4{font-family:var(--font-body);font-size:10px;font-weight:600;color:var(--bronze);letter-spacing:0.12em;text-transform:uppercase;margin:0 0 var(--sp-sm) 0;}
+.decisions-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;}
+.decision-card{padding:0 var(--sp-md) 0 0;border-right:1px solid var(--panel-bdr);background:none;border-radius:0;box-shadow:none;}
+.decision-card:last-child{border-right:none;padding-right:0;}
+.decision-card:not(:first-child){padding-left:var(--sp-md);}
+.decision-num{font-family:var(--font-display);font-size:20pt;color:var(--bronze);font-weight:400;line-height:1;}
+.decision-title{font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--dark);margin:4px 0 3px 0;}
+.decision-desc{font-size:8.5pt;color:var(--muted);line-height:1.5;}
+
+/* ═══ STRATEGY CARDS ═══ */
+.strategy-card{background:var(--panel-bg);border:none;border-left:2px solid var(--bronze);border-radius:0;padding:var(--sp-sm) var(--sp-md);margin:var(--sp-sm) 0;}
+.strategy-card h5{font-family:var(--font-body);font-size:9px;font-weight:600;color:var(--bronze);letter-spacing:0.1em;text-transform:uppercase;margin:0 0 6px 0;}
+.strategy-card p{margin:0;font-size:9.5pt;line-height:1.6;color:var(--dark);}
+
+/* ═══ RESEARCH FUNNEL ═══ */
+.research-funnel{margin:var(--sp-sm) 0;border-collapse:collapse;width:100%;}
+.research-funnel td{padding:10px var(--sp-sm);vertical-align:top;border-bottom:1px solid rgba(230,225,218,0.5);}
+.research-funnel .funnel-stage{font-weight:600;font-size:9px;color:var(--bronze);text-transform:uppercase;letter-spacing:0.08em;width:120px;}
+.research-funnel .funnel-desc{font-size:9.5pt;color:var(--dark);line-height:1.55;}
+
+/* ═══ IMPLEMENTATION CHECKLIST ═══ */
 .impl-checklist{list-style:none;padding:0;margin:0;}
-.impl-checklist li{padding:10px 0 10px 32px;border-bottom:1px solid var(--rule-lt);position:relative;font-size:9.5pt;line-height:1.5;}
+.impl-checklist li{padding:10px 0 10px 28px;border-bottom:1px solid rgba(230,225,218,0.5);position:relative;font-size:9.5pt;line-height:1.55;}
 .impl-checklist li:last-child{border-bottom:none;}
-.impl-checklist li::before{content:'\\2610';position:absolute;left:6px;top:10px;font-size:13pt;color:var(--bronze);}
+.impl-checklist li::before{content:'\\2610';position:absolute;left:4px;top:10px;font-size:12pt;color:var(--bronze);}
+
+/* ═══ SOURCE LIST ═══ */
 .source-list{list-style:none;padding:0;margin:0;}
-.source-list li{padding:6px 0;border-bottom:1px solid var(--rule-lt);font-size:8.5pt;line-height:1.5;}
+.source-list li{padding:6px 0;border-bottom:1px solid rgba(230,225,218,0.5);font-size:8.5pt;line-height:1.55;}
 .source-list li:last-child{border-bottom:none;}
 .source-list .source-name{font-weight:600;color:var(--dark);}
 .source-list .source-url{color:var(--muted);font-style:italic;}
-.change-trigger-list{columns:2;column-gap:24px;list-style:none;padding:0;margin:0;}
-.change-trigger-list li{padding:5px 0 5px 18px;position:relative;font-size:9pt;color:var(--dark);break-inside:avoid;}
-.change-trigger-list li::before{content:'\\25B8';position:absolute;left:0;color:var(--bronze);}
-.risk-dimensions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:14px 0;}
-.risk-dim-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;text-align:center;}
-.risk-dim-card .dim-label{font-size:7.5pt;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;margin-bottom:6px;}
+
+/* ═══ CHANGE TRIGGERS ═══ */
+.change-trigger-list{columns:2;column-gap:var(--sp-md);list-style:none;padding:0;margin:0;}
+.change-trigger-list li{padding:4px 0 4px 14px;position:relative;font-size:9pt;color:var(--dark);break-inside:avoid;}
+.change-trigger-list li::before{content:'\\2014';position:absolute;left:0;color:var(--bronze);font-size:8pt;}
+
+/* ═══ RISK DIMENSIONS ═══ */
+.risk-dimensions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-sm);margin:var(--sp-sm) 0;}
+.risk-dim-card{background:var(--panel-bg);border:1px solid var(--panel-bdr);border-radius:0;padding:var(--sp-sm);text-align:center;}
+.risk-dim-card .dim-label{font-size:7.5pt;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:600;margin-bottom:6px;}
 .risk-dim-card .dim-value{font-family:var(--font-display);font-size:14pt;color:var(--dark);font-weight:400;letter-spacing:-0.3px;}
-.review-schedule{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
-.review-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;}
-.review-card h5{font-size:9pt;font-weight:600;color:var(--dark);text-transform:uppercase;letter-spacing:0.3px;margin:0 0 6px 0;}
-.review-card p,.review-card ul{font-size:9pt;color:var(--muted);line-height:1.5;margin:0;}
-.review-card ul{padding-left:16px;margin-top:4px;}
+
+/* ═══ REVIEW SCHEDULE ═══ */
+.review-schedule{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);margin:var(--sp-sm) 0;}
+.review-card{background:var(--panel-bg);border:1px solid var(--panel-bdr);border-radius:0;padding:var(--sp-sm);}
+.review-card h5{font-size:9px;font-weight:600;color:var(--dark);text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px 0;}
+.review-card p,.review-card ul{font-size:9pt;color:var(--muted);line-height:1.55;margin:0;}
+.review-card ul{padding-left:var(--sp-sm);margin-top:4px;}
+
+/* ═══ RECOMMENDATION TWO-COLUMN ═══ */
+.rec-layout{display:grid;grid-template-columns:1fr 280px;gap:var(--sp-md);margin:var(--sp-sm) 0;page-break-inside:avoid;}
+.rec-layout .rec-text{font-size:10pt;line-height:1.65;}
+.rec-panel{background:var(--panel-bg);border:1px solid var(--panel-bdr);padding:var(--sp-md);}
+.rec-panel .rec-panel-title{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--bronze);margin-bottom:var(--sp-sm);}
+.rec-panel .rec-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(230,225,218,0.5);font-size:9pt;}
+.rec-panel .rec-row:last-child{border-bottom:none;}
+.rec-panel .rec-label{color:var(--muted);font-weight:500;}
+.rec-panel .rec-value{color:var(--dark);font-weight:600;text-align:right;}
+
+/* ═══ FUND DESCRIPTION PANEL ═══ */
+.fund-desc{background:var(--panel-bg);border:1px solid var(--panel-bdr);padding:var(--sp-md);margin:var(--sp-sm) 0;page-break-inside:avoid;}
+.fund-desc .fund-desc-title{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--bronze);margin-bottom:8px;}
+.fund-desc p{font-size:9.5pt;line-height:1.6;color:var(--dark);margin:0 0 6px 0;}
+.fund-desc p:last-child{margin-bottom:0;}
+
+/* ═══ ASSET ALLOCATION BAR ═══ */
+.alloc-bar-wrap{margin:var(--sp-sm) 0;}
+.alloc-bar-label{font-size:8pt;color:var(--muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
+.alloc-bar{display:flex;height:10px;width:100%;overflow:hidden;}
+.alloc-bar .alloc-growth{background:var(--bronze);height:100%;}
+.alloc-bar .alloc-income{background:var(--navy);height:100%;opacity:0.3;}
+.alloc-bar-legend{display:flex;gap:var(--sp-md);margin-top:6px;font-size:8pt;color:var(--muted);}
+.alloc-bar-legend span::before{content:'';display:inline-block;width:8px;height:8px;margin-right:4px;vertical-align:middle;}
+.alloc-bar-legend .leg-growth::before{background:var(--bronze);}
+.alloc-bar-legend .leg-income::before{background:var(--navy);opacity:0.3;}
+
+/* ═══ DATA TABLE REFINEMENT ═══ */
+.data-table th{background:var(--panel-bg);color:var(--dark);border-bottom:1px solid var(--panel-bdr);}
 `;
 
 function buildKiwisaverTemplate(): string {
@@ -925,6 +1008,11 @@ function buildKiwisaverTemplate(): string {
 </div>
 
 <!-- ═══ SECTION 5 — FUND TYPES & RISK ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
 <div class="section-heading"><div class="num">5</div><h2>Fund Types and Investment Risk</h2></div>
 <p class="body-text">KiwiSaver funds are categorised by their asset allocation and risk level. The right fund depends on your investment timeframe, goals, and comfort with short-term losses.</p>
 
@@ -952,6 +1040,7 @@ function buildKiwisaverTemplate(): string {
 <p class="body-text"><strong>Growth assets</strong> (shares, property, infrastructure) offer higher long-term returns but with more volatility. <strong>Income assets</strong> (bonds, cash, term deposits) provide stability but lower returns over time. The right balance depends on how long you have until you need the money.</p>
 
 <div class="callout-box"><strong>Key principle:</strong> The longer your investment timeframe, the more growth assets your portfolio can afford. Short-term losses are smoothed out over longer periods, and historically, growth-oriented funds have outperformed conservative funds over 10+ year horizons.</div>
+</div>
 
 <!-- ═══ SECTION 6 — YOUR RISK PROFILE ═══ -->
 <div class="section-block section-block-break">
@@ -1103,26 +1192,44 @@ function buildKiwisaverTemplate(): string {
 </div>
 
 <!-- ═══ SECTION 10 — RECOMMENDATION ═══ -->
-<div class="section-heading"><div class="num">10</div><h2>Our Recommendation</h2></div>
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
 
-<p class="body-text">{{ RECOMMENDATION_SUMMARY_PARAGRAPH }}</p>
+<div class="section-heading"><div class="num">10</div><h2>Our Recommendation</h2></div>
 
 {{ RECOMMENDATION_COMPARISON_BLOCKS }}
 
+{{ FUND_DESCRIPTION_BLOCKS }}
+
 <div class="warning-box"><strong>Timing:</strong> This recommendation should not be acted on after <strong>30 days</strong> from the date of this advice without prior consultation. Markets and personal circumstances change, and the suitability of this advice may be affected.</div>
+</div>
 
 <!-- ═══ SECTION 11 — FEES & COSTS ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
 <div class="section-heading"><div class="num">11</div><h2>Fees and Costs</h2></div>
 <p class="body-text">All KiwiSaver funds charge fees, which are deducted from your investment balance. Fees reduce your returns and compound over time, so even small differences can have a meaningful impact on your long-term outcome.</p>
 <p class="body-text">Fee information below is sourced directly from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong>.</p>
 
 {{ FEES_TABLE_BLOCKS }}
+</div>
 
 <!-- ═══ SECTION 12 — PERFORMANCE ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
 <div class="section-heading"><div class="num">12</div><h2>Fund Performance</h2></div>
 <p class="body-text">Historical performance provides context about how a fund has performed through different market conditions. Returns shown are annualised (the average return per year over the period) and are calculated after fund fees but before tax.</p>
 
 {{ PERFORMANCE_TABLE_BLOCKS }}
+</div>
 
 <!-- ═══ SECTION 13 — PROJECTIONS (only if data exists) ═══ -->
 {% if HAS_PROJECTIONS %}
@@ -1184,6 +1291,11 @@ function buildKiwisaverTemplate(): string {
 </div>
 
 <!-- ═══ SECTION 15 — KEY RISKS ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
 <div class="section-heading"><div class="num">15</div><h2>Key Risks and Considerations</h2></div>
 
 <p class="body-text">All investments carry risk. It is important you understand the following before acting on this advice:</p>
@@ -1197,6 +1309,7 @@ function buildKiwisaverTemplate(): string {
   <li><strong>Provider risk:</strong> While KiwiSaver funds are held in trust (separate from the provider's own assets), there is still a small risk of operational failure or regulatory action.</li>
   <li><strong>Basis of advice:</strong> This advice is based on the information you provided at the time of your meeting. If your circumstances change, please contact us for a review.</li>
 </ul>
+</div>
 
 <!-- ═══ SECTION 16 — ONGOING SERVICE & REVIEW ═══ -->
 <div class="section-block section-block-break">
@@ -1240,6 +1353,11 @@ function buildKiwisaverTemplate(): string {
 </div>
 
 <!-- ═══ SECTION 17 — FEES, COMMISSION & CONFLICTS ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
 <div class="section-heading"><div class="num">17</div><h2>Adviser Fees, Commission &amp; Conflicts of Interest</h2></div>
 
 <p class="body-text"><strong>There is no direct fee charged to you for this KiwiSaver advice.</strong></p>
@@ -1264,8 +1382,14 @@ function buildKiwisaverTemplate(): string {
   <li>Maintaining a conflicts register and completing annual compliance training</li>
 </ul>
 <p class="body-text">We confirm that no conflict of interest has influenced the recommendation in this document.</p>
+</div>
 
 <!-- ═══ SECTION 18 — COMPLAINTS & PRIVACY ═══ -->
+<div class="section-block section-block-break">
+<div class="header">
+  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
+</div>
+
 <div class="section-heading"><div class="num">18</div><h2>Complaints, Disputes &amp; Privacy</h2></div>
 
 <p class="body-text"><strong>Internal complaints:</strong> If you have a concern about our service, please contact us directly:</p>
@@ -1275,6 +1399,7 @@ function buildKiwisaverTemplate(): string {
 <p class="body-text" style="margin-left:16px;"><strong>Financial Dispute Resolution Service (FDRS)</strong><br>Website: fdrs.org.nz | Email: enquiries@fdrs.org.nz<br>Freepost 231075, PO Box 2272, Wellington 6140</p>
 
 <p class="body-text"><strong>Privacy:</strong> We collect personal information to provide advice and arrange financial products. Information may be shared with product providers, compliance partners, and service providers as required. Records are retained for a minimum of seven years in accordance with regulatory requirements. You may request access to or correction of your information at any time.</p>
+</div>
 
 <!-- ═══ SECTION 19 — APPENDICES & REFERENCES ═══ -->
 <div class="section-block section-block-break">
@@ -1321,7 +1446,8 @@ function buildKiwisaverTemplate(): string {
 </div>
 
 <!-- ═══ SECTION 20 — SIGN-OFF ═══ -->
-<div class="header page-break">
+<div class="section-block section-block-break">
+<div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
@@ -1353,6 +1479,7 @@ function buildKiwisaverTemplate(): string {
 <div class="footer">
   <span>Statement of Advice | Confidential</span>
   <span>Craig Smith Business Services Limited | FAP Licence #712931 | <a href="https://www.smiths.net.nz">www.smiths.net.nz</a></span>
+</div>
 </div>
 
 <!-- ═══ BACK COVER ═══ -->
