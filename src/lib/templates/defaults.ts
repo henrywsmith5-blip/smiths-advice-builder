@@ -546,7 +546,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   <p class="body-text">I, <strong><em>{{ CLIENT_A_NAME }}</em></strong>, have read and understand this report and wish to:</p>
   {% endif %}
   <div class="checkbox-group" style="margin:14px 0;">
-    <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label"><strong>ACCEPT</strong> the sign-off document</span></div>
+    <div class="checkbox-item checked"><span class="checkbox-box"></span><span class="checkbox-label"><strong>ACCEPT</strong> the sign-off document</span></div>
     <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label"><strong>DECLINE</strong> the sign-off document</span></div>
     <div class="checkbox-item"><span class="checkbox-box"></span><span class="checkbox-label"><strong>MODIFY</strong> the sign-off document (see notes below)</span></div>
   </div>
