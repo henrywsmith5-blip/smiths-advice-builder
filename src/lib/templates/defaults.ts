@@ -200,7 +200,7 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
   <div class="cover-adviser-block">
     <p><strong>{{ ADVISER_NAME }}</strong></p>
-    <p>Financial Adviser | FSP #33042</p>
+    <p>Financial Adviser | {{ ADVISER_FSP }}</p>
     <p>Craig Smith Business Services Limited</p>
     <p>FAP Licence #712931</p>
   </div>
@@ -253,8 +253,8 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 
 <div class="section-heading"><div class="num">2</div><h2>Nature and Scope of Advice Provided</h2></div>
 <p class="body-text"><em>"What we do (and don't do) for our clients"</em></p>
-<p class="body-text">Craig Smith (your Financial Adviser) in working for Craig Smith Business Services Limited (the Financial Advice Provider) provides advice to clients about their investments, life insurance, health insurance and certain general insurance such as home, car, and contents insurance.</p>
-<p class="body-text">Craig Smith provides financial advice in relation to KiwiSaver, managed funds, life insurance, health insurance, home, car and contents insurance. He only provides financial advice about products from certain providers:</p>
+<p class="body-text">{{ ADVISER_NAME }} (your Financial Adviser) in working for Craig Smith Business Services Limited (the Financial Advice Provider) provides advice to clients about their investments, life insurance, health insurance and certain general insurance such as home, car, and contents insurance.</p>
+<p class="body-text">{{ ADVISER_NAME }} provides financial advice in relation to KiwiSaver, managed funds, life insurance, health insurance, home, car and contents insurance. They only provide financial advice about products from certain providers:</p>
 
 <table class="provider-table">
   <tr><td>Life Insurance:</td><td>Partners Life, AIA, Asteron, Fidelity Life, Chubb and Pinnacle</td></tr>
@@ -798,8 +798,8 @@ function buildKiwisaverTemplate(): string {
   </div>
 
   <div class="cover-adviser-block">
-    <p><strong>Craig Smith</strong></p>
-    <p>Financial Adviser | FSP #33042</p>
+    <p><strong>{{ ADVISER_NAME }}</strong></p>
+    <p>Financial Adviser | {{ ADVISER_FSP }}</p>
     <p>Craig Smith Business Services Limited</p>
     <p>FAP Licence #712931</p>
   </div>
@@ -877,8 +877,8 @@ function buildKiwisaverTemplate(): string {
 
   <div class="info-card">
     <h4>Your adviser</h4>
-    <p class="body-text"><strong>Craig Smith</strong> (FSP #33042) is your Financial Adviser, operating under <strong>Craig Smith Business Services Limited</strong> (FAP Licence #712931). Craig is authorised to provide financial advice under the Financial Markets Conduct Act 2013 and complies with the Code of Professional Conduct for Financial Advice Services (the Financial Advice Code).</p>
-    <p class="body-text">Under the Financial Advice Code, Craig has a duty to treat you fairly, give advice that is suitable for your circumstances, ensure you understand the advice, and act with integrity at all times.</p>
+    <p class="body-text"><strong>{{ ADVISER_NAME }}</strong> ({{ ADVISER_FSP }}) is your Financial Adviser, operating under <strong>Craig Smith Business Services Limited</strong> (FAP Licence #712931). {{ ADVISER_NAME }} is authorised to provide financial advice under the Financial Markets Conduct Act 2013 and complies with the Code of Professional Conduct for Financial Advice Services (the Financial Advice Code).</p>
+    <p class="body-text">Under the Financial Advice Code, {{ ADVISER_NAME }} has a duty to treat you fairly, give advice that is suitable for your circumstances, ensure you understand the advice, and act with integrity at all times.</p>
   </div>
 
   <div class="info-card">
@@ -1525,8 +1525,8 @@ function buildKiwisaverTemplate(): string {
     <h3>Smiths Insurance &amp; KiwiSaver</h3>
     <p class="muted">Practical advice. Clear documentation. Ongoing support when it matters.</p>
     <div class="contact">
-      <p><strong>Craig Smith</strong> - Financial Adviser | FSP #33042</p>
-      <p>craig@smiths.net.nz | 0274 293 939</p>
+      <p><strong>{{ ADVISER_NAME }}</strong> - Financial Adviser | {{ ADVISER_FSP }}</p>
+      <p>{{ ADVISER_EMAIL }} | {{ ADVISER_PHONE }}</p>
       <p>FAP Licence #712931</p>
       <p><a href="https://www.smiths.net.nz">www.smiths.net.nz</a></p>
     </div>

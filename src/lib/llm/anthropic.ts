@@ -131,11 +131,11 @@ IMPORTANT: Return ONLY the JSON object. No markdown code fences. No explanation.
   return prompt;
 }
 
-function buildWriterPrompt(extractedJson: ExtractedJson, docType: string): string {
+function buildWriterPrompt(extractedJson: ExtractedJson, docType: string, adviserName = "Craig Smith"): string {
   const isROA = docType === "ROA";
   const tense = isROA ? "PAST tense (was implemented, was arranged)" : "FUTURE tense (we recommend, will provide)";
 
-  return `You are Craig Smith, a professional NZ financial adviser writing for Smiths Insurance & KiwiSaver.
+  return `You are ${adviserName}, a professional NZ financial adviser writing for Smiths Insurance & KiwiSaver.
 
 TASK: Write polished HTML content sections for a ${docType} (${isROA ? "Record of Advice" : "Statement of Advice"}).
 
@@ -332,8 +332,8 @@ export class AnthropicProvider implements LLMProvider {
     return normalized;
   }
 
-  async writeSections(extractedJson: ExtractedJson, docType: string): Promise<WriterOutput> {
-    const prompt = buildWriterPrompt(extractedJson, docType);
+  async writeSections(extractedJson: ExtractedJson, docType: string, adviserName?: string): Promise<WriterOutput> {
+    const prompt = buildWriterPrompt(extractedJson, docType, adviserName);
     console.log(`[Anthropic] Writer: ${prompt.length} chars`);
 
     let response;

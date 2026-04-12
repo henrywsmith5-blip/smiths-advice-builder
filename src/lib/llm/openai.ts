@@ -99,7 +99,7 @@ export class OpenAIProvider implements LLMProvider {
     return ExtractedJsonSchema.parse({ client: {}, doc_type: input.docType, sections_included: {}, missing_fields: ["Extraction failed"] });
   }
 
-  async writeSections(extractedJson: ExtractedJson, docType: string): Promise<WriterOutput> {
+  async writeSections(extractedJson: ExtractedJson, docType: string, _adviserName?: string): Promise<WriterOutput> {
     const prompt = buildWriterPrompt(extractedJson, docType);
     const response = await client.chat.completions.create({
       model: MODEL,

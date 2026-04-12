@@ -56,6 +56,10 @@ export async function POST(
       clientAHasExisting: body.clientAHasExisting ?? caseRecord.clientAHasExisting ?? false,
       clientBHasExisting: body.clientBHasExisting ?? caseRecord.clientBHasExisting ?? false,
       saveCase: body.saveCase ?? true,
+      adviserName: session.adviserName || "Craig Smith",
+      adviserEmail: session.adviserEmail || "craig@smiths.net.nz",
+      adviserPhone: session.adviserPhone || "0274 293 939",
+      adviserFsp: session.adviserFsp || "FSP33042",
     });
 
     console.log(`[Generate] Complete: docId=${result.docId}`);

@@ -8,8 +8,8 @@ export interface KiwisaverWriterOutput {
   sections: Record<string, { included: boolean; html: string }>;
 }
 
-function buildKiwisaverWriterPrompt(factPack: KiwisaverFactPack): string {
-  return `You are Craig Smith, a professional NZ financial adviser writing for Smiths Insurance & KiwiSaver.
+function buildKiwisaverWriterPrompt(factPack: KiwisaverFactPack, adviserName = "Craig Smith"): string {
+  return `You are ${adviserName}, a professional NZ financial adviser writing for Smiths Insurance & KiwiSaver.
 
 TASK: Write polished HTML content sections for a KiwiSaver Statement of Advice.
 
@@ -41,8 +41,8 @@ SECTION KEYS:
 Return ONLY valid JSON. No markdown.`;
 }
 
-export async function writeKiwisaverSections(factPack: KiwisaverFactPack): Promise<KiwisaverWriterOutput> {
-  const prompt = buildKiwisaverWriterPrompt(factPack);
+export async function writeKiwisaverSections(factPack: KiwisaverFactPack, adviserName?: string): Promise<KiwisaverWriterOutput> {
+  const prompt = buildKiwisaverWriterPrompt(factPack, adviserName);
 
   const response = await anthropic.messages.create({
     model: MODEL,

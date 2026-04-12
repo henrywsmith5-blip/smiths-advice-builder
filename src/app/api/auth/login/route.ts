@@ -35,6 +35,10 @@ export async function POST(request: NextRequest) {
     session.userId = user.id;
     session.email = user.email;
     session.isLoggedIn = true;
+    session.adviserName = user.adviserName;
+    session.adviserEmail = user.adviserEmail;
+    session.adviserPhone = user.adviserPhone;
+    session.adviserFsp = user.adviserFsp;
     await session.save();
 
     return NextResponse.json({ ok: true, email: user.email });

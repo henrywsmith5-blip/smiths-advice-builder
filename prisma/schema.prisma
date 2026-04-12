@@ -23,6 +23,10 @@ model User {
   id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String   @map("password_hash")
+  adviserName  String   @default("Craig Smith") @map("adviser_name")
+  adviserEmail String   @default("craig@smiths.net.nz") @map("adviser_email")
+  adviserPhone String   @default("0274 293 939") @map("adviser_phone")
+  adviserFsp   String   @default("FSP33042") @map("adviser_fsp")
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@map("users")

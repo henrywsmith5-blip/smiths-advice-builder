@@ -439,7 +439,7 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
 
   // Step 4: Writer - generate narrative sections
   console.log("[KiwiSaver Pipeline] Writing sections...");
-  const writerOutput = await writeKiwisaverSections(factPack);
+  const writerOutput = await writeKiwisaverSections(factPack, input.adviserName);
 
   const sec = (key: string): string => {
     if (writerOutput.sections[key]?.included) return writerOutput.sections[key].html || "";
@@ -517,6 +517,12 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     FEES_TABLE_BLOCKS: buildFeesBlock(currentProviderData, recommendedProviderData),
     PERFORMANCE_TABLE_BLOCKS: buildPerformanceBlock(currentProviderData, recommendedProviderData),
     SIGNATURE_BLOCKS: buildSignatureBlock(clientName),
+
+    // Adviser
+    ADVISER_NAME: input.adviserName || "Craig Smith",
+    ADVISER_EMAIL: input.adviserEmail || "craig@smiths.net.nz",
+    ADVISER_PHONE: input.adviserPhone || "0274 293 939",
+    ADVISER_FSP: input.adviserFsp || "FSP33042",
 
     // Declaration
     DECLARATION_INTRO: `I, <strong><em>${clientName}</em></strong>, have read and understand this KiwiSaver Statement of Advice and wish to:`,

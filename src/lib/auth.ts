@@ -5,6 +5,10 @@ export interface SessionData {
   userId: string;
   email: string;
   isLoggedIn: boolean;
+  adviserName: string;
+  adviserEmail: string;
+  adviserPhone: string;
+  adviserFsp: string;
 }
 
 const sessionOptions = {
@@ -32,5 +36,9 @@ export async function requireAuth(): Promise<SessionData> {
     userId: session.userId,
     email: session.email,
     isLoggedIn: session.isLoggedIn,
+    adviserName: session.adviserName || "Craig Smith",
+    adviserEmail: session.adviserEmail || "craig@smiths.net.nz",
+    adviserPhone: session.adviserPhone || "0274 293 939",
+    adviserFsp: session.adviserFsp || "FSP33042",
   };
 }

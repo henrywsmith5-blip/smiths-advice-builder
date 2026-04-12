@@ -27,6 +27,10 @@ export interface GenerateInput {
   clientAHasExisting: boolean;
   clientBHasExisting: boolean;
   saveCase: boolean;
+  adviserName?: string;
+  adviserEmail?: string;
+  adviserPhone?: string;
+  adviserFsp?: string;
 }
 
 export interface GenerateResult {
@@ -91,7 +95,7 @@ export async function runGenerationPipeline(
 
   // ── Step 3: LLM Writer ──
   console.log("[Pipeline] Running writer...");
-  const writerOutput = await llm.writeSections(extractedJson, input.docType);
+  const writerOutput = await llm.writeSections(extractedJson, input.docType, input.adviserName);
   console.log("[Pipeline] Writer complete");
 
   // ── Step 4: Compute cover logic ──
@@ -167,10 +171,10 @@ export async function runGenerationPipeline(
     ENGAGEMENT_DATE: nzDate,
 
     // Adviser
-    ADVISER_NAME: "Craig Smith",
-    ADVISER_EMAIL: "craig@smiths.net.nz",
-    ADVISER_PHONE: "0274 293 939",
-    ADVISER_FSP: "FSP33042",
+    ADVISER_NAME: input.adviserName || "Craig Smith",
+    ADVISER_EMAIL: input.adviserEmail || "craig@smiths.net.nz",
+    ADVISER_PHONE: input.adviserPhone || "0274 293 939",
+    ADVISER_FSP: input.adviserFsp || "FSP33042",
 
     // Structure flags (auto-detected from extraction)
     IS_PARTNER: isPartner,

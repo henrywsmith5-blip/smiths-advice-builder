@@ -2,7 +2,7 @@ import type { ExtractedJson, WriterOutput } from "./schemas";
 
 export interface LLMProvider {
   extractCaseJson(input: ExtractInput): Promise<ExtractedJson>;
-  writeSections(extractedJson: ExtractedJson, docType: string): Promise<WriterOutput>;
+  writeSections(extractedJson: ExtractedJson, docType: string, adviserName?: string): Promise<WriterOutput>;
 }
 
 export interface ExtractInput {
