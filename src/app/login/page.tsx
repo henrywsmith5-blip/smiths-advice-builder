@@ -40,7 +40,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#FAFAF9" }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "#FFFFFF" }}>
       <div className="w-full max-w-[380px] px-6 animate-fade-in">
         {/* Logo */}
         <div className="flex justify-center mb-12">
@@ -56,8 +56,9 @@ export default function LoginPage() {
 
         {/* Card */}
         <div
-          className="bg-white rounded-2xl px-8 py-10"
+          className="rounded-2xl px-8 py-10"
           style={{
+            background: "#FAFAF9",
             boxShadow:
               "0 0 0 1px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.02), 0 12px 40px rgba(0,0,0,0.06)",
           }}
