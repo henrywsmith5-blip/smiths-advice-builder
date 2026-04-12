@@ -418,9 +418,13 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <div class="premium-card">
   {% if HAS_EXISTING_COVER %}
   <div class="premium-grid">
+    {% if OLD_PREMIUM %}
     <div class="premium-cell"><div class="p-label">Existing Premium</div><div class="p-amount">{{ OLD_PREMIUM }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
+    {% endif %}
     <div class="premium-cell"><div class="p-label">New Premium</div><div class="p-amount">{{ NEW_PREMIUM }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
+    {% if PREMIUM_CHANGE_LABEL %}
     <div class="premium-cell"><div class="p-label">{{ PREMIUM_CHANGE_LABEL }}</div><div class="p-amount">{{ PREMIUM_CHANGE }}</div><div class="p-freq">{{ PREMIUM_FREQUENCY }}</div></div>
+    {% endif %}
   </div>
   {% else %}
   <div class="premium-grid single-row">
