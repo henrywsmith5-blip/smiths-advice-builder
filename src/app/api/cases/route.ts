@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { ClientType } from "@prisma/client";
 
-// GET /api/cases - List all cases
+// GET /api/cases - List cases for the logged-in user
 export async function GET() {
   try {
+    const session = await getSession();
+    if (!session.isLoggedIn || !session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const cases = await prisma.case.findMany({
+      where: { userId: session.userId },
       orderBy: { updatedAt: "desc" },
       select: {
         id: true,
@@ -29,13 +36,19 @@ export async function GET() {
   }
 }
 
-// POST /api/cases - Create a new case
+// POST /api/cases - Create a new case for the logged-in user
 export async function POST(request: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session.isLoggedIn || !session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json().catch(() => ({}));
 
     const newCase = await prisma.case.create({
       data: {
+        userId: session.userId,
         title: body.title || `New Case — ${new Date().toLocaleDateString("en-NZ")}`,
         clientType: body.clientType === "PARTNER" ? ClientType.PARTNER : ClientType.INDIVIDUAL,
         clientAName: body.clientAName || null,

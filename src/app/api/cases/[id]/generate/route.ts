@@ -26,7 +26,7 @@ export async function POST(
     }
 
     const caseRecord = await prisma.case.findUnique({ where: { id } });
-    if (!caseRecord) {
+    if (!caseRecord || (caseRecord.userId && caseRecord.userId !== session.userId)) {
       return NextResponse.json({ error: "Case not found" }, { status: 404 });
     }
 

@@ -28,6 +28,7 @@ model User {
   adviserPhone String   @default("0274 293 939") @map("adviser_phone")
   adviserFsp   String   @default("FSP33042") @map("adviser_fsp")
   createdAt    DateTime @default(now()) @map("created_at")
+  cases        Case[]
 
   @@map("users")
 }
@@ -50,6 +51,8 @@ model Template {
 
 model Case {
   id                 String      @id @default(uuid())
+  userId             String?     @map("user_id")
+  user               User?       @relation(fields: [userId], references: [id])
   title              String      @default("")
   clientType         ClientType  @default(INDIVIDUAL) @map("client_type")
   clientAName        String?     @map("client_a_name")

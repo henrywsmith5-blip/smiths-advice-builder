@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 // GET /api/cases/:id
 export async function GET(
@@ -8,6 +9,11 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
+    const session = await getSession();
+    if (!session.isLoggedIn || !session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const c = await prisma.case.findUnique({
       where: { id },
       include: {
@@ -17,7 +23,7 @@ export async function GET(
       },
     });
 
-    if (!c) {
+    if (!c || (c.userId && c.userId !== session.userId)) {
       return NextResponse.json({ error: "Case not found" }, { status: 404 });
     }
 
@@ -34,6 +40,16 @@ export async function PATCH(
 ) {
   const { id } = await params;
   try {
+    const session = await getSession();
+    if (!session.isLoggedIn || !session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const existing = await prisma.case.findUnique({ where: { id } });
+    if (!existing || (existing.userId && existing.userId !== session.userId)) {
+      return NextResponse.json({ error: "Case not found" }, { status: 404 });
+    }
+
     const body = await request.json();
 
     const updated = await prisma.case.update({
@@ -64,6 +80,16 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
+    const session = await getSession();
+    if (!session.isLoggedIn || !session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const existing = await prisma.case.findUnique({ where: { id } });
+    if (!existing || (existing.userId && existing.userId !== session.userId)) {
+      return NextResponse.json({ error: "Case not found" }, { status: 404 });
+    }
+
     await prisma.case.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch {
