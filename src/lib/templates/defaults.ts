@@ -263,8 +263,6 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
   <tr><td>General Insurance:</td><td>AON Insurance Brokers</td></tr>
 </table>
 
-<div class="callout-box"><strong>Preferred Insurer:</strong> Our preferred insurer (if appropriate for your needs) will be AIA Life due to (1) the excellent policy benefits and product ratings, (2) their reasonable premiums, (3) the modular benefits which allow you to add and delete benefits over time without having to take a "whole package" approach.</div>
-
 <p class="body-text">In providing you with financial advice, we will only consider existing term life, trauma, income protection and health insurance policies available through the above-mentioned insurers.</p>
 <p class="body-text">We will not provide advice on existing whole of life or endowment products. Our advice is limited to New Zealand based financial insurance products only.</p>
 </div><!-- /section-block-break: Section 2 -->
