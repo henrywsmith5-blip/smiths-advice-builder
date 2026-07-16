@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { KiwisaverFactPack } from "./kiwisaver-schemas";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || "" });
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 export interface KiwisaverWriterOutput {
   sections: Record<string, { included: boolean; html: string }>;

@@ -3,7 +3,7 @@ import { KiwisaverFactPackSchema, type KiwisaverFactPack } from "./kiwisaver-sch
 import type { ExtractInput } from "./provider";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || "" });
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 function buildKiwisaverExtractPrompt(input: ExtractInput): string {
   const nzDate = new Date().toLocaleDateString("en-NZ", {

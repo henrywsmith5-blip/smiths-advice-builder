@@ -4,7 +4,7 @@ import { ExtractedJsonSchema, WriterOutputSchema } from "./schemas";
 import type { ExtractedJson, WriterOutput } from "./schemas";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = "claude-sonnet-4-5-20250929";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 function buildExtractPrompt(input: ExtractInput): string {
   const isROA = input.docType === "ROA";
