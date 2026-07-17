@@ -70,7 +70,7 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .cover-lockup{display:inline-flex;align-items:center;justify-content:center;gap:26px;flex-wrap:nowrap;}
 .cover-lockup .lockup-smiths{height:56px;width:auto;display:block;}
 .cover-lockup .lockup-divider{width:1px;height:52px;background:var(--color-border-soft);display:block;}
-.cover-lockup .lockup-ks{height:60px;width:auto;display:block;border:1px solid var(--color-border-soft);border-radius:6px;}
+.cover-lockup .lockup-ks{height:64px;width:auto;display:block;}
 .cover-doodle{display:block;margin:26px auto 0 auto;height:76px;width:auto;opacity:0.92;}
 .cover-logo-overlay{display:none;}
 .cover-page{display:flex;flex-direction:column;align-items:center;text-align:center;padding:52px 0 0 0;position:relative;}
@@ -167,10 +167,10 @@ body.production .placeholder-block{border:none;background:none;color:#3A3A3A;fon
 .footer a{color:var(--color-coral-text);text-decoration:none;}
 .page-break{page-break-before:always;margin-top:0;}
 .section-block{page-break-inside:avoid;}
-.section-block-break{page-break-before:always;}
-.section-page-2{page-break-before:always;page-break-after:always;}
+.section-block-break{margin-top:var(--sp-xl);}
+.section-page-2{margin-top:var(--sp-xl);}
 .section-heading{page-break-after:avoid;}
-@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:400px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.section-heading{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{page-break-before:always;}.section-page-2{page-break-before:always;page-break-after:always;}.placeholder{border:none;background:transparent;color:var(--dark);font-style:normal;font-weight:600;padding:0;}.placeholder-block{border:none;background:transparent;color:var(--body);font-style:normal;padding:14px 0;min-height:0;}}
+@media print{body{background:white;}.page{max-width:none;padding:0;}.cover-hero{margin:0;width:100%;height:auto;padding-top:56px;}.cover-page{page-break-after:always;}h2,h3,h4{page-break-after:avoid;}.section-heading{page-break-after:avoid;}.info-card,.data-table,.dual-cover-wrapper,.single-cover-wrapper,.premium-card,.sig-box,.pros-cons-grid{page-break-inside:avoid;}.section-block-break{margin-top:var(--sp-xl);}.section-page-2{margin-top:var(--sp-xl);}.placeholder{border:none;background:transparent;color:var(--dark);font-style:normal;font-weight:600;padding:0;}.placeholder-block{border:none;background:transparent;color:var(--body);font-style:normal;padding:14px 0;min-height:0;}}
 `;
 
 const LOGO_URL = "/images/ks/smiths-logo-wide.webp";
@@ -613,7 +613,7 @@ const KIWISAVER_EXTRA_CSS = `
 :root{--sp-xs:8px;--sp-sm:16px;--sp-md:24px;--sp-lg:40px;--sp-xl:64px;--panel-bg:var(--color-paper-deep);--panel-bdr:var(--color-border-soft);--section-gap:var(--sp-lg);}
 
 /* ═══ PAGE BREAK CONTROL ═══ */
-.section-block-break{page-break-before:always;}
+.section-block-break{margin-top:var(--sp-xl);}
 .section-heading{page-break-after:avoid;page-break-inside:avoid;}
 .info-card,.callout-box,.warning-box,.ks-compare,.dual-cover-wrapper,.strategy-card,.risk-dimensions,.review-schedule{page-break-inside:avoid;break-inside:avoid;}
 .section-heading+.body-text,.section-heading+.info-card,.sub-heading+.info-card{page-break-before:avoid;}
@@ -674,8 +674,8 @@ const KIWISAVER_EXTRA_CSS = `
 .provider-header-label{margin-top:8px;opacity:0.85;letter-spacing:0.16em;}
 
 /* ═══ BACK COVER ═══ */
-.back-cover{page-break-before:always;background:var(--color-forest-dark);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 44mm);display:flex;flex-direction:column;justify-content:space-between;}
-.back-cover-top{padding-top:var(--sp-xl);}
+.back-cover{page-break-before:always;background:var(--color-forest-dark);color:var(--white);margin:0 -44px;padding:0 44px;min-height:calc(297mm - 96mm);display:flex;flex-direction:column;justify-content:space-between;}
+.back-cover-top{padding-top:var(--sp-lg);}
 .back-cover .back-logo{height:44px;width:auto;filter:brightness(0) invert(1);}
 .back-cover .back-rule{width:44px;height:2px;background:var(--color-coral);margin:18px 0 0 0;}
 .back-cover-bottom{padding-bottom:46px;}
@@ -695,7 +695,7 @@ const KIWISAVER_EXTRA_CSS = `
 /* ═══ PAGE CONTROL UTILITIES ═══ */
 .page-section{page-break-inside:avoid;break-inside:avoid;}
 .keep-together{page-break-inside:avoid;break-inside:avoid;}
-.decisions-section{page-break-before:always;break-before:page;page-break-inside:avoid;break-inside:avoid;display:block !important;padding-top:var(--sp-lg);margin:0;}
+.decisions-section{page-break-inside:avoid;break-inside:avoid;display:block !important;padding-top:var(--sp-md);margin-top:var(--sp-xl);}
 .decisions-section *{page-break-inside:avoid;break-inside:avoid;}
 .decisions-box{border-top:1px solid var(--color-border-soft);border-bottom:1px solid var(--color-border-soft);padding:var(--sp-md) 0;margin:0;}
 .decisions-box h4{font-family:var(--font-body);font-size:10px;font-weight:600;color:var(--color-coral-text);letter-spacing:0.16em;text-transform:uppercase;margin:0 0 var(--sp-sm) 0;}
@@ -1178,13 +1178,13 @@ function buildKiwisaverTemplate(): string {
       <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Meeting date</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ MEETING_DATE_LONG }}</td></tr>
       {% if CLIENT_1_AGE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Age</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_AGE }}</td></tr>{% endif %}
       {% if CLIENT_1_EMPLOYMENT_STATUS %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Employment status</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_EMPLOYMENT_STATUS }}</td></tr>{% endif %}
-      {% if CLIENT_1_INCOME_ANNUAL %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Annual income</td><td class="ks-row-val" style="text-align:left;">{{ CLIENT_1_INCOME_ANNUAL }}</td></tr>{% endif %}
+      {% if CLIENT_1_INCOME_ANNUAL %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Annual income</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_INCOME_ANNUAL }}</td></tr>{% endif %}
       {% if CLIENT_1_PIR %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Prescribed Investor Rate (PIR)</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_PIR }}</td></tr>{% endif %}
       <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Employee contribution</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_EMPLOYEE_CONTRIB }}</td></tr>
       <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Employer contribution</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_EMPLOYER_CONTRIB }}</td></tr>
       {% if CLIENT_1_CURRENT_PROVIDER %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current provider</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_CURRENT_PROVIDER }}</td></tr>{% endif %}
       {% if CLIENT_1_CURRENT_FUND %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current fund</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_CURRENT_FUND }}</td></tr>{% endif %}
-      {% if CLIENT_1_CURRENT_BALANCE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current balance</td><td class="ks-row-val" style="text-align:left;">{{ CLIENT_1_CURRENT_BALANCE }}</td></tr>{% endif %}
+      {% if CLIENT_1_CURRENT_BALANCE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Current balance</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_CURRENT_BALANCE }}</td></tr>{% endif %}
       {% if CLIENT_1_GOAL %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Primary goal</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_GOAL }}</td></tr>{% endif %}
       {% if CLIENT_1_TIMEFRAME %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Investment timeframe</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_TIMEFRAME }}</td></tr>{% endif %}
       <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Risk profile outcome</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_RISK_PROFILE_OUTCOME }}</td></tr>
@@ -1276,8 +1276,6 @@ function buildKiwisaverTemplate(): string {
 </div>
 
 <div class="section-heading"><div class="num">10</div><h2>Our Recommendation</h2></div>
-<img class="section-doodle ks-doodle" src="/images/ks/doodles/decision-recommend.png" alt="" aria-hidden="true">
-
 {{ RECOMMENDATION_COMPARISON_BLOCKS }}
 
 {{ FUND_DESCRIPTION_BLOCKS }}

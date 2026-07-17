@@ -3,6 +3,7 @@ import { extractKiwisaverData } from "@/lib/llm/kiwisaver-extractor";
 import { writeKiwisaverSections } from "@/lib/llm/kiwisaver-writer";
 import { getProviderData, getFundDescription } from "@/lib/providers";
 import type { FundDescription, AssetAllocation } from "@/lib/providers";
+import { findSiteFund, siteFundToProviderData } from "@/lib/site-funds";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
 import { validateKiwisaverHtml } from "@/lib/generation/kiwisaver-validate";
@@ -84,13 +85,16 @@ function providerLogoChip(name: string | null | undefined, imgHeight: number): s
       : "";
   }
   const selfContained = isLogoSelfContained(name);
-  const chipStyle = selfContained
-    ? `padding:0;overflow:hidden;`
-    : ``;
+  // Fixed-size chip boxes so EVERY provider logo sits in an IDENTICAL rectangle -
+  // a wide wordmark (Fisher) and a near-square mark (Milford) no longer produce
+  // different-width chips. Logo is contained + centred inside the fixed box.
+  const boxH = imgHeight + 16;
+  const boxW = selfContained ? boxH : Math.round(imgHeight * 2.2);
+  const chipStyle = `box-sizing:border-box;width:${boxW}px;height:${boxH}px;${selfContained ? "padding:0;overflow:hidden;" : "padding:6px 12px;"}`;
   const imgStyle = selfContained
-    ? `height:${imgHeight}px;width:${imgHeight}px;object-fit:cover;display:block;`
-    : `height:${imgHeight}px;width:auto;object-fit:contain;display:block;`;
-  return `<div class="provider-logo-badge"${chipStyle ? ` style="${chipStyle}"` : ""}><img src="${logo}" alt="${name}" style="${imgStyle}"></div>`;
+    ? `width:100%;height:100%;object-fit:cover;display:block;`
+    : `max-width:100%;max-height:100%;object-fit:contain;display:block;`;
+  return `<div class="provider-logo-badge" style="${chipStyle}"><img src="${logo}" alt="${name}" style="${imgStyle}"></div>`;
 }
 
 function providerLogoBadge(name: string | null | undefined): string {
@@ -104,7 +108,7 @@ function providerLogoInline(name: string | null | undefined): string {
   return "";
 }
 
-function buildComparisonBlock(
+export function buildComparisonBlock(
   client: KiwisaverFactPack["clients"][0],
   recDesc: FundDescription | null,
   recData: ProviderData | null,
@@ -182,7 +186,7 @@ function ksProviderHead(name: string | null | undefined, fund: string | null | u
   return `<th class="ks-provider-head">${logoHtml}<div class="ks-fund-name">${fund || ""}</div><div class="ks-provider-tag">${tag}</div></th>`;
 }
 
-function buildFeesBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
+export function buildFeesBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
   const hasCurrent = !!(currentData?.provider);
 
   const feeSummary = buildFeeSummary(recommendedData, currentData);
@@ -236,7 +240,7 @@ function buildFeeSummary(recommendedData: ProviderData | null, currentData: Prov
   return `<p class="body-text" style="margin-top:10px;">Fees are charged as a percentage of your fund balance and are deducted from your investment returns. Even small differences in fees can compound over time and impact your retirement balance.</p>`;
 }
 
-function buildPerformanceBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
+export function buildPerformanceBlock(currentData: ProviderData | null, recommendedData: ProviderData | null): string {
   const cp = currentData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
   const rp = recommendedData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
   const hasCurrent = !!currentData?.provider;
@@ -256,7 +260,7 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
       <tr class="ks-row"><td class="ks-row-label">1 year return (p.a.)</td>${ksVal(rp.oneYear)}${hasCurrent ? ksVal(cp.oneYear) : ""}</tr>
       <tr class="ks-row"><td class="ks-row-label">3 year return (p.a.)</td>${ksVal(rp.threeYear)}${hasCurrent ? ksVal(cp.threeYear) : ""}</tr>
       <tr class="ks-row"><td class="ks-row-label">5 year return (p.a.)</td>${ksVal(rp.fiveYear)}${hasCurrent ? ksVal(cp.fiveYear) : ""}</tr>
-      <tr class="ks-row"><td class="ks-row-label">Since inception (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
+      <tr class="ks-row"><td class="ks-row-label">10 year return (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
     </tbody>
   </table>
   <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
@@ -436,7 +440,7 @@ function buildFundBreakdownSection(
 </div>`;
 }
 
-function buildFundDescBlock(
+export function buildFundDescBlock(
   recData: ProviderData | null,
   recDesc: FundDescription | null,
   curData: ProviderData | null,
@@ -457,7 +461,7 @@ function buildFundDescBlock(
   return html;
 }
 
-function buildSignatureBlock(clientName: string): string {
+export function buildSignatureBlock(clientName: string): string {
   return `
 <div class="signature-grid single">
   <div class="sig-box">
@@ -514,10 +518,14 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
   try {
     if (client.current.provider && client.current.fund) {
       currentProviderData = await getProviderData(client.current.provider, client.current.fund);
+      // Prefer the SITE data (Morningstar Q1 2026, sorted) so fees + full return
+      // history match exactly what the KiwiSaver site displays.
+      { const sf = findSiteFund(client.current.provider, client.current.fund); if (sf) currentProviderData = siteFundToProviderData(sf, client.current.provider, client.current.fund); }
       curFundDesc = getFundDescription(client.current.provider, client.current.fund);
     }
     if (client.recommended.provider && client.recommended.fund) {
       recommendedProviderData = await getProviderData(client.recommended.provider, client.recommended.fund);
+      { const sf = findSiteFund(client.recommended.provider, client.recommended.fund); if (sf) recommendedProviderData = siteFundToProviderData(sf, client.recommended.provider, client.recommended.fund); }
       recFundDesc = getFundDescription(client.recommended.provider, client.recommended.fund);
     }
   } catch (err) {
