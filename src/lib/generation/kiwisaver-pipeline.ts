@@ -21,27 +21,85 @@ function v(val: string | number | null | undefined, fallback = ""): string {
   return String(val);
 }
 
+// Canonical provider ids -> logo asset. Assets live at /images/ks/providers/<id>.png
 const PROVIDER_LOGO_MAP: Record<string, string> = {
-  milford: "/images/providers/milford.png",
-  fisher: "/images/providers/fisher.png",
-  "fisher funds": "/images/providers/fisher.png",
+  anz: "/images/ks/providers/anz.png",
+  asb: "/images/ks/providers/asb.png",
+  bnz: "/images/ks/providers/bnz.png",
+  westpac: "/images/ks/providers/westpac.png",
+  kiwibank: "/images/ks/providers/kiwibank.png",
+  amp: "/images/ks/providers/amp.png",
+  mercer: "/images/ks/providers/mercer.png",
+  booster: "/images/ks/providers/booster.png",
+  fisher: "/images/ks/providers/fisher.png",
+  generate: "/images/ks/providers/generate.png",
+  milford: "/images/ks/providers/milford.png",
+  simplicity: "/images/ks/providers/simplicity.png",
+  kernel: "/images/ks/providers/kernel.png",
+  pathfinder: "/images/ks/providers/pathfinder.png",
+  nzfunds: "/images/ks/providers/nzfunds.png",
+  sbs: "/images/ks/providers/sbs.png",
+  koura: "/images/ks/providers/koura.png",
+  quaystreet: "/images/ks/providers/quaystreet.png",
+  nikko: "/images/ks/providers/nikko.png",
+  mas: "/images/ks/providers/mas.png",
 };
 
-function getProviderLogo(name: string | null | undefined): string {
+// Providers whose logo ships its own coloured background: render object-fit:cover, no padding.
+const LOGO_SELF_CONTAINED = new Set(["asb", "bnz", "mas"]);
+
+// Map a free-text provider name to a canonical id (or "" if unknown).
+function providerId(name: string | null | undefined): string {
   if (!name) return "";
-  return PROVIDER_LOGO_MAP[name.toLowerCase().trim()] || "";
+  const n = name.toLowerCase().trim();
+  if (PROVIDER_LOGO_MAP[n]) return n;
+  // common aliases / embedded names
+  if (n.includes("fisher")) return "fisher";
+  if (n.includes("nz funds") || n.includes("nzfunds")) return "nzfunds";
+  if (n.includes("quay")) return "quaystreet";
+  if (n.includes("quaystreet")) return "quaystreet";
+  if (n.includes("westpac")) return "westpac";
+  if (n.includes("kiwibank")) return "kiwibank";
+  for (const id of Object.keys(PROVIDER_LOGO_MAP)) {
+    if (n.includes(id)) return id;
+  }
+  return "";
+}
+
+function getProviderLogo(name: string | null | undefined): string {
+  const id = providerId(name);
+  return id ? PROVIDER_LOGO_MAP[id] : "";
+}
+
+function isLogoSelfContained(name: string | null | undefined): boolean {
+  return LOGO_SELF_CONTAINED.has(providerId(name));
+}
+
+// The frozen white-chip treatment. Self-contained logos fill the chip (cover, no padding).
+function providerLogoChip(name: string | null | undefined, imgHeight: number): string {
+  const logo = getProviderLogo(name);
+  if (!logo) {
+    return name
+      ? `<div style="font-weight:600;font-size:11pt;color:var(--dark);margin-bottom:6px;">${name}</div>`
+      : "";
+  }
+  const selfContained = isLogoSelfContained(name);
+  const chipStyle = selfContained
+    ? `padding:0;overflow:hidden;`
+    : ``;
+  const imgStyle = selfContained
+    ? `height:${imgHeight}px;width:${imgHeight}px;object-fit:cover;display:block;`
+    : `height:${imgHeight}px;width:auto;object-fit:contain;display:block;`;
+  return `<div class="provider-logo-badge"${chipStyle ? ` style="${chipStyle}"` : ""}><img src="${logo}" alt="${name}" style="${imgStyle}"></div>`;
 }
 
 function providerLogoBadge(name: string | null | undefined): string {
-  const logo = getProviderLogo(name);
-  if (logo) return `<div class="provider-logo-badge"><img src="${logo}" alt="${name}"></div>`;
-  if (name) return `<div style="font-weight:700;font-size:12pt;margin-bottom:6px;">${name}</div>`;
-  return "";
+  return providerLogoChip(name, 90);
 }
 
 function providerLogoInline(name: string | null | undefined): string {
   const logo = getProviderLogo(name);
-  if (logo) return `<img class="provider-logo" src="${logo}" alt="${name}">`;
+  if (logo) return providerLogoChip(name, 54);
   if (name) return `<strong>${name}</strong>`;
   return "";
 }
@@ -52,9 +110,8 @@ function buildComparisonBlock(
   recData: ProviderData | null,
   recommendationSummaryHtml: string,
 ): string {
-  const recLogo = getProviderLogo(client.recommended.provider);
-  const recLogoHtml = recLogo
-    ? `<img src="${recLogo}" alt="${client.recommended.provider}" style="height:108px;width:auto;display:block;margin-bottom:14px;">`
+  const recLogoHtml = getProviderLogo(client.recommended.provider)
+    ? `<div style="margin-bottom:14px;">${providerLogoChip(client.recommended.provider, 108)}</div>`
     : "";
 
   const panelRows = [
@@ -113,13 +170,15 @@ function buildComparisonBlock(
 }
 
 function ksVal(val: string | null | undefined): string {
-  if (!val || val === "N/A") return `<td class="ks-row-val na">-</td>`;
-  return `<td class="ks-row-val">${val}</td>`;
+  if (!val || val === "N/A") return `<td class="ks-row-val na" style="font-variant-numeric:tabular-nums;">-</td>`;
+  return `<td class="ks-row-val" style="font-variant-numeric:tabular-nums;">${val}</td>`;
 }
 
 function ksProviderHead(name: string | null | undefined, fund: string | null | undefined, tag: string): string {
   const logo = getProviderLogo(name);
-  const logoHtml = logo ? `<img src="${logo}" alt="${name}">` : `<div style="font-weight:700;font-size:11pt;color:var(--dark);margin-bottom:4px;">${name || ""}</div>`;
+  const logoHtml = logo
+    ? `<div style="margin:0 auto 10px auto;">${providerLogoChip(name, 108)}</div>`
+    : `<div style="font-weight:600;font-size:11pt;color:var(--dark);margin-bottom:4px;">${name || ""}</div>`;
   return `<th class="ks-provider-head">${logoHtml}<div class="ks-fund-name">${fund || ""}</div><div class="ks-provider-tag">${tag}</div></th>`;
 }
 
@@ -146,7 +205,7 @@ function buildFeesBlock(currentData: ProviderData | null, recommendedData: Provi
     </tbody>
   </table>
   ${feeSummary}
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Fee data sourced from provider disclosure documents${recommendedData?.sources.feesUrl ? ': <a href="' + recommendedData.sources.feesUrl + '" style="color:var(--bronze);">' + recommendedData.sources.feesUrl + '</a>' : ''}${currentData?.sources.feesUrl ? ' and <a href="' + currentData.sources.feesUrl + '" style="color:var(--bronze);">' + currentData.sources.feesUrl + '</a>' : ''}.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:8px;">Fee data sourced from provider disclosure documents${recommendedData?.sources.feesUrl ? ': <a href="' + recommendedData.sources.feesUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.feesUrl + '</a>' : ''}${currentData?.sources.feesUrl ? ' and <a href="' + currentData.sources.feesUrl + '" style="color:var(--color-coral-text);">' + currentData.sources.feesUrl + '</a>' : ''}.</p>
 </div>`;
 }
 
@@ -200,21 +259,26 @@ function buildPerformanceBlock(currentData: ProviderData | null, recommendedData
       <tr class="ks-row"><td class="ks-row-label">Since inception (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--bronze);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
 </div>`;
 }
 
 // ═══ SVG DONUT CHART GENERATOR ═══
 
+// Portal palette: growth assets = coral family, income assets = forest family.
 const ALLOC_COLORS: Record<string, string> = {
-  cash: "#C4B5A0",
-  nzFixedInterest: "#A39580",
-  intlFixedInterest: "#8A7B66",
-  ausEquities: "#B07D56",
-  intlEquities: "#8C5E3C",
-  listedProperty: "#D4A872",
-  unlistedProperty: "#E6CCAB",
+  // Income assets (forest family)
+  cash: "#2F3D3B",           // forest-dark
+  nzFixedInterest: "#495A58", // forest
+  intlFixedInterest: "#6E807D", // forest tint
+  // Growth assets (coral family)
+  ausEquities: "#965F4C",    // coral-text (deep)
+  intlEquities: "#C69480",   // coral
+  listedProperty: "#A87564", // coral-dark
+  unlistedProperty: "#D9B4A4", // coral soft-mid
 };
+
+const GROWTH_KEYS = new Set(["ausEquities", "intlEquities", "listedProperty", "unlistedProperty"]);
 
 const ALLOC_LABELS: Record<string, string> = {
   cash: "Cash",
@@ -244,22 +308,25 @@ function buildDonutSvg(alloc: AssetAllocation, riskIndicator: number, fundName: 
   });
 
   const riskDots = Array.from({ length: 7 }, (_, i) =>
-    `<rect x="${14 + i * 23}" y="0" width="18" height="6" rx="1" fill="${i < riskIndicator ? '#B07D56' : '#E6E1DA'}"/>`
+    `<rect x="${14 + i * 23}" y="0" width="18" height="6" rx="1" fill="${i < riskIndicator ? '#C69480' : '#E5E2DA'}"/>`
   ).join("");
 
   const legendItems = entries.map((e, i) =>
     `<g transform="translate(0, ${i * 18})">
       <rect width="10" height="10" rx="1" fill="${e.color}"/>
-      <text x="14" y="9" font-family="'Satoshi', sans-serif" font-size="8" fill="#3D3D3D">${e.label} ${e.pct}%</text>
+      <text x="14" y="9" font-family="'Inter', sans-serif" font-size="8" fill="#1A1A1A" style="font-variant-numeric:tabular-nums;">${e.label} ${e.pct}%</text>
     </g>`
   ).join("");
 
+  // Growth vs income share for the centre label
+  const growthPct = entries.filter(e => GROWTH_KEYS.has(e.key)).reduce((s, e) => s + e.pct, 0);
+
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 ${200 + entries.length * 18}" width="180">
   <g>${segments.join("")}</g>
-  <text x="${cx}" y="${cy - 6}" text-anchor="middle" font-family="'Instrument Serif', serif" font-size="18" fill="#1A1A1A">${fundName}</text>
-  <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-family="'Satoshi', sans-serif" font-size="8" fill="#7A7A7A" letter-spacing="0.08em" text-transform="uppercase">FUND</text>
+  <text x="${cx}" y="${cy - 2}" text-anchor="middle" font-family="'Geist', 'Inter', sans-serif" font-size="20" font-weight="600" fill="#7B4F3F" style="font-variant-numeric:tabular-nums;">${growthPct}%</text>
+  <text x="${cx}" y="${cy + 13}" text-anchor="middle" font-family="'Inter', sans-serif" font-size="7" fill="#6B6B68" letter-spacing="0.14em">GROWTH</text>
   <g transform="translate(10, 190)">${riskDots}</g>
-  <text x="10" y="206" font-family="'Satoshi', sans-serif" font-size="7" fill="#7A7A7A" letter-spacing="0.06em">RISK INDICATOR</text>
+  <text x="10" y="206" font-family="'Inter', sans-serif" font-size="7" fill="#6B6B68" letter-spacing="0.14em">RISK INDICATOR ${riskIndicator}/7</text>
   <g transform="translate(10, 220)">${legendItems}</g>
 </svg>`;
 }
@@ -286,7 +353,7 @@ function buildFundBreakdownSection(
   feeRows.push({ label: "Total estimated annual charge", value: desc.fees.totalEstimated });
 
   const feeTableHtml = feeRows.map(r =>
-    `<div class="fb-fee-row"><span class="fb-fee-label">${r.label}</span><span class="fb-fee-value">${r.value}</span></div>`
+    `<div class="fb-fee-row"><span class="fb-fee-label">${r.label}</span><span class="fb-fee-value" style="font-variant-numeric:tabular-nums;">${r.value}</span></div>`
   ).join("\n");
 
   const perfFeeNote = desc.fees.performanceFeeDetail
@@ -299,12 +366,31 @@ function buildFundBreakdownSection(
 
   const allocEntries = Object.entries(desc.allocation)
     .filter(([, pct]) => (pct as number) > 0)
-    .map(([key, pct]) => ({ label: ALLOC_LABELS[key] || key, pct: pct as number, isGrowth: ["ausEquities", "intlEquities", "listedProperty", "unlistedProperty"].includes(key) }));
+    .map(([key, pct]) => ({ key, label: ALLOC_LABELS[key] || key, pct: pct as number, color: ALLOC_COLORS[key] || "#CCC", isGrowth: GROWTH_KEYS.has(key) }));
 
   const incomeItems = allocEntries.filter(e => !e.isGrowth);
   const growthItems = allocEntries.filter(e => e.isGrowth);
 
-  const logoHtml = logo ? `<img src="${logo}" alt="${provider}" style="height:54px;width:auto;display:block;margin-bottom:8px;">` : "";
+  const allocRow = (e: { label: string; pct: number; color: string }) =>
+    `<div class="fb-alloc-item"><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${e.color};margin-right:7px;vertical-align:middle;"></span>${e.label}</span><span style="font-variant-numeric:tabular-nums;">${e.pct}%</span></div>`;
+
+  // Growth vs income twin bar (portal "this fund" split)
+  const splitBar = `
+      <div class="alloc-bar-wrap" style="margin-bottom:var(--sp-sm);">
+        <div class="alloc-bar-label">Growth / income split</div>
+        <div class="alloc-bar">
+          <div class="alloc-growth" style="width:${desc.growthPercent}%;"></div>
+          <div class="alloc-income" style="width:${desc.incomePercent}%;"></div>
+        </div>
+        <div class="alloc-bar-legend">
+          <span class="leg-growth">Growth ${desc.growthPercent}%</span>
+          <span class="leg-income">Income ${desc.incomePercent}%</span>
+        </div>
+      </div>`;
+
+  const logoHtml = logo
+    ? `<div style="margin-bottom:10px;">${providerLogoChip(provider, 54)}</div>`
+    : "";
 
   return `
 <div class="fb-section">
@@ -321,14 +407,15 @@ function buildFundBreakdownSection(
       <p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:8px;">On a $10,000 balance, total annual fees would be approximately <strong>${tenKFee}</strong>. On a $100,000 balance, approximately <strong>${hundredKFee}</strong>. These fees compound over time - even small differences can materially affect your retirement balance over 20-30 years.</p>
 
       <div class="fb-sub-title">Asset allocation</div>
+      ${splitBar}
       <div class="fb-alloc-split">
         <div class="fb-alloc-group">
           <div class="fb-alloc-group-label">Income assets ${desc.incomePercent}%</div>
-          ${incomeItems.map(e => `<div class="fb-alloc-item"><span>${e.label}</span><span>${e.pct}%</span></div>`).join("")}
+          ${incomeItems.map(allocRow).join("")}
         </div>
         <div class="fb-alloc-group">
           <div class="fb-alloc-group-label">Growth assets ${desc.growthPercent}%</div>
-          ${growthItems.map(e => `<div class="fb-alloc-item"><span>${e.label}</span><span>${e.pct}%</span></div>`).join("")}
+          ${growthItems.map(allocRow).join("")}
         </div>
       </div>
       <p class="body-text" style="font-size:8.5pt;color:var(--muted);margin-top:8px;">Source: ${provider} Product Disclosure Statement, ${desc.pdsDate}. Target allocations indicate what is expected over the course of an economic cycle; actual allocations may vary.</p>
@@ -338,11 +425,11 @@ function buildFundBreakdownSection(
         ${donut}
       </div>
       <div class="fb-chart-meta">
-        <div class="fb-meta-row"><span>Min. timeframe</span><span>${desc.minTimeframe}</span></div>
-        <div class="fb-meta-row"><span>Risk indicator</span><span>${desc.riskIndicator} / 7</span></div>
-        <div class="fb-meta-row"><span>Growth assets</span><span>${desc.growthPercent}%</span></div>
-        <div class="fb-meta-row"><span>Income assets</span><span>${desc.incomePercent}%</span></div>
-        <div class="fb-meta-row"><span>Total fee (p.a.)</span><span>${desc.fees.totalEstimated}</span></div>
+        <div class="fb-meta-row"><span>Min. timeframe</span><span style="font-variant-numeric:tabular-nums;">${desc.minTimeframe}</span></div>
+        <div class="fb-meta-row"><span>Risk indicator</span><span style="font-variant-numeric:tabular-nums;">${desc.riskIndicator} / 7</span></div>
+        <div class="fb-meta-row"><span>Growth assets</span><span style="font-variant-numeric:tabular-nums;">${desc.growthPercent}%</span></div>
+        <div class="fb-meta-row"><span>Income assets</span><span style="font-variant-numeric:tabular-nums;">${desc.incomePercent}%</span></div>
+        <div class="fb-meta-row"><span>Total fee (p.a.)</span><span style="font-variant-numeric:tabular-nums;">${desc.fees.totalEstimated}</span></div>
       </div>
     </div>
   </div>
