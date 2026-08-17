@@ -999,11 +999,11 @@ function buildKiwisaverTemplate(): string {
   <h4>Information relied upon</h4>
   <p class="body-text">This advice is based on information you provided during our meeting, including:</p>
   <ul class="styled-list" style="margin:0;">
-    <li>Verbal information provided during our meeting on <strong>{{ MEETING_DATE_LONG }}</strong></li>
+    <li>Verbal information provided during our meeting{% if MEETING_DATE_LONG %} on <strong>{{ MEETING_DATE_LONG }}</strong>{% endif %}</li>
     <li>Any KiwiSaver statements, payslips, or provider documents you supplied</li>
     <li>Your responses to our risk profile assessment</li>
   </ul>
-  <p class="body-text" style="margin-top:8px;">Fund performance and fee data is sourced from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong>.</p>
+  <p class="body-text" style="margin-top:8px;">Fund performance and fee data is sourced from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong> and the Morningstar KiwiSaver 360 report for <strong>Q2 / June 2026</strong> (returns to 30 June 2026).</p>
 </div>
 
 <div class="info-card">
@@ -1044,12 +1044,11 @@ function buildKiwisaverTemplate(): string {
 
 <div class="info-card">
   <h4>Contribution rates (current rules)</h4>
-  <p class="body-text">If you are employed, you can choose to contribute <strong>3%, 4%, 6%, 8%, or 10%</strong> of your before-tax pay. Your employer is required to contribute a minimum of 3%. Self-employed or non-employed members can make voluntary contributions at any time.</p>
-  <div class="warning-box" style="margin-top:10px;"><strong>Upcoming changes:</strong>
+  <p class="body-text">If you are employed, you can choose to contribute <strong>3.5%, 4%, 6%, 8%, or 10%</strong> of your before-tax pay. Your employer is generally required to contribute a minimum of 3.5%, subject to eligibility and any temporary rate reduction. Self-employed or non-employed members can make voluntary contributions at any time.</p>
+  <div class="warning-box" style="margin-top:10px;"><strong>Contribution rate changes:</strong>
     <ul class="styled-list" style="margin:6px 0 0 0;">
-      <li><strong>1 April 2026:</strong> Default employee and employer contribution rates increase from <strong>3% to 3.5%</strong></li>
       <li><strong>1 April 2028:</strong> Default rates increase again from <strong>3.5% to 4%</strong></li>
-      <li><strong>From 1 February 2026:</strong> A new opt-down mechanism allows members to apply to Inland Revenue to temporarily remain at 3% (for up to 12 months at a time, then reapply)</li>
+      <li>A temporary rate reduction may allow eligible members to contribute <strong>3%</strong> for a limited period. Apply through Inland Revenue if needed.</li>
     </ul>
   </div>
 </div>
@@ -1062,15 +1061,18 @@ function buildKiwisaverTemplate(): string {
 
 <div class="info-card">
   <h4>PIE funds and your PIR</h4>
-  <p class="body-text">KiwiSaver funds are structured as Portfolio Investment Entities (PIEs). Your investment returns are taxed at your Prescribed Investor Rate (PIR) rather than your marginal income tax rate. The available PIR rates for NZ resident individuals are:</p>
+  <p class="body-text">KiwiSaver funds are structured as Portfolio Investment Entities (PIEs). Your investment returns are taxed at your Prescribed Investor Rate (PIR) rather than your marginal income tax rate. Your PIR is assessed using income from either of the last two tax years. The available rates for New Zealand resident individuals are:</p>
   <table class="ks-compare" style="margin:10px 0;">
+    <thead>
+      <tr><th class="ks-label-head" style="width:90px;">PIR rate</th><th class="ks-label-head">Taxable income (excluding PIE income)</th><th class="ks-label-head">Taxable income plus attributed PIE income</th></tr>
+    </thead>
     <tbody>
-      <tr class="ks-row"><td class="ks-row-label" style="width:120px;">10.5%</td><td style="padding:8px 16px;font-size:9pt;">Taxable income up to $14,000 (two years prior) or up to $48,000 (combined)</td></tr>
-      <tr class="ks-row"><td class="ks-row-label" style="width:120px;">17.5%</td><td style="padding:8px 16px;font-size:9pt;">Taxable income $14,001 - $48,000 (two years prior) or $48,001 - $70,000 (combined)</td></tr>
-      <tr class="ks-row"><td class="ks-row-label" style="width:120px;">28%</td><td style="padding:8px 16px;font-size:9pt;">Taxable income over $48,000 (two years prior) or over $70,000 (combined)</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">10.5%</td><td style="padding:8px 16px;font-size:9pt;">$15,600 or less</td><td style="padding:8px 16px;font-size:9pt;">$53,500 or less</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">17.5%</td><td style="padding:8px 16px;font-size:9pt;">$53,500 or less</td><td style="padding:8px 16px;font-size:9pt;">$78,100 or less</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">28%</td><td colspan="2" style="padding:8px 16px;font-size:9pt;">Anything above the 17.5% limits</td></tr>
     </tbody>
   </table>
-  <p class="body-text"><strong>Choosing the correct PIR matters.</strong> If your PIR is too high, you overpay tax. If too low, you may face a tax bill at year-end. We recommend checking your PIR at least annually, especially after income changes.</p>
+  <p class="body-text"><strong>Choosing the correct PIR matters.</strong> If your PIR is too high, you overpay tax. If too low, you may face a tax bill at year-end. We recommend checking your PIR through Inland Revenue at least annually, especially after income changes.</p>
 </div>
 
 <div class="info-card">
@@ -1130,6 +1132,23 @@ function buildKiwisaverTemplate(): string {
 <p class="body-text">Your risk profile determines which type of KiwiSaver fund is most appropriate for you. We assess three dimensions independently and combine them to determine your recommended fund type.</p>
 
 <div class="info-card">
+  <h4>How we assess your risk profile</h4>
+  <table class="ks-compare" style="margin:0;">
+    <thead>
+      <tr><th class="ks-label-head" style="width:24%;">Question</th><th class="ks-label-head">Conservative</th><th class="ks-label-head">Balanced</th><th class="ks-label-head">Growth</th></tr>
+    </thead>
+    <tbody>
+      <tr class="ks-row"><td class="ks-row-label">1. When do you expect to need this money?</td><td style="padding:8px;font-size:8.5pt;">Within approximately 3-5 years</td><td style="padding:8px;font-size:8.5pt;">Around 5-10 years</td><td style="padding:8px;font-size:8.5pt;">More than 10 years</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">2. If your fund fell 20%, what would you do?</td><td style="padding:8px;font-size:8.5pt;">Switch to a lower-risk fund; the fall would be very uncomfortable</td><td style="padding:8px;font-size:8.5pt;">Stay invested, although concerned</td><td style="padding:8px;font-size:8.5pt;">Stay invested or contribute more</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">3. What is your priority?</td><td style="padding:8px;font-size:8.5pt;">Protecting what I have</td><td style="padding:8px;font-size:8.5pt;">A balance between growth and stability</td><td style="padding:8px;font-size:8.5pt;">Maximum long-term growth, accepting fluctuations</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">4. How much movement in value can you tolerate?</td><td style="padding:8px;font-size:8.5pt;">Very little</td><td style="padding:8px;font-size:8.5pt;">A moderate amount</td><td style="padding:8px;font-size:8.5pt;">Large movements</td></tr>
+      <tr class="ks-row"><td class="ks-row-label">5. If markets fell before withdrawal, could you delay or rely on other assets?</td><td style="padding:8px;font-size:8.5pt;">No</td><td style="padding:8px;font-size:8.5pt;">Possibly</td><td style="padding:8px;font-size:8.5pt;">Yes</td></tr>
+    </tbody>
+  </table>
+  <p class="body-text" style="margin:10px 0 0;"><strong>Conservative:</strong> values capital stability, has a shorter timeframe or limited ability to recover from losses. <strong>Balanced:</strong> seeks reasonable growth while tolerating normal market falls. <strong>Growth:</strong> has a long timeframe and is comfortable with substantial temporary losses.</p>
+</div>
+
+<div class="info-card">
   <h4>Risk assessment dimensions</h4>
   <div class="risk-dimensions">
     <div class="risk-dim-card">
@@ -1175,7 +1194,7 @@ function buildKiwisaverTemplate(): string {
   <h4>{{ CLIENT_1_NAME }} - Profile Summary</h4>
   <table class="ks-compare">
     <tbody>
-      <tr class="ks-row"><td class="ks-row-label" style="width:200px;">Meeting date</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ MEETING_DATE_LONG }}</td></tr>
+      {% if MEETING_DATE_LONG %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Meeting date</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ MEETING_DATE_LONG }}</td></tr>{% endif %}
       {% if CLIENT_1_AGE %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Age</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_AGE }}</td></tr>{% endif %}
       {% if CLIENT_1_EMPLOYMENT_STATUS %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Employment status</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_EMPLOYMENT_STATUS }}</td></tr>{% endif %}
       {% if CLIENT_1_INCOME_ANNUAL %}<tr class="ks-row"><td class="ks-row-label" style="width:200px;">Annual income</td><td class="ks-row-val" style="text-align:left;font-size:10.5pt;">{{ CLIENT_1_INCOME_ANNUAL }}</td></tr>{% endif %}
@@ -1296,21 +1315,19 @@ function buildKiwisaverTemplate(): string {
 {{ FEES_TABLE_BLOCKS }}
 </div>
 
-<!-- ═══ SECTION 12 — PERFORMANCE ═══ -->
+<!-- ═══ SECTION 12 — PERFORMANCE & PROJECTIONS ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">12</div><h2>Fund Performance</h2></div>
+<div class="section-heading"><div class="num">12</div><h2>Fund Performance and Projections</h2></div>
 <p class="body-text">Historical performance provides context about how a fund has performed through different market conditions. Returns shown are annualised (the average return per year over the period) and are calculated after fund fees but before tax.</p>
 
 {{ PERFORMANCE_TABLE_BLOCKS }}
-</div>
 
-<!-- ═══ SECTION 13 — PROJECTIONS (only if data exists) ═══ -->
 {% if HAS_PROJECTIONS %}
-<div class="section-heading"><div class="num">13</div><h2>Projections</h2></div>
+<div class="sub-heading">Projections</div>
 
 {% if PROJECTIONS_EXPLANATION_PARAGRAPH %}<p class="body-text">{{ PROJECTIONS_EXPLANATION_PARAGRAPH }}</p>{% endif %}
 
@@ -1328,32 +1345,35 @@ function buildKiwisaverTemplate(): string {
 
 <div class="warning-box"><strong>Important:</strong> Projections are estimates only. They are sensitive to market returns, fees, contributions, and time. Actual outcomes will differ. These figures are provided for illustration purposes and should not be relied upon as a guarantee.</div>
 {% endif %}
+</div>
 
-<!-- ═══ SECTION 14 — IMPLEMENTATION ═══ -->
+<!-- ═══ SECTION 13 — IMPLEMENTATION ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">14</div><h2>Implementation Plan</h2></div>
+<div class="section-heading"><div class="num">13</div><h2>Implementation Plan</h2></div>
 
 <p class="body-text">To action the recommendation in this document, the following steps are required. We will guide you through each step.</p>
 
 <div class="info-card">
   <h4>Implementation checklist</h4>
   <ul class="impl-checklist">
-    <li><strong>Sign this Statement of Advice</strong> - confirm you accept the recommendation in Section 20</li>
+    <li><strong>Establish your new KiwiSaver account</strong> with the selected provider and chosen fund</li>
+    <li><strong>Provide your Record of Advice</strong> confirming the recommendation, the reasons for the selected provider and fund, and the agreed implementation</li>
     <li><strong>Complete identity verification (KYC)</strong> with the new provider - we will assist with this</li>
-    <li><strong>Submit transfer/switch request</strong> to the new provider (online or paper application)</li>
     <li><strong>Confirm fund selection</strong> - ensure you are placed in the correct fund (not the default)</li>
     <li><strong>Confirm your PIR</strong> with the new provider{% if CLIENT_1_PIR %} (your PIR: {{ CLIENT_1_PIR }}){% endif %}</li>
-    <li><strong>Confirm contribution rate</strong> with your employer{% if CLIENT_1_RECOMMENDED_CONTRIB_RATE %} - change to {{ CLIENT_1_RECOMMENDED_CONTRIB_RATE }} if applicable{% endif %}</li>
+    <li><strong>Submit the transfer request</strong> so your existing KiwiSaver funds can be transferred directly between providers</li>
+    <li><strong>Set up the provider's mobile app or online access</strong> to view your balance, contributions, and fund information</li>
+    <li><strong>Confirm contribution rate</strong> with your employer{% if CLIENT_1_RECOMMENDED_CONTRIB_RATE %} - change to {{ CLIENT_1_RECOMMENDED_CONTRIB_RATE }} if applicable{% endif %}. No employer action is generally required if your contribution rate is staying the same.</li>
     <li><strong>Update beneficiary nominations</strong> if applicable (check with new provider)</li>
-    <li><strong>Confirm transfer completed</strong> - typically takes 10-15 business days. We will follow up</li>
+    <li><strong>Confirm transfer completed</strong> - allow approximately 10 business days. We will follow up once it is complete.</li>
   </ul>
 </div>
 
-<div class="callout-box"><strong>During the transfer:</strong> Your funds will temporarily be held in cash while being transferred between providers. This is standard and typically takes 10-15 business days. Market movements during this period will not affect your transferring balance.</div>
+<div class="callout-box"><strong>During the transfer:</strong> Your funds will temporarily be held in cash while being transferred between providers. This is standard and generally takes approximately 10 business days. Market movements during this period will not affect your transferring balance.</div>
 
 <div class="info-card">
   <h4>What to watch for after switching</h4>
@@ -1367,13 +1387,13 @@ function buildKiwisaverTemplate(): string {
 </div>
 </div>
 
-<!-- ═══ SECTION 15 — KEY RISKS ═══ -->
+<!-- ═══ SECTION 14 — KEY RISKS ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">15</div><h2>Key Risks and Considerations</h2></div>
+<div class="section-heading"><div class="num">14</div><h2>Key Risks and Considerations</h2></div>
 
 <p class="body-text">All investments carry risk. It is important you understand the following before acting on this advice:</p>
 
@@ -1388,13 +1408,13 @@ function buildKiwisaverTemplate(): string {
 </ul>
 </div>
 
-<!-- ═══ SECTION 16 — ONGOING SERVICE & REVIEW ═══ -->
+<!-- ═══ SECTION 15 — ONGOING SERVICE & REVIEW ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">16</div><h2>Ongoing Service &amp; Review</h2></div>
+<div class="section-heading"><div class="num">15</div><h2>Ongoing Service &amp; Review</h2></div>
 <p class="body-text">KiwiSaver is a long-term investment. Your circumstances, the market, and the KiwiSaver landscape will change over time. Regular reviews ensure your strategy stays on track.</p>
 
 <div class="info-card">
@@ -1429,13 +1449,13 @@ function buildKiwisaverTemplate(): string {
 <p class="body-text">This engagement is ongoing unless you notify us otherwise. There is no charge for annual reviews as part of this service.</p>
 </div>
 
-<!-- ═══ SECTION 17 — FEES, COMMISSION & CONFLICTS ═══ -->
+<!-- ═══ SECTION 16 — FEES, COMMISSION & CONFLICTS ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">17</div><h2>Adviser Fees, Commission &amp; Conflicts of Interest</h2></div>
+<div class="section-heading"><div class="num">16</div><h2>Adviser Fees, Commission &amp; Conflicts of Interest</h2></div>
 
 <p class="body-text"><strong>There is no direct fee charged to you for this KiwiSaver advice.</strong></p>
 <p class="body-text">Smiths Insurance &amp; KiwiSaver may receive ongoing trail commission from the recommended KiwiSaver provider. Commission is typically a small percentage of your fund balance (approximately 0.20-0.30% p.a.) and is paid by the provider - it is not deducted from your account in addition to the stated fees.</p>
@@ -1461,13 +1481,13 @@ function buildKiwisaverTemplate(): string {
 <p class="body-text">We confirm that no conflict of interest has influenced the recommendation in this document.</p>
 </div>
 
-<!-- ═══ SECTION 18 — COMPLAINTS & PRIVACY ═══ -->
+<!-- ═══ SECTION 17 — COMPLAINTS & PRIVACY ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">18</div><h2>Complaints, Disputes &amp; Privacy</h2></div>
+<div class="section-heading"><div class="num">17</div><h2>Complaints, Disputes &amp; Privacy</h2></div>
 
 <p class="body-text"><strong>Internal complaints:</strong> If you have a concern about our service, please contact us directly:</p>
 <p class="body-text" style="margin-left:16px;">Henry Smith: henry@smiths.net.nz | 027 344 5255<br>Craig Smith: craig@smiths.net.nz | 0274 293 939<br>Post: PO Box 8267, Riccarton, Christchurch</p>
@@ -1478,13 +1498,13 @@ function buildKiwisaverTemplate(): string {
 <p class="body-text"><strong>Privacy:</strong> We collect personal information to provide advice and arrange financial products. Information may be shared with product providers, compliance partners, and service providers as required. Records are retained for a minimum of seven years in accordance with regulatory requirements. You may request access to or correction of your information at any time.</p>
 </div>
 
-<!-- ═══ SECTION 19 — APPENDICES & REFERENCES ═══ -->
+<!-- ═══ SECTION 18 — APPENDICES & REFERENCES ═══ -->
 <div class="section-block section-block-break">
 <div class="header">
   <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
 </div>
 
-<div class="section-heading"><div class="num">19</div><h2>Appendices &amp; References</h2></div>
+<div class="section-heading"><div class="num">18</div><h2>Appendices &amp; References</h2></div>
 <p class="body-text">The following sources and references were used in preparing this advice. We encourage you to review these documents for additional information.</p>
 
 <div class="info-card">
@@ -1511,6 +1531,7 @@ function buildKiwisaverTemplate(): string {
   <h4>C. Market research sources</h4>
   <ul class="source-list">
     <li><span class="source-name">Companies Office Disclose Register</span> - Official repository for PDS, fund updates, SIPO, and OMI documents <span class="source-url">disclose-register.companiesoffice.govt.nz</span></li>
+    <li><span class="source-name">Morningstar KiwiSaver 360</span> - Q2 / June 2026 report, with returns to 30 June 2026 <span class="source-url">morningstar.com.au</span></li>
     <li><span class="source-name">Sorted Smart Investor</span> - Fund comparison tool using Disclose Register data <span class="source-url">smartinvestor.sorted.org.nz</span></li>
     <li><span class="source-name">Sorted KiwiSaver Fund Finder</span> - Risk/fees/services/performance methodology using Disclose data <span class="source-url">sorted.org.nz</span></li>
   </ul>
@@ -1519,48 +1540,6 @@ function buildKiwisaverTemplate(): string {
 <div class="info-card">
   <h4>D. Data timestamps</h4>
   <p class="body-text">Fund performance and fee data in this document is sourced from provider disclosure documents and comparison tools as at <strong>{{ DATA_AS_AT_DATE }}</strong>. Product Disclosure Statements (PDS) and fund updates referenced are the most recent versions available at the date of this advice.</p>
-</div>
-</div>
-
-<!-- ═══ SECTION 20 — SIGN-OFF ═══ -->
-<div class="section-block section-block-break">
-<div class="header">
-  <img class="logo" src="${LOGO_URL}" alt="Smiths"><span class="doc-label">Statement of Advice</span>
-</div>
-
-<div class="section-heading"><div class="num">20</div><h2>Declaration &amp; Sign-Off</h2></div>
-
-<div class="info-card" style="background:var(--white);">
-  <p class="body-text">{{ DECLARATION_INTRO }}</p>
-  <div class="checkbox-group" style="margin:14px 0;">
-    <div class="checkbox-item">
-      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
-      <span class="checkbox-label"><strong>ACCEPT</strong> the recommendation(s) in this document</span>
-    </div>
-    <div class="checkbox-item">
-      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
-      <span class="checkbox-label"><strong>DECLINE</strong> the recommendation(s) in this document</span>
-    </div>
-    <div class="checkbox-item">
-      <span class="checkbox-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" d="M20 6L9 17l-5-5"/></svg></span>
-      <span class="checkbox-label"><strong>MODIFY</strong> the recommendation(s) (see notes below)</span>
-    </div>
-  </div>
-</div>
-
-<div class="sub-heading">Modification Notes (if applicable):</div>
-<div class="placeholder-block" style="min-height:56px;">{{ MODIFICATION_NOTES_HTML }}</div>
-
-<div style="display:flex;align-items:center;gap:14px;margin:var(--sp-md) 0 4px 0;">
-  <img class="ks-doodle" src="/images/ks/doodles/craig-signature.png" alt="" aria-hidden="true" style="height:52px;width:auto;">
-  <span style="font-family:var(--font-body);font-size:8pt;font-weight:600;color:var(--color-coral-text);letter-spacing:0.16em;text-transform:uppercase;">Prepared by {{ ADVISER_NAME }}</span>
-</div>
-
-{{ SIGNATURE_BLOCKS }}
-
-<div class="footer">
-  <span>Statement of Advice | Confidential</span>
-  <span>Craig Smith Business Services Limited | FAP Licence #712931 | <a href="https://www.smiths.net.nz">www.smiths.net.nz</a></span>
 </div>
 </div>
 

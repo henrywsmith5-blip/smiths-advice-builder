@@ -461,19 +461,6 @@ export function buildFundDescBlock(
   return html;
 }
 
-export function buildSignatureBlock(clientName: string): string {
-  return `
-<div class="signature-grid single">
-  <div class="sig-box">
-    <div class="sig-name">${clientName}</div>
-    <div class="sig-line"></div>
-    <div class="sig-label">Signature</div>
-    <div class="sig-line"></div>
-    <div class="sig-label">Date</div>
-  </div>
-</div>`;
-}
-
 export async function runKiwisaverPipeline(input: GenerateInput): Promise<GenerateResult> {
   console.log(`[KiwiSaver Pipeline] Starting for case ${input.caseId}`);
 
@@ -561,14 +548,15 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     CLIENTS_PREPARED_FOR: clientName,
     ADVICE_DATE_LONG: factPack.caseMeta.adviceDate || nzDate,
     CLIENT_1_NAME: clientName,
-    MEETING_DATE_LONG: v(factPack.caseMeta.meetingDate, nzDate),
+    // Do not imply a meeting date where one was not recorded.
+    MEETING_DATE_LONG: v(factPack.caseMeta.meetingDate),
     CLIENT_1_AGE: v(client.age),
     CLIENT_1_YEARS_TO_65: yearsTo65 !== null ? String(yearsTo65) : "",
     CLIENT_1_EMPLOYMENT_STATUS: v(client.employmentStatus),
     CLIENT_1_INCOME_ANNUAL: v(client.incomeAnnual),
     CLIENT_1_PIR: v(client.pir),
-    CLIENT_1_EMPLOYEE_CONTRIB: v(client.employeeContrib, "3%"),
-    CLIENT_1_EMPLOYER_CONTRIB: v(client.employerContrib, "3%"),
+    CLIENT_1_EMPLOYEE_CONTRIB: v(client.employeeContrib, "3.5%"),
+    CLIENT_1_EMPLOYER_CONTRIB: v(client.employerContrib, "3.5%"),
     CLIENT_1_CURRENT_PROVIDER: v(client.current.provider),
     CLIENT_1_CURRENT_FUND: v(client.current.fund),
     CLIENT_1_CURRENT_BALANCE: v(client.current.balance),
@@ -611,7 +599,6 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     FUND_DESCRIPTION_BLOCKS: buildFundDescBlock(recommendedProviderData, recFundDesc, currentProviderData, curFundDesc),
     FEES_TABLE_BLOCKS: buildFeesBlock(currentProviderData, recommendedProviderData),
     PERFORMANCE_TABLE_BLOCKS: buildPerformanceBlock(currentProviderData, recommendedProviderData),
-    SIGNATURE_BLOCKS: buildSignatureBlock(clientName),
 
     // Adviser
     ADVISER_NAME: input.adviserName || "Craig Smith",
@@ -619,9 +606,6 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
     ADVISER_PHONE: input.adviserPhone || "0274 293 939",
     ADVISER_FSP: input.adviserFsp || "FSP33042",
 
-    // Declaration
-    DECLARATION_INTRO: `I, <strong><em>${clientName}</em></strong>, have read and understand this KiwiSaver Statement of Advice and wish to:`,
-    MODIFICATION_NOTES_HTML: "",
   };
 
   // Step 6: Render template
