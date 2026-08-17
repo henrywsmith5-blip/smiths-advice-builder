@@ -1003,7 +1003,7 @@ function buildKiwisaverTemplate(): string {
     <li>Any KiwiSaver statements, payslips, or provider documents you supplied</li>
     <li>Your responses to our risk profile assessment</li>
   </ul>
-  <p class="body-text" style="margin-top:8px;">Fund performance and fee data is sourced from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong> and the Morningstar KiwiSaver 360 report for <strong>Q2 / June 2026</strong> (returns to 30 June 2026).</p>
+  <p class="body-text" style="margin-top:8px;">Fund performance and fee data is sourced from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong>. The performance figures shown in this advice reference the Morningstar KiwiSaver 360 report for <strong>Q2 / June 2026</strong> (returns to 30 June 2026). Returns are after fees and before tax.</p>
 </div>
 
 <div class="info-card">
@@ -1310,7 +1310,7 @@ function buildKiwisaverTemplate(): string {
 
 <div class="section-heading"><div class="num">11</div><h2>Fees and Costs</h2></div>
 <p class="body-text">All KiwiSaver funds charge fees, which are deducted from your investment balance. Fees reduce your returns and compound over time, so even small differences can have a meaningful impact on your long-term outcome.</p>
-<p class="body-text">Fee information below is sourced directly from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong>.</p>
+<p class="body-text">Fee information below is sourced directly from provider disclosure documents as at <strong>{{ DATA_AS_AT_DATE }}</strong>. Performance figures reference the Morningstar KiwiSaver 360 Q2 2026 report, with returns to 30 June 2026.</p>
 
 {{ FEES_TABLE_BLOCKS }}
 </div>
@@ -1539,7 +1539,7 @@ function buildKiwisaverTemplate(): string {
 
 <div class="info-card">
   <h4>D. Data timestamps</h4>
-  <p class="body-text">Fund performance and fee data in this document is sourced from provider disclosure documents and comparison tools as at <strong>{{ DATA_AS_AT_DATE }}</strong>. Product Disclosure Statements (PDS) and fund updates referenced are the most recent versions available at the date of this advice.</p>
+  <p class="body-text">Fund fees in this document are sourced from provider disclosure documents and comparison tools as at <strong>{{ DATA_AS_AT_DATE }}</strong>. Performance figures reference the Morningstar KiwiSaver 360 Q2 / June 2026 report, with returns to 30 June 2026, after fees and before tax. Product Disclosure Statements (PDS) and fund updates referenced are the most recent versions available at the date of this advice.</p>
 </div>
 </div>
 

@@ -263,7 +263,7 @@ export function buildPerformanceBlock(currentData: ProviderData | null, recommen
       <tr class="ks-row"><td class="ks-row-label">10 year return (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown from the Morningstar KiwiSaver 360 Q2 2026 report, to 30 June 2026. Returns are after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
 </div>`;
 }
 
@@ -505,7 +505,7 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
   try {
     if (client.current.provider && client.current.fund) {
       currentProviderData = await getProviderData(client.current.provider, client.current.fund);
-      // Prefer the SITE data (Morningstar Q1 2026, sorted) so fees + full return
+      // Prefer the SITE data with Morningstar Q2 2026 performance overrides so fees + return
       // history match exactly what the KiwiSaver site displays.
       { const sf = findSiteFund(client.current.provider, client.current.fund); if (sf) currentProviderData = siteFundToProviderData(sf, client.current.provider, client.current.fund); }
       curFundDesc = getFundDescription(client.current.provider, client.current.fund);
