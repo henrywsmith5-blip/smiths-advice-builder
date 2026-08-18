@@ -83,9 +83,18 @@ const Q2_PERFORMANCE: Array<{ tokens: string[]; returns: Q2Performance }> = [
 ];
 
 function q2Performance(provider: string, fund: string): Q2Performance | null {
-  const key = norm(`${provider} ${fund}`);
+  // OCR/LLM extraction occasionally drops the "e" in Geared.
+  const key = norm(`${provider} ${fund}`).replace(/\bgared\b/g, "geared");
   const match = Q2_PERFORMANCE.find(({ tokens }) => tokens.every((token) => key.includes(token)));
   return match?.returns || null;
+}
+
+/** Correct the known extraction typo before fund matching and rendering. */
+export function canonicalKiwisaverFundName(provider: string, fund: string): string {
+  if (/booster/i.test(provider) && /\bgared\b/i.test(fund)) {
+    return fund.replace(/\bgared\b/gi, "Geared");
+  }
+  return fund;
 }
 
 /** Convert a site fund into the Builder's ProviderData (fees + Q2 performance). */

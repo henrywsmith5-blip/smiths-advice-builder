@@ -3,7 +3,7 @@ import { extractKiwisaverData } from "@/lib/llm/kiwisaver-extractor";
 import { writeKiwisaverSections } from "@/lib/llm/kiwisaver-writer";
 import { getProviderData, getFundDescription } from "@/lib/providers";
 import type { FundDescription, AssetAllocation } from "@/lib/providers";
-import { findSiteFund, siteFundToProviderData } from "@/lib/site-funds";
+import { canonicalKiwisaverFundName, findSiteFund, siteFundToProviderData } from "@/lib/site-funds";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
 import { validateKiwisaverHtml } from "@/lib/generation/kiwisaver-validate";
@@ -504,16 +504,20 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
 
   try {
     if (client.current.provider && client.current.fund) {
-      currentProviderData = await getProviderData(client.current.provider, client.current.fund);
+      const currentFund = canonicalKiwisaverFundName(client.current.provider, client.current.fund);
+      currentProviderData = await getProviderData(client.current.provider, currentFund);
       // Prefer the SITE data with Morningstar Q2 2026 performance overrides so fees + return
       // history match exactly what the KiwiSaver site displays.
-      { const sf = findSiteFund(client.current.provider, client.current.fund); if (sf) currentProviderData = siteFundToProviderData(sf, client.current.provider, client.current.fund); }
-      curFundDesc = getFundDescription(client.current.provider, client.current.fund);
+      { const sf = findSiteFund(client.current.provider, currentFund); if (sf) currentProviderData = siteFundToProviderData(sf, client.current.provider, currentFund); }
+      curFundDesc = getFundDescription(client.current.provider, currentFund);
+      client.current.fund = currentFund;
     }
     if (client.recommended.provider && client.recommended.fund) {
-      recommendedProviderData = await getProviderData(client.recommended.provider, client.recommended.fund);
-      { const sf = findSiteFund(client.recommended.provider, client.recommended.fund); if (sf) recommendedProviderData = siteFundToProviderData(sf, client.recommended.provider, client.recommended.fund); }
-      recFundDesc = getFundDescription(client.recommended.provider, client.recommended.fund);
+      const recommendedFund = canonicalKiwisaverFundName(client.recommended.provider, client.recommended.fund);
+      recommendedProviderData = await getProviderData(client.recommended.provider, recommendedFund);
+      { const sf = findSiteFund(client.recommended.provider, recommendedFund); if (sf) recommendedProviderData = siteFundToProviderData(sf, client.recommended.provider, recommendedFund); }
+      recFundDesc = getFundDescription(client.recommended.provider, recommendedFund);
+      client.recommended.fund = recommendedFund;
     }
   } catch (err) {
     console.warn("[KiwiSaver Pipeline] Provider fetch failed:", err);
