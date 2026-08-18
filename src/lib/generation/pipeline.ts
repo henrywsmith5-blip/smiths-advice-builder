@@ -132,7 +132,6 @@ export async function runGenerationPipeline(
     "nib": "/images/insurers/nib.png",
     "partners life": "/images/insurers/partners.png",
     "partners": "/images/insurers/partners.png",
-    "pinnacle": "/images/insurers/pinnacle.png",
   };
   const getInsurerLogo = (name: string | null | undefined): string => {
     if (!name) return "";

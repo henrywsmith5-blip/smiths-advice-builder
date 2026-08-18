@@ -282,9 +282,9 @@ function buildTemplate(docType: "SOA" | "ROA"): string {
 <p class="body-text">{{ ADVISER_NAME }} provides financial advice in relation to KiwiSaver, managed funds, life insurance, health insurance, home, car and contents insurance. They only provide financial advice about products from certain providers:</p>
 
 <table class="provider-table">
-  <tr><td>Life Insurance:</td><td>Partners Life, AIA, Asteron, Fidelity Life, Chubb and Pinnacle</td></tr>
+  <tr><td>Life Insurance:</td><td>Partners Life, AIA, Asteron, Fidelity Life and Chubb</td></tr>
   <tr><td>Health Insurance:</td><td>Partners Life, AIA and NIB</td></tr>
-  <tr><td>KiwiSaver / Investment:</td><td>Booster, Milford and Generate</td></tr>
+  <tr><td>KiwiSaver / Investment:</td><td>Booster, Milford, Generate and NZ Funds</td></tr>
   <tr><td>General Insurance:</td><td>AON Insurance Brokers</td></tr>
 </table>
 
@@ -932,8 +932,8 @@ function buildKiwisaverTemplate(): string {
     <table class="data-table" style="margin:10px 0 0 0;">
       <thead><tr><th>Advice Area</th><th>Product Providers Considered</th></tr></thead>
       <tbody>
-        <tr><td>KiwiSaver / Investment</td><td>Booster, Milford and Generate</td></tr>
-        <tr><td>Life Insurance</td><td>Partners Life, AIA, Asteron, Fidelity Life, Chubb and Pinnacle</td></tr>
+        <tr><td>KiwiSaver / Investment</td><td>Booster, Milford, Generate and NZ Funds</td></tr>
+        <tr><td>Life Insurance</td><td>Partners Life, AIA, Asteron, Fidelity Life and Chubb</td></tr>
         <tr><td>Health Insurance</td><td>Partners Life, AIA and NIB</td></tr>
         <tr><td>General Insurance</td><td>AON Insurance Brokers</td></tr>
       </tbody>
@@ -1272,13 +1272,13 @@ function buildKiwisaverTemplate(): string {
 
 <div class="info-card">
   <h4>Our research process</h4>
-  <p class="body-text">In preparing this advice, we followed a structured research process to identify the most suitable KiwiSaver fund for your situation. While our advice is limited to our panel of providers (Booster, Milford, and Generate), we reference broader market data to ensure our recommendations are competitive.</p>
+  <p class="body-text">In preparing this advice, we followed a structured research process to identify the most suitable KiwiSaver fund for your situation. While our advice is limited to our panel of providers (Booster, Milford, Generate, and NZ Funds), we reference broader market data to ensure our recommendations are competitive.</p>
 
   <table class="research-funnel">
     <tbody>
       <tr><td class="funnel-stage">1. Universe</td><td class="funnel-desc">We considered the full NZ KiwiSaver market as listed by Inland Revenue, including default and non-default providers, to understand the competitive landscape.</td></tr>
       <tr><td class="funnel-stage">2. Data sources</td><td class="funnel-desc">Fund data sourced from: Companies Office Disclose Register (official PDS, fund updates, SIPO documents), Sorted Smart Investor comparison tool (uses Disclose Register data), provider websites and disclosure documents.</td></tr>
-      <tr><td class="funnel-stage">3. Panel filter</td><td class="funnel-desc">From the broader market, we focused on our panel providers: Booster, Milford, and Generate. We selected funds matching your risk profile ({{ CLIENT_1_RISK_PROFILE_OUTCOME }}).</td></tr>
+      <tr><td class="funnel-stage">3. Panel filter</td><td class="funnel-desc">From the broader market, we focused on our panel providers: Booster, Milford, Generate, and NZ Funds. We selected funds matching your risk profile ({{ CLIENT_1_RISK_PROFILE_OUTCOME }}).</td></tr>
       <tr><td class="funnel-stage">4. Shortlist</td><td class="funnel-desc">We compared funds on: fees (total cost), investment approach and asset allocation, historical performance (with appropriate caveats), service model and member experience, alignment with your goals and values.</td></tr>
       <tr><td class="funnel-stage">5. Recommendation</td><td class="funnel-desc">The recommended fund was selected as the best overall fit based on the criteria above, weighted towards your specific situation, timeframe, and preferences.</td></tr>
     </tbody>

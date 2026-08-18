@@ -69,7 +69,7 @@ YOU MUST RETURN THIS EXACT JSON STRUCTURE:
         "balance": "$120,000 or null"
       },
       "recommended": {
-        "provider": "Milford or null",
+        "provider": "Booster, Milford, Generate, NZ Funds, Fisher Funds, or another provider explicitly named in the documents; otherwise null",
         "fund": "Active Growth Fund or null"
       },
       "projections": {
