@@ -20,31 +20,85 @@ export interface SiteFund {
 
 const FUNDS: SiteFund[] = Object.values(fundsRaw as Record<string, SiteFund>);
 
-/** Strip scheme/plan noise words so provider + fund tokens match cleanly. */
-function norm(s: string): string {
+/** Strip document noise words so provider + fund names compare cleanly. */
+function norm(s: string, stripFundWords = true): string {
+  const fundWords = stripFundWords ? "|fund|funds" : "";
   return (s || "")
     .toLowerCase()
-    .replace(/\b(kiwisaver|scheme|schemes|plan|fund|funds|the|a|s)\b/g, " ")
+    .replace(new RegExp(`\\b(kiwisaver|scheme|schemes|plan|the|a|s${fundWords})\\b`, "g"), " ")
     .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-/** Fuzzy-match a provider + fund name to a site fund entry. */
-export function findSiteFund(provider: string | null | undefined, fund: string | null | undefined): SiteFund | null {
-  const provTokens = norm(provider || "").split(" ").filter((t) => t.length > 2);
-  const fundTokens = norm(fund || "").split(" ").filter((t) => t.length > 2);
-  if (!provTokens.length && !fundTokens.length) return null;
-  let best: SiteFund | null = null;
-  let bestScore = 0;
-  for (const sf of FUNDS) {
-    const name = norm(`${sf.fundName} ${sf.schemeName || ""}`);
-    let score = 0;
-    for (const t of provTokens) if (name.includes(t)) score += 2;
-    for (const t of fundTokens) if (name.includes(t)) score += 3;
-    if (score > bestScore) { bestScore = score; best = sf; }
+function editDistance(a: string, b: string): number {
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i += 1) {
+    const current = [i];
+    for (let j = 1; j <= b.length; j += 1) {
+      current[j] = Math.min(
+        current[j - 1] + 1,
+        previous[j] + 1,
+        previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+    }
+    for (let j = 0; j <= b.length; j += 1) previous[j] = current[j];
   }
-  // Require both a provider and a fund token to have matched (score >= 5).
-  return bestScore >= 5 ? best : null;
+  return previous[b.length];
+}
+
+function similarity(a: string, b: string): number {
+  if (a === b) return 1;
+  const longest = Math.max(a.length, b.length);
+  return longest ? 1 - editDistance(a, b) / longest : 0;
+}
+
+function tokenSimilarity(a: string, b: string): number {
+  const aTokens = a.split(" ").filter(Boolean);
+  const bTokens = b.split(" ").filter(Boolean);
+  if (!aTokens.length || !bTokens.length) return 0;
+  const directional = (from: string[], to: string[]) =>
+    from.reduce((sum, token) => sum + Math.max(...to.map((candidate) => similarity(token, candidate))), 0) / from.length;
+  return (directional(aTokens, bTokens) + directional(bTokens, aTokens)) / 2;
+}
+
+function removeProviderWords(fund: string, provider: string): string {
+  const providerWords = new Set(norm(provider, false).split(" ").filter(Boolean));
+  return norm(fund).split(" ").filter((word) => !providerWords.has(word)).join(" ");
+}
+
+type FundMatch = { fund: SiteFund; score: number };
+
+function closestSiteFund(provider: string, fund: string): FundMatch | null {
+  const providerName = norm(provider, false);
+  const requestedFund = removeProviderWords(fund, provider);
+  if (!providerName || !requestedFund) return null;
+
+  const candidates = FUNDS
+    .map((siteFund) => {
+      const schemeName = norm(siteFund.schemeName || "", false);
+      const providerScore = similarity(providerName, schemeName);
+      const candidateFund = removeProviderWords(siteFund.fundName, siteFund.schemeName || provider);
+      const fundScore = similarity(requestedFund, candidateFund) * 0.7 + tokenSimilarity(requestedFund, candidateFund) * 0.3;
+      return { fund: siteFund, providerScore, score: fundScore };
+    })
+    .filter((candidate) => candidate.providerScore >= 0.72)
+    .sort((a, b) => b.score - a.score);
+
+  const best = candidates[0];
+  const runnerUp = candidates[1];
+  if (!best || best.score < 0.72) return null;
+  // Reject genuinely ambiguous names instead of silently selecting the wrong fund.
+  if (runnerUp && best.score - runnerUp.score < 0.06) return null;
+  return { fund: best.fund, score: best.score };
+}
+
+/** Match spelling mistakes and missing letters to a fund within the named provider. */
+export function findSiteFund(provider: string | null | undefined, fund: string | null | undefined): SiteFund | null {
+  if (!provider || !fund) return null;
+  return closestSiteFund(provider, fund)?.fund || null;
 }
 
 function pct(n: number | null | undefined): string | null {
@@ -59,7 +113,7 @@ type Q2Performance = {
 };
 
 // Morningstar's Q2 report publishes total returns after fees and before tax.
-// Token matching handles provider and fund names with different suffixes.
+// Each entry must match the canonical provider and fund name exactly.
 const Q2_PERFORMANCE: Array<{ tokens: string[]; returns: Q2Performance }> = [
   { tokens: ["booster", "geared", "growth"], returns: { oneYear: 19.8, threeYear: 15.0, fiveYear: 8.2, tenYear: 12.1 } },
   { tokens: ["anz", "high", "growth"], returns: { oneYear: 19.7, threeYear: null, fiveYear: null, tenYear: null } },
@@ -83,18 +137,49 @@ const Q2_PERFORMANCE: Array<{ tokens: string[]; returns: Q2Performance }> = [
 ];
 
 function q2Performance(provider: string, fund: string): Q2Performance | null {
-  // OCR/LLM extraction occasionally drops the "e" in Geared.
-  const key = norm(`${provider} ${fund}`).replace(/\bgared\b/g, "geared");
-  const match = Q2_PERFORMANCE.find(({ tokens }) => tokens.every((token) => key.includes(token)));
+  const key = norm(`${provider} ${fund}`);
+  const match = Q2_PERFORMANCE.find(({ tokens }) => tokens.join(" ") === key);
   return match?.returns || null;
 }
 
-/** Correct the known extraction typo before fund matching and rendering. */
+function titleCase(name: string): string {
+  return name.toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+}
+
+function displayProviderName(schemeName: string): string {
+  const name = norm(schemeName, false);
+  return titleCase(name)
+    .replace(/\bNz\b/g, "NZ")
+    .replace(/\bAnz\b/g, "ANZ")
+    .replace(/\bAsb\b/g, "ASB")
+    .replace(/\bBnz\b/g, "BNZ")
+    .replace(/\bAmp\b/g, "AMP")
+    .replace(/\bSbs\b/g, "SBS")
+    .replace(/\bMas\b/g, "MAS");
+}
+
+function displayFundName(siteFund: SiteFund, provider: string): string {
+  const canonicalProvider = siteFund.schemeName || provider;
+  const providerWords = new Set(norm(canonicalProvider, false).split(" ").filter(Boolean));
+  const words = siteFund.fundName
+    .split(/\s+/)
+    .filter((word) => {
+      const clean = word.toLowerCase().replace(/[^a-z0-9]/g, "");
+      return clean !== "kiwisaver" && clean !== "scheme" && clean !== "plan" && !providerWords.has(clean);
+    });
+  return titleCase(words.join(" "));
+}
+
+/** Resolve a confidently matched misspelling to the catalogue's canonical fund name. */
 export function canonicalKiwisaverFundName(provider: string, fund: string): string {
-  if (/booster/i.test(provider) && /\bgared\b/i.test(fund)) {
-    return fund.replace(/\bgared\b/gi, "Geared");
-  }
-  return fund;
+  const match = closestSiteFund(provider, fund);
+  return match ? displayFundName(match.fund, provider) : fund;
+}
+
+/** Resolve a confidently matched provider misspelling from the same catalogue entry. */
+export function canonicalKiwisaverProviderName(provider: string, fund: string): string {
+  const match = closestSiteFund(provider, fund);
+  return match?.fund.schemeName ? displayProviderName(match.fund.schemeName) : provider;
 }
 
 /** Convert a site fund into the Builder's ProviderData (fees + Q2 performance). */
@@ -104,7 +189,10 @@ export function siteFundToProviderData(
   fund: string,
 ): ProviderData {
   const mgmt = sf.fees?.management?.pct ?? null;
-  const q2 = q2Performance(provider, fund);
+  // Performance is keyed from the matched catalogue names, never raw input text.
+  const canonicalProvider = sf.schemeName || provider;
+  const canonicalFund = removeProviderWords(sf.fundName, canonicalProvider);
+  const q2 = q2Performance(canonicalProvider, canonicalFund);
   return {
     provider,
     fund,
