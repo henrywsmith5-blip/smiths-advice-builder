@@ -3,7 +3,7 @@ import { extractKiwisaverData } from "@/lib/llm/kiwisaver-extractor";
 import { writeKiwisaverSections } from "@/lib/llm/kiwisaver-writer";
 import { getProviderData, getFundDescription } from "@/lib/providers";
 import type { FundDescription, AssetAllocation } from "@/lib/providers";
-import { canonicalKiwisaverFundName, canonicalKiwisaverProviderName, findSiteFund, siteFundToProviderData } from "@/lib/site-funds";
+import { canonicalKiwisaverFundName, canonicalKiwisaverProviderName, findSiteFund, siteFundToProviderData, withQ2Performance } from "@/lib/site-funds";
 import { renderTemplate, type RenderContext } from "@/lib/templates/renderer";
 import { generatePdf } from "@/lib/pdf/generator";
 import { validateKiwisaverHtml } from "@/lib/generation/kiwisaver-validate";
@@ -245,6 +245,16 @@ export function buildPerformanceBlock(currentData: ProviderData | null, recommen
   const rp = recommendedData?.performance || { oneYear: null, threeYear: null, fiveYear: null, sinceInception: null };
   const hasCurrent = !!currentData?.provider;
 
+  // Bulletproof flag: if a fund's Q2 figures couldn't be sourced (an unmatched or
+  // unsurveyed fund, e.g. Kiwibank), say so LOUDLY in the document instead of
+  // rendering silent blank cells — the adviser must confirm before sending.
+  const noFigs = (p: { oneYear: string | null; threeYear: string | null; fiveYear: string | null; sinceInception: string | null }) =>
+    !p.oneYear && !p.threeYear && !p.fiveYear && !p.sinceInception;
+  const missingWho = [noFigs(rp) ? "recommended fund" : null, hasCurrent && noFigs(cp) ? "current fund" : null].filter(Boolean);
+  const missingNote = missingWho.length
+    ? `<p class="body-text" style="font-size:8pt;color:#b91c1c;font-weight:600;margin-top:6px;">&#9888; Performance figures for the ${missingWho.join(" and ")} were not found in the Morningstar KiwiSaver 360 Q2 2026 data &mdash; confirm and enter them manually before sending this SOA.</p>`
+    : "";
+
   return `
 <div class="info-card">
   <h4>Annualised Returns</h4>
@@ -263,7 +273,7 @@ export function buildPerformanceBlock(currentData: ProviderData | null, recommen
       <tr class="ks-row"><td class="ks-row-label">10 year return (p.a.)</td>${ksVal(rp.sinceInception)}${hasCurrent ? ksVal(cp.sinceInception) : ""}</tr>
     </tbody>
   </table>
-  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown from the Morningstar KiwiSaver 360 Q2 2026 report, to 30 June 2026. Returns are after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>
+  <p class="body-text" style="font-size:7.5pt;color:var(--muted);margin-top:10px;">Annualised returns shown from the Morningstar KiwiSaver 360 Q2 2026 report, to 30 June 2026. Returns are after fees and before tax. Past performance is not a reliable indicator of future performance.${recommendedData?.sources.performanceUrl ? ' Source: <a href="' + recommendedData.sources.performanceUrl + '" style="color:var(--color-coral-text);">' + recommendedData.sources.performanceUrl + '</a>' : ''}.</p>${missingNote}
 </div>`;
 }
 
@@ -510,6 +520,9 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
       // Prefer the SITE data with Morningstar Q2 2026 performance overrides so fees + return
       // history match exactly what the KiwiSaver site displays.
       { const sf = findSiteFund(currentProvider, currentFund); if (sf) currentProviderData = siteFundToProviderData(sf, currentProvider, currentFund); }
+      // Returns ALWAYS come from the Q2 report — independent of the catalogue
+      // match above — so figures fill in even if findSiteFund missed the fund.
+      currentProviderData = withQ2Performance(currentProviderData, currentProvider, currentFund);
       curFundDesc = getFundDescription(currentProvider, currentFund);
       client.current.provider = currentProvider;
       client.current.fund = currentFund;
@@ -519,6 +532,7 @@ export async function runKiwisaverPipeline(input: GenerateInput): Promise<Genera
       const recommendedFund = canonicalKiwisaverFundName(client.recommended.provider, client.recommended.fund);
       recommendedProviderData = await getProviderData(recommendedProvider, recommendedFund);
       { const sf = findSiteFund(recommendedProvider, recommendedFund); if (sf) recommendedProviderData = siteFundToProviderData(sf, recommendedProvider, recommendedFund); }
+      recommendedProviderData = withQ2Performance(recommendedProviderData, recommendedProvider, recommendedFund);
       recFundDesc = getFundDescription(recommendedProvider, recommendedFund);
       client.recommended.provider = recommendedProvider;
       client.recommended.fund = recommendedFund;

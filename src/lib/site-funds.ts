@@ -1,8 +1,15 @@
 // Site fund data — the SAME source the Smiths KiwiSaver site displays.
-// Q2 performance overrides below come from Morningstar KiwiSaver 360,
-// Q2 2026 (returns to 30 June 2026). Keyed by provider + fund name so the
-// SOA never silently reuses an older report's performance figures.
+//
+// Q2 fund PERFORMANCE (1/3/5/10-year returns) is the SINGLE SOURCE OF TRUTH for
+// the SOA and comes from the Morningstar KiwiSaver 360 Q2 2026 survey (returns to
+// 30 June 2026, after fees, before tax). Figures live in the human-editable CSV
+// `data/ks-q2-2026-returns.csv` → built to `data/ks-q2-2026-returns.json` via
+// `node scripts/build-q2-returns.mjs`. EVERY surveyed fund is covered (266), and
+// a fund is matched by robust token-overlap so a name variation never drops the
+// figures. An unmatched fund (e.g. Kiwibank — not in the survey) returns null and
+// is flagged in validation — the SOA NEVER silently reuses an older report.
 import fundsRaw from "./ks-site-funds.data.json";
+import q2ReturnsRaw from "./data/ks-q2-2026-returns.json";
 import type { ProviderData } from "@/lib/llm/kiwisaver-schemas";
 
 interface YearReturn { yearEndingMarch: number; fundPct: number | null; avgPct: number | null }
@@ -113,33 +120,67 @@ type Q2Performance = {
 };
 
 // Morningstar's Q2 report publishes total returns after fees and before tax.
-// Each entry must match the canonical provider and fund name exactly.
-const Q2_PERFORMANCE: Array<{ tokens: string[]; returns: Q2Performance }> = [
-  { tokens: ["booster", "geared", "growth"], returns: { oneYear: 19.8, threeYear: 15.0, fiveYear: 8.2, tenYear: 12.1 } },
-  { tokens: ["anz", "high", "growth"], returns: { oneYear: 19.7, threeYear: null, fiveYear: null, tenYear: null } },
-  { tokens: ["booster", "high", "growth"], returns: { oneYear: 16.6, threeYear: 12.6, fiveYear: 7.6, tenYear: 9.9 } },
-  { tokens: ["booster", "shielded", "growth"], returns: { oneYear: 15.8, threeYear: 11.8, fiveYear: 6.8, tenYear: null } },
-  { tokens: ["booster", "socially", "responsible", "high", "growth"], returns: { oneYear: 17.0, threeYear: 13.9, fiveYear: 8.5, tenYear: 11.0 } },
-  { tokens: ["generate", "focused", "growth"], returns: { oneYear: 16.5, threeYear: 15.4, fiveYear: 8.6, tenYear: 11.1 } },
-  { tokens: ["milford", "aggressive"], returns: { oneYear: 10.9, threeYear: 11.9, fiveYear: 7.7, tenYear: null } },
-  { tokens: ["booster", "growth"], returns: { oneYear: 13.6, threeYear: 10.6, fiveYear: 6.2, tenYear: 8.5 } },
-  { tokens: ["generate", "growth"], returns: { oneYear: 13.7, threeYear: 13.0, fiveYear: 7.3, tenYear: 9.5 } },
-  { tokens: ["milford", "active", "growth"], returns: { oneYear: 7.8, threeYear: 10.7, fiveYear: 7.5, tenYear: 10.2 } },
-  { tokens: ["booster", "balanced"], returns: { oneYear: 10.8, threeYear: 8.9, fiveYear: 4.9, tenYear: 6.8 } },
-  { tokens: ["generate", "balanced"], returns: { oneYear: 11.6, threeYear: 10.9, fiveYear: null, tenYear: null } },
-  { tokens: ["milford", "balanced"], returns: { oneYear: 6.6, threeYear: 8.8, fiveYear: 6.0, tenYear: 8.2 } },
-  { tokens: ["booster", "moderate"], returns: { oneYear: 7.2, threeYear: 6.5, fiveYear: 3.2, tenYear: 4.5 } },
-  { tokens: ["generate", "moderate"], returns: { oneYear: 8.9, threeYear: 9.1, fiveYear: 5.2, tenYear: 5.7 } },
-  { tokens: ["milford", "moderate"], returns: { oneYear: 4.3, threeYear: 7.4, fiveYear: 4.6, tenYear: null } },
-  { tokens: ["booster", "conservative"], returns: { oneYear: 5.9, threeYear: 6.1, fiveYear: 3.0, tenYear: 3.9 } },
-  { tokens: ["generate", "conservative"], returns: { oneYear: 6.6, threeYear: 7.4, fiveYear: null, tenYear: null } },
-  { tokens: ["milford", "conservative"], returns: { oneYear: 2.4, threeYear: 6.2, fiveYear: 3.4, tenYear: 4.7 } },
-];
+// Loaded from the CSV-built JSON (ALL 266 surveyed funds). Each row's fund name
+// is tokenised once so we can match a case's fund by best token-overlap.
+type Q2Row = { fund: string; oneYear: number | null; threeYear: number | null; fiveYear: number | null; tenYear: number | null };
+const Q2_ROWS: Array<{ name: string; tokens: Set<string>; returns: Q2Performance }> = (
+  q2ReturnsRaw as Q2Row[]
+).map((r) => ({
+  name: r.fund,
+  tokens: new Set(q2Tokens(r.fund)),
+  returns: { oneYear: r.oneYear, threeYear: r.threeYear, fiveYear: r.fiveYear, tenYear: r.tenYear },
+}));
 
-function q2Performance(provider: string, fund: string): Q2Performance | null {
-  const key = norm(`${provider} ${fund}`);
-  const match = Q2_PERFORMANCE.find(({ tokens }) => tokens.join(" ") === key);
-  return match?.returns || null;
+/** Tokenise a fund/provider string for Q2 matching. Drops only truly generic
+ *  words (kiwisaver/scheme/fund) but KEEPS discriminators like "plan"/"two"/
+ *  "default" so sibling schemes (Fisher Funds Plan Growth vs Fisher Funds Growth,
+ *  ANZ Growth vs ANZ Default Growth) stay distinct instead of tying. */
+function q2Tokens(s: string): string[] {
+  return (s || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2") // split run-together names: "GrowthFund" -> "Growth Fund"
+    .toLowerCase()
+    .replace(/\b(kiwisaver|scheme|schemes|the|a|s|fund|funds)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean);
+}
+
+/**
+ * Resolve a fund's Q2 returns by ROBUST token-overlap — never an exact string
+ * match, so a name variant ("ANZ Balanced Fund" vs "ANZ Balanced") still resolves.
+ * Scores every catalogue fund by Jaccard similarity against the `provider fund`
+ * tokens, takes the best, and requires a clear threshold + margin over the
+ * runner-up so a near-sibling ("ANZ Balanced" vs "ANZ Balanced Growth") never
+ * wins by accident and an unsurveyed fund (Kiwibank) returns null (→ flagged in
+ * validation) rather than a false match.
+ */
+export function q2Performance(provider: string, fund: string): Q2Performance | null {
+  const query = new Set(q2Tokens(`${provider || ""} ${fund || ""}`));
+  if (query.size === 0) return null;
+  let best: Q2Performance | null = null;
+  let bestScore = 0;
+  let secondScore = 0;
+  for (const row of Q2_ROWS) {
+    if (row.tokens.size === 0) continue;
+    let inter = 0;
+    for (const t of row.tokens) if (query.has(t)) inter += 1;
+    const union = new Set([...query, ...row.tokens]).size;
+    const score = union === 0 ? 0 : inter / union; // Jaccard
+    if (score > bestScore) {
+      secondScore = bestScore;
+      bestScore = score;
+      best = row.returns;
+    } else if (score > secondScore) {
+      secondScore = score;
+    }
+  }
+  // Strong overlap AND a clear win over the runner-up → confident match.
+  // A near-exact match (>=0.8) is safe even if a sibling sits close behind.
+  if (bestScore >= 0.8) return best;
+  if (bestScore >= 0.5 && bestScore - secondScore >= 0.08) return best;
+  return null;
 }
 
 function titleCase(name: string): string {
@@ -206,5 +247,37 @@ export function siteFundToProviderData(
     asAtDate: q2
       ? "Morningstar KiwiSaver 360, Q2 2026 (returns to 30 June 2026; after fees and before tax)"
       : "Morningstar KiwiSaver 360 Q2 2026 (fund-specific figures not available in the configured Q2 mapping)",
+  };
+}
+
+/**
+ * Overlay a fund's Q2 report RETURNS onto its ProviderData, INDEPENDENT of the
+ * Sorted catalogue. This is the guarantee the SOA needs: returns come from the
+ * Q2 report whenever the fund is in the survey — even if `findSiteFund` couldn't
+ * match the fund for fees/holdings, and even when there is no ProviderData at all
+ * (a minimal record is built so the figures still render). A fund NOT in the Q2
+ * survey keeps null performance — the SOA flags it and NEVER invents a number.
+ */
+export function withQ2Performance(
+  pd: ProviderData | null,
+  provider: string,
+  fund: string,
+): ProviderData | null {
+  const q2 = q2Performance(provider, fund);
+  if (!q2) return pd; // unsurveyed fund → leave blank (flagged downstream), never guess
+  const performance = {
+    oneYear: pct(q2.oneYear),
+    threeYear: pct(q2.threeYear),
+    fiveYear: pct(q2.fiveYear),
+    sinceInception: pct(q2.tenYear),
+  };
+  if (pd) return { ...pd, performance };
+  return {
+    provider,
+    fund,
+    fees: { fundFeePercent: null, adminFee: null, other: null },
+    performance,
+    sources: { feesUrl: "", performanceUrl: "" },
+    asAtDate: "Morningstar KiwiSaver 360, Q2 2026 (returns to 30 June 2026; after fees and before tax)",
   };
 }

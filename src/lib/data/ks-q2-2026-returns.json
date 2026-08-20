@@ -1,0 +1,1864 @@
+[
+ {
+  "fund": "AMP Aggressive",
+  "oneYear": 21.4,
+  "threeYear": 16,
+  "fiveYear": 8.9,
+  "tenYear": 9.9
+ },
+ {
+  "fund": "AMP Australasian Shares",
+  "oneYear": 6.6,
+  "threeYear": 6.2,
+  "fiveYear": 2.5,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Balanced",
+  "oneYear": 14.1,
+  "threeYear": 11.7,
+  "fiveYear": 6,
+  "tenYear": 7
+ },
+ {
+  "fund": "AMP Balanced Fund No.2",
+  "oneYear": 14.2,
+  "threeYear": 11.7,
+  "fiveYear": 6,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Cash",
+  "oneYear": 2.3,
+  "threeYear": 3.9,
+  "fiveYear": 3.1,
+  "tenYear": 2.1
+ },
+ {
+  "fund": "AMP Conservative",
+  "oneYear": 7.2,
+  "threeYear": 7.1,
+  "fiveYear": 3.1,
+  "tenYear": 3.8
+ },
+ {
+  "fund": "AMP Defensive Conservative",
+  "oneYear": 6.6,
+  "threeYear": 6.7,
+  "fiveYear": 3,
+  "tenYear": 3.8
+ },
+ {
+  "fund": "AMP Global Fixed Interest",
+  "oneYear": 0.7,
+  "threeYear": 2.6,
+  "fiveYear": -0.8,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Global Select Balanced Growth Fund",
+  "oneYear": 18.4,
+  "threeYear": 11.8,
+  "fiveYear": 6.1,
+  "tenYear": 7.9
+ },
+ {
+  "fund": "AMP Global Select Conservative Fund",
+  "oneYear": 7.8,
+  "threeYear": 6.6,
+  "fiveYear": 2.7,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Global Select Growth Fund",
+  "oneYear": 21.5,
+  "threeYear": 13.3,
+  "fiveYear": 7.2,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Growth",
+  "oneYear": 18.1,
+  "threeYear": 14.2,
+  "fiveYear": 7.7,
+  "tenYear": 8.9
+ },
+ {
+  "fund": "AMP International Shares",
+  "oneYear": 24.2,
+  "threeYear": 19.9,
+  "fiveYear": 12.2,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Milford Active Growth",
+  "oneYear": 7.3,
+  "threeYear": 10.2,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Milford Aggressive",
+  "oneYear": 10.6,
+  "threeYear": 11.8,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Milford Balanced",
+  "oneYear": 5.6,
+  "threeYear": 8,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Milford Conservative",
+  "oneYear": 1.9,
+  "threeYear": 5.8,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "AMP Moderate",
+  "oneYear": 10.5,
+  "threeYear": 8.9,
+  "fiveYear": 4.2,
+  "tenYear": 5
+ },
+ {
+  "fund": "AMP Moderate Balanced",
+  "oneYear": 12.4,
+  "threeYear": 10.3,
+  "fiveYear": 5.1,
+  "tenYear": 6
+ },
+ {
+  "fund": "AMP NZ Fixed Interest",
+  "oneYear": 4.7,
+  "threeYear": 4.8,
+  "fiveYear": 0.3,
+  "tenYear": null
+ },
+ {
+  "fund": "ANZ Balanced",
+  "oneYear": 11.3,
+  "threeYear": 8.4,
+  "fiveYear": 4.1,
+  "tenYear": 6
+ },
+ {
+  "fund": "ANZ Balanced Growth",
+  "oneYear": 14.1,
+  "threeYear": 9.7,
+  "fiveYear": 5.1,
+  "tenYear": 7.3
+ },
+ {
+  "fund": "ANZ Cash",
+  "oneYear": 3.1,
+  "threeYear": 4.6,
+  "fiveYear": 3.8,
+  "tenYear": 2.8
+ },
+ {
+  "fund": "ANZ Conservative",
+  "oneYear": 5.6,
+  "threeYear": 5.8,
+  "fiveYear": 2.3,
+  "tenYear": 3.5
+ },
+ {
+  "fund": "ANZ Conservative Balanced",
+  "oneYear": 7.9,
+  "threeYear": 6.9,
+  "fiveYear": 3.1,
+  "tenYear": 4.7
+ },
+ {
+  "fund": "ANZ Default High Growth",
+  "oneYear": 19.7,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "ANZ Default Scheme Conservative",
+  "oneYear": 5.4,
+  "threeYear": 6.3,
+  "fiveYear": 2.9,
+  "tenYear": 4
+ },
+ {
+  "fund": "ANZ Default Scheme-Balanced",
+  "oneYear": 11.2,
+  "threeYear": 8.4,
+  "fiveYear": 4.1,
+  "tenYear": 6
+ },
+ {
+  "fund": "ANZ Default Scheme-Balanced Growth",
+  "oneYear": 14.1,
+  "threeYear": 9.7,
+  "fiveYear": 5.1,
+  "tenYear": 7.3
+ },
+ {
+  "fund": "ANZ Default Scheme-Cash",
+  "oneYear": 3.1,
+  "threeYear": 4.6,
+  "fiveYear": 3.7,
+  "tenYear": 2.8
+ },
+ {
+  "fund": "ANZ Default Scheme-Conservative Balanced",
+  "oneYear": 7.9,
+  "threeYear": 6.9,
+  "fiveYear": 3.1,
+  "tenYear": 4.7
+ },
+ {
+  "fund": "ANZ Default Scheme-Growth",
+  "oneYear": 17,
+  "threeYear": 11,
+  "fiveYear": 6.1,
+  "tenYear": 8.6
+ },
+ {
+  "fund": "ANZ Growth",
+  "oneYear": 17,
+  "threeYear": 11,
+  "fiveYear": 6.1,
+  "tenYear": 8.6
+ },
+ {
+  "fund": "ANZ High Growth",
+  "oneYear": 19.7,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "ASB Aggressive Fund",
+  "oneYear": 19.8,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "ASB Balanced",
+  "oneYear": 13.6,
+  "threeYear": 11.5,
+  "fiveYear": 6.4,
+  "tenYear": 7.6
+ },
+ {
+  "fund": "ASB Conservative",
+  "oneYear": 7.9,
+  "threeYear": 7.7,
+  "fiveYear": 3.6,
+  "tenYear": 4.2
+ },
+ {
+  "fund": "ASB Growth",
+  "oneYear": 16.9,
+  "threeYear": 13.5,
+  "fiveYear": 7.9,
+  "tenYear": 9.3
+ },
+ {
+  "fund": "ASB Moderate",
+  "oneYear": 10.5,
+  "threeYear": 9.4,
+  "fiveYear": 4.8,
+  "tenYear": 5.5
+ },
+ {
+  "fund": "ASB NZ Cash",
+  "oneYear": 2.7,
+  "threeYear": 4.3,
+  "fiveYear": 3.5,
+  "tenYear": 2.5
+ },
+ {
+  "fund": "Aurora Conservative Fund",
+  "oneYear": 5,
+  "threeYear": 5.4,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Aurora Growth Fund",
+  "oneYear": 10.5,
+  "threeYear": 9.5,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Aurora Liquidity Fund",
+  "oneYear": 2.7,
+  "threeYear": 4.2,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Average",
+  "oneYear": 6.4,
+  "threeYear": 3.3,
+  "fiveYear": 4.1,
+  "tenYear": 0.67
+ },
+ {
+  "fund": "BNZ Balanced Fund",
+  "oneYear": 12.7,
+  "threeYear": 11.1,
+  "fiveYear": 5.9,
+  "tenYear": 7.4
+ },
+ {
+  "fund": "BNZ Cash Fund",
+  "oneYear": 3,
+  "threeYear": 4.5,
+  "fiveYear": 3.7,
+  "tenYear": 2.7
+ },
+ {
+  "fund": "BNZ Conservative",
+  "oneYear": 5.9,
+  "threeYear": 6.6,
+  "fiveYear": 2.9,
+  "tenYear": 3.8
+ },
+ {
+  "fund": "BNZ Default",
+  "oneYear": 13.4,
+  "threeYear": 11.3,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "BNZ First Home Buyer Fund",
+  "oneYear": 5.2,
+  "threeYear": 6.1,
+  "fiveYear": 3.7,
+  "tenYear": 3.7
+ },
+ {
+  "fund": "BNZ Growth Fund",
+  "oneYear": 16.1,
+  "threeYear": 13.1,
+  "fiveYear": 7.5,
+  "tenYear": 9.4
+ },
+ {
+  "fund": "BNZ High Growth Fund",
+  "oneYear": 19.5,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "BNZ Moderate Fund",
+  "oneYear": 9.3,
+  "threeYear": 8.9,
+  "fiveYear": 4.5,
+  "tenYear": 5.7
+ },
+ {
+  "fund": "Booster Balanced",
+  "oneYear": 10.8,
+  "threeYear": 8.9,
+  "fiveYear": 4.9,
+  "tenYear": 6.8
+ },
+ {
+  "fund": "Booster Capital Guaranteed",
+  "oneYear": 4.1,
+  "threeYear": 5,
+  "fiveYear": 3.7,
+  "tenYear": 2.6
+ },
+ {
+  "fund": "Booster Conservative Fund",
+  "oneYear": 5.9,
+  "threeYear": 6.1,
+  "fiveYear": 3,
+  "tenYear": 3.9
+ },
+ {
+  "fund": "Booster Default Saver",
+  "oneYear": 12.2,
+  "threeYear": 10.9,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Booster Enhanced Cash",
+  "oneYear": 2.5,
+  "threeYear": 3.8,
+  "fiveYear": 3,
+  "tenYear": 2.2
+ },
+ {
+  "fund": "Booster Geared Growth",
+  "oneYear": 19.8,
+  "threeYear": 15,
+  "fiveYear": 8.2,
+  "tenYear": 12.1
+ },
+ {
+  "fund": "Booster Growth",
+  "oneYear": 13.6,
+  "threeYear": 10.6,
+  "fiveYear": 6.2,
+  "tenYear": 8.5
+ },
+ {
+  "fund": "Booster High Growth",
+  "oneYear": 16.6,
+  "threeYear": 12.6,
+  "fiveYear": 7.6,
+  "tenYear": 9.9
+ },
+ {
+  "fund": "Booster Moderate",
+  "oneYear": 7.2,
+  "threeYear": 6.5,
+  "fiveYear": 3.2,
+  "tenYear": 4.5
+ },
+ {
+  "fund": "Booster Shielded Growth",
+  "oneYear": 15.8,
+  "threeYear": 11.8,
+  "fiveYear": 6.8,
+  "tenYear": null
+ },
+ {
+  "fund": "Booster Socially Responsible Balanced",
+  "oneYear": 10.7,
+  "threeYear": 9.5,
+  "fiveYear": 5.1,
+  "tenYear": 7.1
+ },
+ {
+  "fund": "Booster Socially Responsible Geared Growth",
+  "oneYear": 19.8,
+  "threeYear": 16,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Booster Socially Responsible Growth",
+  "oneYear": 13.6,
+  "threeYear": 11.5,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Booster Socially Responsible High Growth",
+  "oneYear": 17,
+  "threeYear": 13.9,
+  "fiveYear": 8.5,
+  "tenYear": 11
+ },
+ {
+  "fund": "Booster Socially Responsible Moderate",
+  "oneYear": 7.1,
+  "threeYear": 6.9,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Evidential Balanced Fund",
+  "oneYear": 12.8,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Evidential Growth Fund",
+  "oneYear": 16.6,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Evidential High Growth Fund",
+  "oneYear": 19.9,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Fisher Funds Conservative Fund",
+  "oneYear": 4.6,
+  "threeYear": 6.1,
+  "fiveYear": 2.7,
+  "tenYear": 4
+ },
+ {
+  "fund": "Fisher Funds Growth Fund",
+  "oneYear": 6.4,
+  "threeYear": 8.9,
+  "fiveYear": 4.6,
+  "tenYear": 8.4
+ },
+ {
+  "fund": "Fisher Funds Plan Aggressive",
+  "oneYear": 6.8,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Fisher Funds Plan Balanced",
+  "oneYear": 6.6,
+  "threeYear": 8,
+  "fiveYear": 4.5,
+  "tenYear": 6.9
+ },
+ {
+  "fund": "Fisher Funds Plan Cash",
+  "oneYear": 3,
+  "threeYear": 4.6,
+  "fiveYear": 3.7,
+  "tenYear": 2.9
+ },
+ {
+  "fund": "Fisher Funds Plan CashPlus",
+  "oneYear": 2.9,
+  "threeYear": 4.3,
+  "fiveYear": 2.5,
+  "tenYear": 2.3
+ },
+ {
+  "fund": "Fisher Funds Plan Conservative",
+  "oneYear": 5,
+  "threeYear": 6.4,
+  "fiveYear": 2.9,
+  "tenYear": 4.4
+ },
+ {
+  "fund": "Fisher Funds Plan Default",
+  "oneYear": 16.1,
+  "threeYear": 11.5,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Fisher Funds Plan Defensive Conservative",
+  "oneYear": 4.2,
+  "threeYear": 6.2,
+  "fiveYear": 3.7,
+  "tenYear": 4.5
+ },
+ {
+  "fund": "Fisher Funds Plan Growth",
+  "oneYear": 7.1,
+  "threeYear": 8.6,
+  "fiveYear": 5.3,
+  "tenYear": 8.9
+ },
+ {
+  "fund": "Generate Australasian Fund",
+  "oneYear": 5.2,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Generate Balanced Fund",
+  "oneYear": 11.6,
+  "threeYear": 10.9,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Generate CashPlus",
+  "oneYear": 3,
+  "threeYear": 5.4,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Generate Conservative Fund",
+  "oneYear": 6.6,
+  "threeYear": 7.4,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Generate Focused Growth Fund",
+  "oneYear": 16.5,
+  "threeYear": 15.4,
+  "fiveYear": 8.6,
+  "tenYear": 11.1
+ },
+ {
+  "fund": "Generate Global Fund",
+  "oneYear": 21.3,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Generate Growth Fund",
+  "oneYear": 13.7,
+  "threeYear": 13,
+  "fiveYear": 7.3,
+  "tenYear": 9.5
+ },
+ {
+  "fund": "Generate Moderate",
+  "oneYear": 8.9,
+  "threeYear": 9.1,
+  "fiveYear": 5.2,
+  "tenYear": 5.7
+ },
+ {
+  "fund": "Generate Thematic Fund",
+  "oneYear": 24.2,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova Balanced",
+  "oneYear": 7.7,
+  "threeYear": 8.6,
+  "fiveYear": 3.3,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova Cnsv",
+  "oneYear": 5,
+  "threeYear": 6.2,
+  "fiveYear": 2.6,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova Global Shr",
+  "oneYear": 1.2,
+  "threeYear": 13.5,
+  "fiveYear": 8.6,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova Growth",
+  "oneYear": 8.8,
+  "threeYear": 9.8,
+  "fiveYear": 3.7,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova NZ Cash",
+  "oneYear": 3.1,
+  "threeYear": 4.7,
+  "fiveYear": 3.8,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova NZ Corp Bd",
+  "oneYear": 4.9,
+  "threeYear": 6.3,
+  "fiveYear": 2.7,
+  "tenYear": null
+ },
+ {
+  "fund": "GoalsGetter Amova SRI Equity",
+  "oneYear": 6.3,
+  "threeYear": 4.1,
+  "fiveYear": 2.2,
+  "tenYear": null
+ },
+ {
+  "fund": "JMI Wealth Balanced",
+  "oneYear": 12,
+  "threeYear": 9.7,
+  "fiveYear": 5.4,
+  "tenYear": null
+ },
+ {
+  "fund": "JMI Wealth Conservative",
+  "oneYear": 7,
+  "threeYear": 6.6,
+  "fiveYear": 3.2,
+  "tenYear": null
+ },
+ {
+  "fund": "JMI Wealth Growth",
+  "oneYear": 13.8,
+  "threeYear": 11.3,
+  "fiveYear": 6.7,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Balanced Fund",
+  "oneYear": 14.9,
+  "threeYear": 12.7,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Cash Plus Fund",
+  "oneYear": 3.5,
+  "threeYear": 5.1,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Emerging Markets Fund",
+  "oneYear": 32.1,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Global ESG",
+  "oneYear": 30.4,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Global ESG NZD Hedged",
+  "oneYear": 22.1,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Global Infras NZD Hdg",
+  "oneYear": 13.5,
+  "threeYear": 13.1,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Global Infrastructure",
+  "oneYear": 20.6,
+  "threeYear": 16.3,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel Global Property NZD Hdg",
+  "oneYear": 16.7,
+  "threeYear": 10.6,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel High Growth",
+  "oneYear": 22.7,
+  "threeYear": 17.1,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel NZ 20",
+  "oneYear": 7.8,
+  "threeYear": 4.5,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel NZ 50 ESG Tilted",
+  "oneYear": 7.5,
+  "threeYear": 5.1,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel NZ Bond Fund",
+  "oneYear": 6.1,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel NZ Commercial Property",
+  "oneYear": 5.5,
+  "threeYear": 2.2,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel NZ Small & Mid Cap Opps",
+  "oneYear": 9.8,
+  "threeYear": 9,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel S&P 500 (unhedged) Fund",
+  "oneYear": 30.2,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel S&P 500 NZD Hedged",
+  "oneYear": 19.5,
+  "threeYear": 18.6,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel S&P Global 100",
+  "oneYear": 36.8,
+  "threeYear": 26.2,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel S&P Global 100 NZD Hdg",
+  "oneYear": 26.6,
+  "threeYear": 21.8,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel S&P Global Clean Energy",
+  "oneYear": 98.4,
+  "threeYear": 15.5,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel S&P Global Div Arstcrts",
+  "oneYear": 26,
+  "threeYear": 18.1,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Kernel US Bond Fund",
+  "oneYear": 1.8,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura Cash",
+  "oneYear": 2.2,
+  "threeYear": 3.7,
+  "fiveYear": 3.2,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura Clean Energy",
+  "oneYear": 97.9,
+  "threeYear": 8.7,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura Emerging Markets Eqs",
+  "oneYear": 46.7,
+  "threeYear": 23.2,
+  "fiveYear": 11,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura Fixed Interest",
+  "oneYear": 4.3,
+  "threeYear": 6,
+  "fiveYear": 2.4,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura NZ Equities",
+  "oneYear": 5.3,
+  "threeYear": 2.9,
+  "fiveYear": 1.2,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura NZ Property",
+  "oneYear": -0.5,
+  "threeYear": -3.7,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura Rest of World Equities",
+  "oneYear": 24,
+  "threeYear": 16.2,
+  "fiveYear": 10.8,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura Scheme – Koura Bitcoin",
+  "oneYear": -41.9,
+  "threeYear": 25.9,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Koura US Equities",
+  "oneYear": 22.1,
+  "threeYear": 21.3,
+  "fiveYear": 13.1,
+  "tenYear": null
+ },
+ {
+  "fund": "MAS Aggressive",
+  "oneYear": 22.2,
+  "threeYear": 14.6,
+  "fiveYear": 8.5,
+  "tenYear": 10.8
+ },
+ {
+  "fund": "MAS Balanced",
+  "oneYear": 14.9,
+  "threeYear": 11.1,
+  "fiveYear": 6,
+  "tenYear": 7.8
+ },
+ {
+  "fund": "MAS Cash",
+  "oneYear": 3.5,
+  "threeYear": 4.8,
+  "fiveYear": 3.8,
+  "tenYear": 2.8
+ },
+ {
+  "fund": "MAS Conservative",
+  "oneYear": 6.9,
+  "threeYear": 6.9,
+  "fiveYear": 2.9,
+  "tenYear": 4.1
+ },
+ {
+  "fund": "MAS Global Equities",
+  "oneYear": 23.1,
+  "threeYear": 15.3,
+  "fiveYear": 9.1,
+  "tenYear": 11.9
+ },
+ {
+  "fund": "MAS Growth",
+  "oneYear": 19,
+  "threeYear": 13.2,
+  "fiveYear": 7.6,
+  "tenYear": 9.6
+ },
+ {
+  "fund": "MAS Moderate",
+  "oneYear": 10.7,
+  "threeYear": 8.9,
+  "fiveYear": 4.4,
+  "tenYear": 5.9
+ },
+ {
+  "fund": "Mercer Cash",
+  "oneYear": 2.8,
+  "threeYear": 4.3,
+  "fiveYear": 3.5,
+  "tenYear": 2.5
+ },
+ {
+  "fund": "Mercer Responsible Balanced",
+  "oneYear": 11.8,
+  "threeYear": 9.7,
+  "fiveYear": 5.3,
+  "tenYear": 6.7
+ },
+ {
+  "fund": "Mercer Responsible Conservativ",
+  "oneYear": 6.5,
+  "threeYear": 6.4,
+  "fiveYear": 2.9,
+  "tenYear": 3.8
+ },
+ {
+  "fund": "Mercer Responsible Growth",
+  "oneYear": 14.7,
+  "threeYear": 11.5,
+  "fiveYear": 6.6,
+  "tenYear": 8.5
+ },
+ {
+  "fund": "Mercer Responsible High Growth",
+  "oneYear": 17.5,
+  "threeYear": 13.1,
+  "fiveYear": 7.7,
+  "tenYear": 9.8
+ },
+ {
+  "fund": "Mercer Responsible Moderate",
+  "oneYear": 8.6,
+  "threeYear": 7.8,
+  "fiveYear": 4.1,
+  "tenYear": 5.1
+ },
+ {
+  "fund": "Mercer Responsible Shares",
+  "oneYear": 18.9,
+  "threeYear": 14.2,
+  "fiveYear": 7.8,
+  "tenYear": 10.6
+ },
+ {
+  "fund": "Milford Active Growth Fund",
+  "oneYear": 7.8,
+  "threeYear": 10.7,
+  "fiveYear": 7.5,
+  "tenYear": 10.2
+ },
+ {
+  "fund": "Milford Aggressive",
+  "oneYear": 10.9,
+  "threeYear": 11.9,
+  "fiveYear": 7.7,
+  "tenYear": null
+ },
+ {
+  "fund": "Milford Balanced Fund",
+  "oneYear": 6.6,
+  "threeYear": 8.8,
+  "fiveYear": 6,
+  "tenYear": 8.2
+ },
+ {
+  "fund": "Milford Cash Fund",
+  "oneYear": 2.8,
+  "threeYear": 4.4,
+  "fiveYear": 3.7,
+  "tenYear": null
+ },
+ {
+  "fund": "Milford Conservative Fund",
+  "oneYear": 2.4,
+  "threeYear": 6.2,
+  "fiveYear": 3.4,
+  "tenYear": 4.7
+ },
+ {
+  "fund": "Milford Moderate Fund",
+  "oneYear": 4.3,
+  "threeYear": 7.4,
+  "fiveYear": 4.6,
+  "tenYear": null
+ },
+ {
+  "fund": "NZ Defence Force Balanced",
+  "oneYear": 14,
+  "threeYear": 10.6,
+  "fiveYear": 5.4,
+  "tenYear": 6.7
+ },
+ {
+  "fund": "NZ Defence Force Cash",
+  "oneYear": 2.6,
+  "threeYear": 4.2,
+  "fiveYear": 3.4,
+  "tenYear": 2.4
+ },
+ {
+  "fund": "NZ Defence Force Conservative",
+  "oneYear": 6.7,
+  "threeYear": 6.3,
+  "fiveYear": 3,
+  "tenYear": 3.7
+ },
+ {
+  "fund": "NZ Defence Force Growth",
+  "oneYear": 17.3,
+  "threeYear": 12.6,
+  "fiveYear": 6.7,
+  "tenYear": 8.3
+ },
+ {
+  "fund": "NZ Defence Force High Growth",
+  "oneYear": 20.9,
+  "threeYear": 14.7,
+  "fiveYear": 8.1,
+  "tenYear": 9.8
+ },
+ {
+  "fund": "NZ Defence Force Moderate",
+  "oneYear": 9.9,
+  "threeYear": 8.2,
+  "fiveYear": 4,
+  "tenYear": 5
+ },
+ {
+  "fund": "NZ Defence Force Shares",
+  "oneYear": 22.5,
+  "threeYear": 15.7,
+  "fiveYear": 8.7,
+  "tenYear": 10.9
+ },
+ {
+  "fund": "OneAnswer Australasian Prpty",
+  "oneYear": 4.7,
+  "threeYear": 0.7,
+  "fiveYear": -2.8,
+  "tenYear": 3.4
+ },
+ {
+  "fund": "OneAnswer Australasian Share",
+  "oneYear": 8,
+  "threeYear": 5.4,
+  "fiveYear": 2,
+  "tenYear": 7.2
+ },
+ {
+  "fund": "OneAnswer Balanced",
+  "oneYear": 11.2,
+  "threeYear": 8.4,
+  "fiveYear": 4.1,
+  "tenYear": 6
+ },
+ {
+  "fund": "OneAnswer Balanced Growth",
+  "oneYear": 14.1,
+  "threeYear": 9.7,
+  "fiveYear": 5.1,
+  "tenYear": 7.3
+ },
+ {
+  "fund": "OneAnswer Cash Fund",
+  "oneYear": 3.1,
+  "threeYear": 4.6,
+  "fiveYear": 3.7,
+  "tenYear": 2.7
+ },
+ {
+  "fund": "OneAnswer Conservative",
+  "oneYear": 5.6,
+  "threeYear": 5.8,
+  "fiveYear": 2.3,
+  "tenYear": 3.5
+ },
+ {
+  "fund": "OneAnswer Conservative Balanced",
+  "oneYear": 7.9,
+  "threeYear": 6.9,
+  "fiveYear": 3.1,
+  "tenYear": 4.7
+ },
+ {
+  "fund": "OneAnswer Growth Fund",
+  "oneYear": 17,
+  "threeYear": 11,
+  "fiveYear": 6.1,
+  "tenYear": 8.6
+ },
+ {
+  "fund": "OneAnswer High Growth",
+  "oneYear": 19.7,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "OneAnswer Intl Fxd Int",
+  "oneYear": 1.2,
+  "threeYear": 3.3,
+  "fiveYear": -0.9,
+  "tenYear": 0.8
+ },
+ {
+  "fund": "OneAnswer Intl Property",
+  "oneYear": 18.1,
+  "threeYear": 10.9,
+  "fiveYear": 3.5,
+  "tenYear": 4.3
+ },
+ {
+  "fund": "OneAnswer Intl Share",
+  "oneYear": 32.2,
+  "threeYear": 17.4,
+  "fiveYear": 11.6,
+  "tenYear": 13.7
+ },
+ {
+  "fund": "OneAnswer NZ Fixed Interest",
+  "oneYear": 5.1,
+  "threeYear": 5.7,
+  "fiveYear": 1.6,
+  "tenYear": 2.3
+ },
+ {
+  "fund": "OneAnswer Sustainable Int Shr",
+  "oneYear": 26.3,
+  "threeYear": 19.7,
+  "fiveYear": 14.5,
+  "tenYear": 16.5
+ },
+ {
+  "fund": "Pathfinder Balanced Fund",
+  "oneYear": 10.2,
+  "threeYear": 9.3,
+  "fiveYear": 6.1,
+  "tenYear": null
+ },
+ {
+  "fund": "Pathfinder Conservative Fund",
+  "oneYear": 4.1,
+  "threeYear": 5.4,
+  "fiveYear": 3.6,
+  "tenYear": null
+ },
+ {
+  "fund": "Pathfinder Growth Fund",
+  "oneYear": 13.5,
+  "threeYear": 11,
+  "fiveYear": 7,
+  "tenYear": null
+ },
+ {
+  "fund": "Pathfinder High Growth Fund",
+  "oneYear": 15.9,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Pie Aggressive Fund",
+  "oneYear": 16,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Pie Balanced",
+  "oneYear": 12.9,
+  "threeYear": 11,
+  "fiveYear": 3.6,
+  "tenYear": null
+ },
+ {
+  "fund": "Pie Conservative",
+  "oneYear": 6.3,
+  "threeYear": 7.1,
+  "fiveYear": 2.7,
+  "tenYear": null
+ },
+ {
+  "fund": "Pie Growth",
+  "oneYear": 16,
+  "threeYear": 13,
+  "fiveYear": 3.3,
+  "tenYear": null
+ },
+ {
+  "fund": "QuayStreet AU Equity",
+  "oneYear": 5.8,
+  "threeYear": 9.2,
+  "fiveYear": 7,
+  "tenYear": 7
+ },
+ {
+  "fund": "QuayStreet Altum",
+  "oneYear": 14.2,
+  "threeYear": 9.5,
+  "fiveYear": 6.8,
+  "tenYear": 7.6
+ },
+ {
+  "fund": "QuayStreet Balanced",
+  "oneYear": 11.6,
+  "threeYear": 11.4,
+  "fiveYear": 8.4,
+  "tenYear": 8.1
+ },
+ {
+  "fund": "QuayStreet Conservative",
+  "oneYear": 6.1,
+  "threeYear": 7.1,
+  "fiveYear": 4.4,
+  "tenYear": 4.8
+ },
+ {
+  "fund": "QuayStreet Fixed Interest",
+  "oneYear": 4.5,
+  "threeYear": 6,
+  "fiveYear": 2.9,
+  "tenYear": 3.3
+ },
+ {
+  "fund": "QuayStreet Growth",
+  "oneYear": 14.4,
+  "threeYear": 13.3,
+  "fiveYear": 10.1,
+  "tenYear": 9.7
+ },
+ {
+  "fund": "QuayStreet High Growth Fund",
+  "oneYear": 18.7,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "QuayStreet Income",
+  "oneYear": 5,
+  "threeYear": 6.1,
+  "fiveYear": 4.2,
+  "tenYear": 4.6
+ },
+ {
+  "fund": "QuayStreet International Equities",
+  "oneYear": 24,
+  "threeYear": 19.9,
+  "fiveYear": 15.5,
+  "tenYear": 13.9
+ },
+ {
+  "fund": "QuayStreet Intl Equities NZD H Fund",
+  "oneYear": 16.3,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "QuayStreet NZ Equity",
+  "oneYear": 6.3,
+  "threeYear": 4,
+  "fiveYear": 1.9,
+  "tenYear": 7.6
+ },
+ {
+  "fund": "QuayStreet Socially Responsible Inv",
+  "oneYear": 9.4,
+  "threeYear": 12,
+  "fiveYear": 8.2,
+  "tenYear": 7.8
+ },
+ {
+  "fund": "\"Return",
+  "oneYear": null,
+  "threeYear": 5.61,
+  "fiveYear": 2.23,
+  "tenYear": 2.99
+ },
+ {
+  "fund": "SBS Wealth Cash",
+  "oneYear": 2.7,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "SBS Wealth Focused Growth",
+  "oneYear": 24.2,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "SBS Wealth High Growth",
+  "oneYear": 21.2,
+  "threeYear": 15.3,
+  "fiveYear": 9.5,
+  "tenYear": 10.5
+ },
+ {
+  "fund": "SBS Wealth Income",
+  "oneYear": 2.7,
+  "threeYear": 4,
+  "fiveYear": 1.4,
+  "tenYear": 1.6
+ },
+ {
+  "fund": "SBS Wealth LS 0-49",
+  "oneYear": 21.8,
+  "threeYear": 15.5,
+  "fiveYear": 9.7,
+  "tenYear": 10.6
+ },
+ {
+  "fund": "SBS Wealth LS 50-54",
+  "oneYear": 17.6,
+  "threeYear": 13.2,
+  "fiveYear": 8.1,
+  "tenYear": 8.8
+ },
+ {
+  "fund": "SBS Wealth LS 55-59",
+  "oneYear": 13.6,
+  "threeYear": 10.8,
+  "fiveYear": 6.4,
+  "tenYear": 7.1
+ },
+ {
+  "fund": "SBS Wealth LS 60-64",
+  "oneYear": 9.9,
+  "threeYear": 8.6,
+  "fiveYear": 4.8,
+  "tenYear": 5.3
+ },
+ {
+  "fund": "SBS Wealth LS 65+",
+  "oneYear": 8.1,
+  "threeYear": 7.4,
+  "fiveYear": 3.9,
+  "tenYear": 4.1
+ },
+ {
+  "fund": "Simplicity Balanced Fund",
+  "oneYear": 13.4,
+  "threeYear": 11,
+  "fiveYear": 6.1,
+  "tenYear": null
+ },
+ {
+  "fund": "Simplicity Conservative Fund",
+  "oneYear": 6.2,
+  "threeYear": 6.5,
+  "fiveYear": 2.5,
+  "tenYear": null
+ },
+ {
+  "fund": "Simplicity Default",
+  "oneYear": 13.3,
+  "threeYear": 11,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Simplicity Defensive",
+  "oneYear": 3.2,
+  "threeYear": 4.7,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Simplicity Growth Fund",
+  "oneYear": 17.6,
+  "threeYear": 13.8,
+  "fiveYear": 8.3,
+  "tenYear": null
+ },
+ {
+  "fund": "Simplicity High Growth",
+  "oneYear": 20.9,
+  "threeYear": 16,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Australian Equities",
+  "oneYear": 9.9,
+  "threeYear": 10.1,
+  "fiveYear": 8.4,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Balanced Selection",
+  "oneYear": 8.1,
+  "threeYear": 7.9,
+  "fiveYear": 4.2,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Conservative Selection",
+  "oneYear": 5.8,
+  "threeYear": 6.4,
+  "fiveYear": 3.1,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Global Equities",
+  "oneYear": 15.7,
+  "threeYear": 14.8,
+  "fiveYear": 7.7,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Global Fixed Interest",
+  "oneYear": 1.9,
+  "threeYear": 3.9,
+  "fiveYear": 1.1,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Growth Selection",
+  "oneYear": 10.5,
+  "threeYear": 9.4,
+  "fiveYear": 5.4,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer Listed Property",
+  "oneYear": 4.2,
+  "threeYear": 1.4,
+  "fiveYear": -1.9,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer New Zealand Cash",
+  "oneYear": 2.8,
+  "threeYear": 4.4,
+  "fiveYear": 3.5,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer New Zealand Equities",
+  "oneYear": 8,
+  "threeYear": 4.7,
+  "fiveYear": 2.8,
+  "tenYear": null
+ },
+ {
+  "fund": "Summer New Zealand Fixed Int",
+  "oneYear": 5,
+  "threeYear": 5.8,
+  "fiveYear": 2.2,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife Aust Dividend",
+  "oneYear": 19.6,
+  "threeYear": 14.7,
+  "fiveYear": 10.6,
+  "tenYear": 9.5
+ },
+ {
+  "fund": "SuperLife Aust Financials",
+  "oneYear": 13.5,
+  "threeYear": 22.9,
+  "fiveYear": 14.2,
+  "tenYear": 11.5
+ },
+ {
+  "fund": "SuperLife Aust Mid Cap",
+  "oneYear": 19.9,
+  "threeYear": 13.1,
+  "fiveYear": 9.3,
+  "tenYear": 11.7
+ },
+ {
+  "fund": "SuperLife Aust Property",
+  "oneYear": 13,
+  "threeYear": 10.7,
+  "fiveYear": 4.2,
+  "tenYear": 5.5
+ },
+ {
+  "fund": "SuperLife Aust Res",
+  "oneYear": 66.7,
+  "threeYear": 15.1,
+  "fiveYear": 13.7,
+  "tenYear": 16.7
+ },
+ {
+  "fund": "SuperLife Aust Shares",
+  "oneYear": 11.3,
+  "threeYear": 12.3,
+  "fiveYear": 8.7,
+  "tenYear": 10.4
+ },
+ {
+  "fund": "SuperLife Aust Top 20",
+  "oneYear": 24.9,
+  "threeYear": 16.3,
+  "fiveYear": 11.1,
+  "tenYear": 11.6
+ },
+ {
+  "fund": "SuperLife Balanced",
+  "oneYear": 13.7,
+  "threeYear": 10.7,
+  "fiveYear": 5.9,
+  "tenYear": 7.3
+ },
+ {
+  "fund": "SuperLife Conservative",
+  "oneYear": 8.4,
+  "threeYear": 7.4,
+  "fiveYear": 3.8,
+  "tenYear": 4.9
+ },
+ {
+  "fund": "SuperLife Default",
+  "oneYear": 12.1,
+  "threeYear": 10.1,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife Emerging Mkts",
+  "oneYear": 29.8,
+  "threeYear": 18.2,
+  "fiveYear": 7.9,
+  "tenYear": 9.5
+ },
+ {
+  "fund": "SuperLife Ethica",
+  "oneYear": 13.2,
+  "threeYear": 11.1,
+  "fiveYear": 6,
+  "tenYear": 7.5
+ },
+ {
+  "fund": "SuperLife Europe",
+  "oneYear": 23.3,
+  "threeYear": 18.2,
+  "fiveYear": 12.2,
+  "tenYear": 11.5
+ },
+ {
+  "fund": "SuperLife Global Aggregate Bd",
+  "oneYear": 1.3,
+  "threeYear": 3.1,
+  "fiveYear": -0.5,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife Global Prpty",
+  "oneYear": 9.6,
+  "threeYear": 7.2,
+  "fiveYear": 1.2,
+  "tenYear": 4.2
+ },
+ {
+  "fund": "SuperLife Growth",
+  "oneYear": 17.2,
+  "threeYear": 12.9,
+  "fiveYear": 7.4,
+  "tenYear": 8.7
+ },
+ {
+  "fund": "SuperLife High Growth",
+  "oneYear": 21.1,
+  "threeYear": 15.2,
+  "fiveYear": 8.8,
+  "tenYear": 10.1
+ },
+ {
+  "fund": "SuperLife Income",
+  "oneYear": 3.1,
+  "threeYear": 3.7,
+  "fiveYear": 1.2,
+  "tenYear": 2.4
+ },
+ {
+  "fund": "SuperLife NZ Bonds",
+  "oneYear": 4.8,
+  "threeYear": 5.3,
+  "fiveYear": 2.5,
+  "tenYear": 3.3
+ },
+ {
+  "fund": "SuperLife NZ Cash",
+  "oneYear": 3.4,
+  "threeYear": 4.4,
+  "fiveYear": 3.5,
+  "tenYear": 2.8
+ },
+ {
+  "fund": "SuperLife NZ Dividend",
+  "oneYear": 17.9,
+  "threeYear": 7.4,
+  "fiveYear": 4.9,
+  "tenYear": 7.3
+ },
+ {
+  "fund": "SuperLife NZ Mid Cap",
+  "oneYear": 10.7,
+  "threeYear": 7.7,
+  "fiveYear": 1.8,
+  "tenYear": 8.2
+ },
+ {
+  "fund": "SuperLife NZ Property",
+  "oneYear": 6.5,
+  "threeYear": 2.1,
+  "fiveYear": -1.9,
+  "tenYear": 4.2
+ },
+ {
+  "fund": "SuperLife NZ Shares",
+  "oneYear": 7.8,
+  "threeYear": 4,
+  "fiveYear": 1.2,
+  "tenYear": 6
+ },
+ {
+  "fund": "SuperLife NZ Top 10",
+  "oneYear": 7.9,
+  "threeYear": 3.4,
+  "fiveYear": 1.9,
+  "tenYear": 7
+ },
+ {
+  "fund": "SuperLife NZ Top 50",
+  "oneYear": 7.7,
+  "threeYear": 4,
+  "fiveYear": 1.2,
+  "tenYear": 7.6
+ },
+ {
+  "fund": "SuperLife Overseas Bonds",
+  "oneYear": 1.2,
+  "threeYear": 2.8,
+  "fiveYear": 0.5,
+  "tenYear": 2.2
+ },
+ {
+  "fund": "SuperLife Overseas Non Govt Bd",
+  "oneYear": 2.2,
+  "threeYear": 4.2,
+  "fiveYear": -0.2,
+  "tenYear": 1.3
+ },
+ {
+  "fund": "SuperLife Overseas Shares",
+  "oneYear": 30.3,
+  "threeYear": 21.6,
+  "fiveYear": 15.1,
+  "tenYear": 14.4
+ },
+ {
+  "fund": "SuperLife Ovrs ShrsCcyH",
+  "oneYear": 20.9,
+  "threeYear": 18.1,
+  "fiveYear": 10.6,
+  "tenYear": 11.3
+ },
+ {
+  "fund": "SuperLife S&P/ASX 200",
+  "oneYear": 19.1,
+  "threeYear": 14.1,
+  "fiveYear": 9.8,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife S&P/NZX 50",
+  "oneYear": 9.2,
+  "threeYear": 5.1,
+  "fiveYear": 1.8,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife S&P/NZX NZ Gov Bd",
+  "oneYear": 6.9,
+  "threeYear": 4.5,
+  "fiveYear": 0.8,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife Total Wld (NZD H)",
+  "oneYear": 22.7,
+  "threeYear": 18.3,
+  "fiveYear": 10.4,
+  "tenYear": null
+ },
+ {
+  "fund": "SuperLife Total World",
+  "oneYear": 32.3,
+  "threeYear": 22.1,
+  "fiveYear": 14.7,
+  "tenYear": 14.5
+ },
+ {
+  "fund": "SuperLife UK Cash",
+  "oneYear": 4.8,
+  "threeYear": 6.3,
+  "fiveYear": 5.1,
+  "tenYear": 2.7
+ },
+ {
+  "fund": "SuperLife US 500",
+  "oneYear": 29.3,
+  "threeYear": 22.9,
+  "fiveYear": 17.1,
+  "tenYear": 17.1
+ },
+ {
+  "fund": "SuperLife US Large Growth",
+  "oneYear": 25,
+  "threeYear": 24.9,
+  "fiveYear": 16.8,
+  "tenYear": 19.6
+ },
+ {
+  "fund": "SuperLife US Large Value",
+  "oneYear": 33.7,
+  "threeYear": 20,
+  "fiveYear": 16.2,
+  "tenYear": 14.3
+ },
+ {
+  "fund": "SuperLife US Mid Cap",
+  "oneYear": 23.8,
+  "threeYear": 17.6,
+  "fiveYear": 11.6,
+  "tenYear": 13.6
+ },
+ {
+  "fund": "SuperLife US Small Cap",
+  "oneYear": 37.6,
+  "threeYear": 18.6,
+  "fiveYear": 11.3,
+  "tenYear": 13.5
+ },
+ {
+  "fund": "Westpac Balanced Fund",
+  "oneYear": 13.9,
+  "threeYear": 11.4,
+  "fiveYear": 5.8,
+  "tenYear": 7.3
+ },
+ {
+  "fund": "Westpac Cash Fund",
+  "oneYear": 3.2,
+  "threeYear": 4.7,
+  "fiveYear": 3.9,
+  "tenYear": 2.8
+ },
+ {
+  "fund": "Westpac Conservative Fund",
+  "oneYear": 7.5,
+  "threeYear": 7.5,
+  "fiveYear": 3.6,
+  "tenYear": 4.3
+ },
+ {
+  "fund": "Westpac Default Balanced",
+  "oneYear": 12.3,
+  "threeYear": 10.5,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Westpac Defensive Conservative",
+  "oneYear": 6.7,
+  "threeYear": 7,
+  "fiveYear": 3.5,
+  "tenYear": 4.1
+ },
+ {
+  "fund": "Westpac Growth Fund",
+  "oneYear": 17.3,
+  "threeYear": 13.4,
+  "fiveYear": 7,
+  "tenYear": 8.7
+ },
+ {
+  "fund": "Westpac High Growth Fund",
+  "oneYear": 21.4,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ },
+ {
+  "fund": "Westpac Moderate",
+  "oneYear": 10.2,
+  "threeYear": 9.2,
+  "fiveYear": 4.6,
+  "tenYear": 5.6
+ },
+ {
+  "fund": "koura Strategic High Growth",
+  "oneYear": 26.5,
+  "threeYear": null,
+  "fiveYear": null,
+  "tenYear": null
+ }
+]
